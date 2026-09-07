@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${MISE_PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "${REPO_ROOT}"
+
+uv lock --check
+# shellcheck disable=SC2154
+# lint:justify -- reason: UV_PYTHON is provided by mise from mise.toml.
+uv sync --python "${UV_PYTHON}" --all-groups --frozen
+CI=1 bun install --frozen-lockfile --dry-run
+uv run python -m quality.repository.dependencies

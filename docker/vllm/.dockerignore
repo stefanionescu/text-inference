@@ -1,0 +1,24 @@
+# Deny everything by default.
+**
+
+# Allow only files required by the vLLM Dockerfile.
+!.dockerignore
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!docker/
+!docker/__init__.py
+!docker/shared/
+!docker/shared/__init__.py
+!docker/shared/download/
+!docker/shared/download/**
+!docker/vllm/
+!docker/vllm/__init__.py
+!docker/vllm/download/
+!docker/vllm/download/**
+!shared/scripts/
+!shared/scripts/**
+!scripts/
+!scripts/**
+!src/
+!src/**

@@ -1,0 +1,53 @@
+# Environment and cache
+/venv/
+.artifacts
+.env
+cache/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+.venv-quant
+.nox
+.cache/
+.pytest_cache
+.ruff_cache
+.import_linter_cache
+.mypi_cache
+.mypy_cache
+node_modules/
+pytest.xml
+.scannerwork/
+.sonarqube/
+.jscpd-report/
+reports/
+gitleaks-report.json
+bearer-results.sarif
+bearer-report.json
+bandit-report.json
+semgrep-results.json
+osv-results.json
+
+# Logs and output files
+logs/
+*.log
+*.zip
+tests/results/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+
+# IDE files
+.idea/
+.claude/
+.vscode/
+*.swp
+*.swo
+.cursor/
+
+tool/models
+.venv_tool

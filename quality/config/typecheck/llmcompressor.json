@@ -1,0 +1,13 @@
+{
+    "pythonVersion": "3.12",
+    "typeCheckingMode": "strict",
+    "extraPaths": ["../../.."],
+    "include": ["../../../src/quantization/vllm/quantize.py"],
+    "exclude": [
+        "../../../.artifacts",
+        "../../../.ruff_cache",
+        "../../../.venv",
+        "../../../.venv-quant",
+        "../../../__pycache__"
+    ]
+}

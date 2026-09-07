@@ -1,0 +1,102 @@
+{
+    "070a091810b809800dfe04b789a6c6a765b95c23:ADVANCED.md:curl-auth-header:285": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "27e67966513bff853df834c14a95275aabb2d345:docker/trt/README.md:generic-api-key:33": {
+        "reason": "Historical Docker image reference using the yap-text-api repository/tag shape; this is an image name, not an API key.",
+        "review_by": "2027-07-16"
+    },
+    "2d9bf389619653a16b89e05c4b24f6ddf9122536:ADVANCED.md:curl-auth-header:34": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "2d9bf389619653a16b89e05c4b24f6ddf9122536:ADVANCED.md:curl-auth-header:44": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "48cfef8aa7c05dcd8f2306448dc759344553d8ba:README.md:generic-api-key:130": {
+        "reason": "Historical Docker image reference using the yap-text-api repository/tag shape; this is an image name, not an API key.",
+        "review_by": "2027-07-16"
+    },
+    "4f079a46d33b4a1aad1964f9f1dae7c9201b939c:ADVANCED.md:curl-auth-header:34": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "4f079a46d33b4a1aad1964f9f1dae7c9201b939c:ADVANCED.md:curl-auth-header:44": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "55938333e780aead8122f39c13c9ef9f808b1a1e:README.md:curl-auth-header:74": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "55938333e780aead8122f39c13c9ef9f808b1a1e:README.md:curl-auth-header:77": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "61f36b61cdcaa70f7c475c2cacb593af2a36f17c:docker/README.md:curl-auth-header:125": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "7fd7da00d7f999358482d990d3c7bba0a4289d5b:README.md:curl-auth-header:327": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "806596b35da9aad3c262fa283c2e0c67484c170f:docker/fp8/README.md:curl-auth-header:88": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "80813b60e969976da254ca9a6b2af7c5566413a8:README.md:curl-auth-header:235": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "80813b60e969976da254ca9a6b2af7c5566413a8:README.md:curl-auth-header:245": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "864cc8f0025fed61549098d78c16008c9d7b8f02:docker/README.md:generic-api-key:168": {
+        "reason": "Historical Docker image reference using the yap-text-api repository/tag shape; this is an image name, not an API key.",
+        "review_by": "2027-07-16"
+    },
+    "92fd94fb8f2d2d8ad5146ad3322995dd1d3a2cdb:README.md:curl-auth-header:74": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "92fd94fb8f2d2d8ad5146ad3322995dd1d3a2cdb:README.md:curl-auth-header:77": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "ac00316171b166bec654ce46199b5032e52e2dc6:README.md:curl-auth-header:235": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "ac00316171b166bec654ce46199b5032e52e2dc6:README.md:curl-auth-header:245": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "bc7f72fcf58b2c1899e489a0e2a519f9035e053f:docker/fp8/README.md:curl-auth-header:88": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "cd1d94dd44f2152c7836a984ea90644a55c9b917:linting/security/sonarqube/lib/api.sh:curl-auth-user:26": {
+        "reason": "Historical SonarQube helper passed its caller-provided token through curl basic authentication; the repository history contains no credential value.",
+        "review_by": "2027-07-16"
+    },
+    "ddfc1bc4d8e28363430a2c3731dea31b2a862075:docker/README.md:curl-auth-header:125": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "eaafb6a73004928629493c6daeb2132151f4ffee:linting/security/sonarqube/lib/api.sh:curl-auth-user:12": {
+        "reason": "Historical SonarQube helper passed an environment-derived authentication string to curl; the repository history contains no credential value.",
+        "review_by": "2027-07-16"
+    },
+    "f338736d8d2b50037faf630012ed0350c7a2813b:README.md:curl-auth-header:327": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    },
+    "faeb7a1a7a0b566d2c5fe422189c0f802dd23bf1:ADVANCED.md:curl-auth-header:285": {
+        "reason": "Historical documentation curl example with an X-API-Key placeholder/default example value; no production credential was committed.",
+        "review_by": "2027-07-16"
+    }
+}

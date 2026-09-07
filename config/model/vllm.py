@@ -1,0 +1,70 @@
+"""vLLM quantization policy."""
+
+VLLM_VERSION = "0.25.1"
+LLM_COMPRESSOR_NAME = "llmcompressor"
+MODELOPT_FP4_BACKEND = "modelopt_fp4"
+MOE_WNA16_BACKEND = "moe_wna16"
+MODEL_TYPE_FIELD = "model_type"
+MODEL_POSITION_LIMIT_FIELD = "max_position_embeddings"
+QWEN_MOE_MODEL_TYPE = "qwen3_5_moe"
+
+DEFAULT_CALIBRATION_DATASET = "open_platypus"
+DEFAULT_CALIBRATION_SAMPLES = 256
+DEFAULT_CALIBRATION_SEQUENCE_LENGTH = 512
+DEFAULT_CALIBRATION_BATCH_SIZE = 1
+DEFAULT_CALIBRATION_PIPELINE = "independent"
+CALIBRATION_PIPELINES = ("basic", "independent", "sequential")
+
+QUANTIZATION_WEIGHT_BITS = 4
+QUANTIZATION_GROUP_SIZE = 128
+QUANTIZATION_TARGETS = ("Linear",)
+
+MOE_EXPERT_FIELDS = (
+    "moe_num_experts",
+    "n_routed_experts",
+    "num_experts",
+    "num_local_experts",
+    "num_routed_experts",
+)
+MOE_MODEL_FAMILY = "moe"
+MOE_SCHEME = "W4A16"
+MOE_IGNORES_BY_TYPE = {
+    "qwen3_moe": ("lm_head", "re:.*mlp.gate$"),
+    "qwen3_next": (
+        "lm_head",
+        "re:.*mlp.gate$",
+        "re:.*mlp.shared_expert_gate$",
+    ),
+}
+
+DENSE_MODEL_FAMILY = "dense"
+DENSE_SCHEME = "W4A16_ASYM"
+DENSE_IGNORED_MODULES = ("lm_head",)
+DENSE_AWQ_DUO_SCALING = "both"
+
+__all__ = [
+    "CALIBRATION_PIPELINES",
+    "DEFAULT_CALIBRATION_BATCH_SIZE",
+    "DEFAULT_CALIBRATION_DATASET",
+    "DEFAULT_CALIBRATION_PIPELINE",
+    "DEFAULT_CALIBRATION_SAMPLES",
+    "DEFAULT_CALIBRATION_SEQUENCE_LENGTH",
+    "DENSE_AWQ_DUO_SCALING",
+    "DENSE_IGNORED_MODULES",
+    "DENSE_MODEL_FAMILY",
+    "DENSE_SCHEME",
+    "LLM_COMPRESSOR_NAME",
+    "MODELOPT_FP4_BACKEND",
+    "MODEL_POSITION_LIMIT_FIELD",
+    "MODEL_TYPE_FIELD",
+    "MOE_EXPERT_FIELDS",
+    "MOE_IGNORES_BY_TYPE",
+    "MOE_MODEL_FAMILY",
+    "MOE_SCHEME",
+    "MOE_WNA16_BACKEND",
+    "QUANTIZATION_GROUP_SIZE",
+    "QUANTIZATION_TARGETS",
+    "QUANTIZATION_WEIGHT_BITS",
+    "QWEN_MOE_MODEL_TYPE",
+    "VLLM_VERSION",
+]

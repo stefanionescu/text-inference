@@ -1,0 +1,1 @@
+"""Assembled character prompts."""

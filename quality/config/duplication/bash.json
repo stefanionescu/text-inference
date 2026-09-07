@@ -1,0 +1,18 @@
+{
+    "threshold": 4,
+    "reporters": ["console"],
+    "format": ["bash"],
+    "ignore": ["**/.artifacts/**", "**/.venv/**", "**/.venv-quant/**"],
+    "path": [
+        "../../../scripts/",
+        "../../../docker/",
+        "../../../.githooks/",
+        "../../../.mise/tasks/",
+        "../../security/",
+        "../../shell/"
+    ],
+    "minLines": 8,
+    "minTokens": 40,
+    "mode": "strict",
+    "output": ".artifacts/cpd/bash"
+}

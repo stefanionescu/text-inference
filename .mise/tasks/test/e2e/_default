@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${MISE_PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "${REPO_ROOT}"
+
+uv run --extra local python -m tests.suites.e2e.test_warmup "$@"
+uv run --extra local python -m tests.suites.e2e.test_bench "$@"
+uv run --extra local python -m tests.suites.e2e.test_conversation "$@"
+uv run --extra local python -m tests.suites.e2e.test_history "$@"

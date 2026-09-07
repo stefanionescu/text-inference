@@ -1,0 +1,24 @@
+# Deny everything by default.
+**
+
+# Allow only files required by the TRT Dockerfile.
+!.dockerignore
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!docker/
+!docker/__init__.py
+!docker/shared/
+!docker/shared/__init__.py
+!docker/shared/download/
+!docker/shared/download/**
+!docker/trt/
+!docker/trt/__init__.py
+!docker/trt/download/
+!docker/trt/download/**
+!shared/scripts/
+!shared/scripts/**
+!scripts/
+!scripts/**
+!src/
+!src/**

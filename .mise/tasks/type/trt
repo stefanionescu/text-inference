@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${MISE_PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "${REPO_ROOT}"
+
+host_os="$(uname -s)"
+if [[ ${host_os} != "Linux" ]]; then
+  printf 'Skipping type:trt on %s: TensorRT GPU dependencies are Linux-only.\n' "${host_os}" >&2
+  exit 0
+fi
+
+uv run --extra trt basedpyright --project quality/config/typecheck/trt.json

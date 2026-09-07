@@ -1,0 +1,15 @@
+[files]
+extend-exclude = [
+    "node_modules",
+    ".venv",
+    ".venv-quant",
+    ".artifacts",
+    ".cache",
+    "quality/config/security/semgrep/vendor",
+]
+
+[default.extend-words]
+AWQ = "AWQ"
+certifi = "certifi"
+TRT = "TRT"
+vLLM = "vLLM"

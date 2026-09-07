@@ -1,0 +1,588 @@
+[project]
+name = "text-inference"
+version = "1.0.0"
+requires-python = ">=3.12,<3.13"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+optional-dependencies.llmcompressor = [
+  "compressed-tensors==0.17.1",
+  "hf-transfer==0.1.8",
+  "llmcompressor==0.12",
+  "torch==2.11.0+cu130; sys_platform=='linux'",
+  "transformers==5.10.1",
+]
+optional-dependencies.local = [
+  "anyio==4.13",
+  "fastapi==0.137.1",
+  "ftfy==6.2.3",
+  "httpx2==2.5",
+  "opentelemetry-api==1.43",
+  "opentelemetry-exporter-otlp-proto-http==1.43",
+  "opentelemetry-sdk==1.43",
+  "orjson==3.11.7",
+  "phonenumbers==9.0.3",
+  "sentry-sdk==2.22",
+  "starlette==1.3.1",
+  "transformers==5.10.1",
+  "websockets==12",
+]
+optional-dependencies.trt = [
+  "anyio==4.13",
+  "cuda-python==13.0.3",
+  "fastapi==0.121.3",
+  "fla-core==0.4",
+  "ftfy==6.2.3",
+  "hf-transfer==0.1.8",
+  "huggingface-hub==1.16",
+  "ninja==1.13",
+  "numpy==2.3.5",
+  "nvidia-ml-py==13.580.65",
+  "opentelemetry-api==1.43",
+  "opentelemetry-exporter-otlp-proto-http==1.43",
+  "opentelemetry-sdk==1.43",
+  "orjson==3.11.7",
+  "packaging==25",
+  "phonenumbers==9.0.3",
+  "python-dotenv==1.2.2",
+  "sentry-sdk==2.22",
+  "setuptools==79.0.1",
+  "snac==1.2.1",
+  "soundfile==0.12.1",
+  "starlette==0.50",
+  "tensorrt-cu13==10.15.1.29; sys_platform=='linux'",
+  "tensorrt-cu13-bindings==10.15.1.29; sys_platform=='linux'",
+  "tensorrt-cu13-libs==10.15.1.29; sys_platform=='linux'",
+  "tensorrt-llm==1.3.0rc20; sys_platform=='linux'",
+  "torch==2.10.0+cu130; sys_platform=='linux'",
+  "torchvision==0.25.0+cu130; sys_platform=='linux'",
+  "transformers==5.5.4",
+  "triton==3.6",
+  "uvicorn[standard]==0.34",
+  "websockets==12",
+  "wheel==0.46.2",
+]
+optional-dependencies.vllm = [
+  "accelerate==1.12",
+  "anyio==4.13",
+  "datasets==4.4.1",
+  "fastapi==0.136.3",
+  "fla-core==0.4",
+  "ftfy==6.2.3",
+  "hf-transfer==0.1.8",
+  "httpx2==2.5",
+  "huggingface-hub==1.19",
+  "loguru==0.7.3",
+  "mistral-common==1.11.5",
+  "opentelemetry-api==1.43",
+  "opentelemetry-exporter-otlp-proto-http==1.43",
+  "opentelemetry-sdk==1.43",
+  "orjson==3.11.7",
+  "phonenumbers==9.0.3",
+  "protobuf==5.29.6",
+  "pydantic==2.12",
+  "pyyaml==6.0.2",
+  "rich==13.9.4",
+  "safetensors==0.7",
+  "sentencepiece==0.2.1",
+  "sentry-sdk==2.22",
+  "starlette==1.3.1",
+  "tokenizers==0.22.2",
+  "torch==2.11.0+cu130; sys_platform=='linux'",
+  "tqdm==4.67.1",
+  "transformers==5.10.1",
+  "uvicorn[standard]==0.49",
+  "uvloop==0.19",
+  "vllm==0.25.1; python_version>='3.12'",
+  "websockets==12",
+]
+
+[dependency-groups]
+dev = [
+  "bandit[toml]",
+  "basedpyright",
+  "deptry",
+  "import-linter",
+  "interrogate",
+  "packaging==25",
+  "pip-audit",
+  "pip-licenses",
+  "pydoclint",
+  "pyproject-fmt",
+  "pytest==9.0.3",
+  "ruff",
+  "tomli",
+  "validate-pyproject",
+  "vulture",
+]
+modelopt = [
+  "compressed-tensors==0.17.1; sys_platform=='linux'",
+  "fire==0.7.1; sys_platform=='linux'",
+  "flash-attn==2.8.3.post1; sys_platform=='linux'",
+  "nvidia-modelopt[hf]==0.45; sys_platform=='linux'",
+  "torch==2.10.0+cu130; sys_platform=='linux'",
+  "transformers==5.5.4; sys_platform=='linux'",
+  "transformers-stream-generator==0.0.5; sys_platform=='linux'",
+  "wheel==0.46.2; sys_platform=='linux'",
+  "zstandard==0.25; sys_platform=='linux'",
+]
+
+[tool.uv]
+constraint-dependencies = [
+  "flash-attn-4==4.0.0b11",
+  "mcp==1.28.1",
+]
+sources.tensorrt-cu13 = [
+  { index = "nvidia", marker = "sys_platform == 'linux'" },
+]
+sources.tensorrt-cu13-bindings = [
+  { index = "nvidia", marker = "sys_platform == 'linux'" },
+]
+sources.tensorrt-cu13-libs = [
+  { index = "nvidia", marker = "sys_platform == 'linux'" },
+]
+sources.tensorrt-llm = [
+  { index = "nvidia", marker = "sys_platform == 'linux' and extra == 'trt'" },
+]
+sources.torch = [
+  { index = "pytorch-cu130", marker = "sys_platform == 'linux'" },
+]
+sources.torchvision = [
+  { index = "pytorch-cu130", marker = "sys_platform == 'linux' and extra == 'trt'" },
+]
+index = [
+  { name = "pytorch-cu130", url = "https://download.pytorch.org/whl/cu130", explicit = true },
+  { name = "nvidia", url = "https://pypi.nvidia.com", explicit = true },
+]
+package = false
+conflicts = [
+  [
+    { extra = "local" },
+    { extra = "vllm" },
+  ],
+  [
+    { extra = "local" },
+    { extra = "trt" },
+  ],
+  [
+    { extra = "local" },
+    { extra = "llmcompressor" },
+  ],
+  [
+    { extra = "local" },
+    { group = "modelopt" },
+  ],
+  [
+    { extra = "vllm" },
+    { extra = "trt" },
+  ],
+  [
+    { extra = "vllm" },
+    { extra = "llmcompressor" },
+  ],
+  [
+    { extra = "vllm" },
+    { group = "modelopt" },
+  ],
+  [
+    { extra = "trt" },
+    { extra = "llmcompressor" },
+  ],
+  [
+    { extra = "trt" },
+    { group = "modelopt" },
+  ],
+  [
+    { extra = "llmcompressor" },
+    { group = "modelopt" },
+  ],
+]
+
+[[tool.uv.dependency-metadata]]
+name = "tensorrt-cu13"
+version = "10.15.1.29"
+requires-python = ">=3.6"
+requires-dist = [
+  "tensorrt-cu13-bindings==10.15.1.29",
+  "tensorrt-cu13-libs==10.15.1.29",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+indent-width = 4
+src = [ "." ]
+exclude = [
+  ".artifacts",
+  ".cache",
+  ".git",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  ".venv-quant",
+  "__pycache__",
+  "build",
+  "dist",
+  "node_modules",
+]
+format.indent-style = "space"
+format.quote-style = "double"
+format.line-ending = "lf"
+format.docstring-code-format = true
+lint.select = [
+  "A",
+  "ANN",
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "COM",
+  "D",
+  "DTZ",
+  "E",
+  "EM",
+  "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FBT",
+  "FIX",
+  "FLY",
+  "FURB",
+  "G",
+  "ICN",
+  "INP",
+  "ISC",
+  "LOG",
+  "N",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T10",
+  "T20",
+  "TC",
+  "TD",
+  "TRY",
+  "UP",
+  "W",
+  "YTT",
+]
+lint.ignore = [
+  "COM812",
+  "D203",
+  "D213",
+]
+lint.fixable = [
+  "ALL",
+]
+lint.unfixable = []
+lint.mccabe.max-complexity = 8
+lint.pep8-naming.extend-ignore-names = [
+  "setUp",
+  "setUpClass",
+  "tearDown",
+  "tearDownClass",
+]
+lint.pylint.max-args = 5
+lint.pylint.max-bool-expr = 4
+lint.pylint.max-branches = 8
+lint.pylint.max-locals = 10
+lint.pylint.max-public-methods = 12
+lint.pylint.max-returns = 4
+lint.pylint.max-statements = 30
+
+[tool.interrogate]
+fail-under = 100
+ignore-init-method = true
+ignore-init-module = false
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = false
+ignore-nested-functions = false
+ignore-nested-classes = false
+ignore-setters = false
+ignore-overloaded-functions = false
+exclude = [
+  ".artifacts",
+  ".cache",
+  ".venv",
+  ".venv-quant",
+  "build",
+  "dist",
+  "node_modules",
+]
+verbose = 1
+omit-covered-files = false
+
+[tool.deptry]
+exclude = [
+  ".artifacts",
+  ".cache",
+  ".git",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  ".venv-quant",
+  "__pycache__",
+  "build",
+  "dist",
+  "node_modules",
+]
+ignore_notebooks = true
+per_rule_ignores = { DEP001 = [
+  "cuda",
+  "flashinfer",
+  "mpi4py",
+  "tensorrt_llm",
+  "torchvision",
+], DEP002 = [
+  "accelerate",
+  "compressed-tensors",
+  "cuda-python",
+  "datasets",
+  "fla-core",
+  "ftfy",
+  "hf-transfer",
+  "httpx2",
+  "llmcompressor",
+  "loguru",
+  "mistral-common",
+  "ninja",
+  "numpy",
+  "nvidia-ml-py",
+  "orjson",
+  "packaging",
+  "protobuf",
+  "python-dotenv",
+  "pyyaml",
+  "rich",
+  "safetensors",
+  "sentencepiece",
+  "setuptools",
+  "snac",
+  "soundfile",
+  "starlette",
+  "tensorrt-cu13",
+  "tensorrt-cu13-bindings",
+  "tensorrt-cu13-libs",
+  "tokenizers",
+  "torch",
+  "tqdm",
+  "triton",
+  "transformers",
+  "uvicorn",
+  "uvloop",
+  "vllm",
+  "wheel",
+], DEP003 = [
+  "anyio",
+  "torchvision",
+], DEP004 = [
+  "pytest",
+  "tomli",
+] }
+known_first_party = [
+  "config",
+  "docker",
+  "quality",
+  "src",
+  "tests",
+]
+package_module_name_map = { opentelemetry-api = [
+  "opentelemetry",
+], opentelemetry-sdk = [
+  "opentelemetry",
+], opentelemetry-exporter-otlp-proto-http = [
+  "opentelemetry",
+] }
+
+[tool.vulture]
+paths = [
+  "config",
+  "quality",
+  "src",
+]
+exclude = [
+  ".artifacts",
+  ".cache",
+  ".venv",
+  ".venv-quant",
+]
+ignore_names = []
+ignore_decorators = []
+make_whitelist = false
+min_confidence = 80
+sort_by_size = true
+
+[tool.bandit]
+exclude_dirs = [
+  ".artifacts",
+  ".cache",
+  ".venv",
+  ".venv-quant",
+]
+skips = []
+
+[tool.pytest]
+ini_options.testpaths = [
+  "tests",
+]
+ini_options.addopts = "-q"
+
+[tool.importlinter]
+root_packages = [
+  "config",
+  "src",
+]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "state must not depend on hf push modules"
+type = "forbidden"
+source_modules = [
+  "src.state",
+]
+forbidden_modules = [
+  "src.hf.trt",
+  "src.hf.vllm",
+]
+
+[[tool.importlinter.contracts]]
+name = "session package must not import websocket or runtime orchestration"
+type = "forbidden"
+source_modules = [
+  "src.session",
+]
+forbidden_modules = [
+  "src.websocket",
+  "src.messages",
+  "src.runtime",
+  "src.server",
+]
+
+[[tool.importlinter.contracts]]
+name = "runtime bootstrap package must not import websocket stack"
+type = "forbidden"
+source_modules = [
+  "src.runtime",
+]
+forbidden_modules = [
+  "src.websocket",
+  "src.messages",
+  "src.server",
+]
+
+[[tool.importlinter.contracts]]
+name = "config may only import config and state inside src"
+type = "forbidden"
+source_modules = [
+  "config",
+]
+forbidden_modules = [
+  "src.engines",
+  "src.errors",
+  "src.execution",
+  "src.hf",
+  "src.logging",
+  "src.messages",
+  "src.model",
+  "src.quantization",
+  "src.runtime",
+  "src.scripts",
+  "src.server",
+  "src.session",
+  "src.telemetry",
+  "src.text",
+  "src.tokens",
+  "src.websocket",
+]
+
+[[tool.importlinter.contracts]]
+name = "config must not import runtime orchestration packages"
+type = "forbidden"
+source_modules = [
+  "config",
+]
+forbidden_modules = [
+  "src.websocket",
+  "src.messages",
+  "src.execution",
+  "src.server",
+  "src.scripts",
+]
+
+[[tool.importlinter.contracts]]
+name = "prompt config must not import runtime implementation"
+type = "forbidden"
+source_modules = [
+  "config.prompt",
+]
+forbidden_modules = [
+  "src.engines",
+  "src.execution",
+  "src.hf",
+  "src.messages",
+  "src.quantization",
+  "src.runtime",
+  "src.scripts",
+  "src.server",
+  "src.session",
+  "src.websocket",
+]
+
+[[tool.importlinter.contracts]]
+name = "text utilities must not import runtime orchestration"
+type = "forbidden"
+source_modules = [
+  "src.text",
+]
+forbidden_modules = [
+  "src.engines",
+  "src.execution",
+  "src.hf",
+  "src.messages",
+  "src.quantization",
+  "src.runtime",
+  "src.scripts",
+  "src.server",
+  "src.session",
+  "src.state",
+  "src.websocket",
+]
+
+[[tool.importlinter.contracts]]
+name = "engines must not import websocket"
+type = "forbidden"
+source_modules = [
+  "src.engines",
+]
+forbidden_modules = [
+  "src.websocket",
+]
+
+[[tool.importlinter.contracts]]
+name = "scripts must not import engines directly"
+type = "forbidden"
+source_modules = [
+  "src.scripts",
+]
+forbidden_modules = [
+  "src.engines",
+]
