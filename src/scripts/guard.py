@@ -17,8 +17,9 @@ except (ImportError, OSError, RuntimeError):
 
 try:
     import torchvision as _torchvision
-except (ImportError, OSError, RuntimeError) as _torchvision_import_error:
+except (ImportError, OSError, RuntimeError) as exception:
     _torchvision = None
+    _torchvision_import_error = str(exception)
 else:
     _torchvision_import_error = None
 

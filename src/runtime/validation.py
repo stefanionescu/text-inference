@@ -9,7 +9,7 @@ from src.tokens.validation import validate_tokenizer_exists
 from config.model.quantization import QUANTIZATIONS_BY_ENGINE
 
 if TYPE_CHECKING:
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
 
 
 def _validate_numeric_bounds(settings: ApplicationSettings) -> list[str]:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.state.session import HistoryMessage
+from src.session.state import HistoryMessage
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

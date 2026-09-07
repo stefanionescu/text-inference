@@ -16,7 +16,7 @@ This prevents both over-admission (too many connections) and race
 conditions during connection/disconnection.
 
 Example:
-    registry = ConnectionRegistry(maximum_connections=100)
+    registry = ConnectionRegistry(maximum_connections=100, acquire_timeout_seconds=0.5)
 
     async def handle_websocket(websocket: WebSocket):
         if not await registry.connect(websocket):
@@ -34,8 +34,6 @@ import asyncio
 import logging
 from fastapi import WebSocket
 from ..telemetry.instruments import get_metrics
-from config.limits import MAX_CONCURRENT_CONNECTIONS
-from config.runtime.websocket import WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS
 
 logger = logging.getLogger(__name__)
 
@@ -57,15 +55,13 @@ class ConnectionRegistry:
 
     def __init__(
         self,
-        maximum_connections: int | None = None,
-        acquire_timeout_seconds: float = WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
+        maximum_connections: int | None,
+        acquire_timeout_seconds: float,
     ) -> None:
         """Initialize connection tracking and concurrency limits."""
         if maximum_connections is None:
-            if MAX_CONCURRENT_CONNECTIONS is None:
-                message = "MAX_CONCURRENT_CONNECTIONS not configured"
-                raise RuntimeError(message)
-            maximum_connections = MAX_CONCURRENT_CONNECTIONS
+            message = "MAX_CONCURRENT_CONNECTIONS not configured"
+            raise RuntimeError(message)
         self.maximum_connections = maximum_connections
         self.acquire_timeout_seconds = acquire_timeout_seconds
         self.active_connections: set[WebSocket] = set()

@@ -11,23 +11,9 @@ from typing import TYPE_CHECKING
 from src.quantization.source import derive_source_identity
 from src.quantization.repository import read_repository_revision
 from config.model.trt import MODELOPT_CALIBRATION_BATCH_SIZE, MODELOPT_QUANTIZER_NAME
-from config.model.quantization import (
-    TRT_ENGINE,
-    INT4_AWQ_FORMAT,
-    BINARY_FLAG_VALUES,
-    QUANTIZATIONS_BY_ENGINE,
-)
-from src.quantization.checkpoint import (
-    copy_source_assets,
-    validate_checkpoint,
-    CHECKPOINT_VALIDATION_ERRORS,
-)
-from src.quantization.provenance import (
-    cache_matches,
-    write_provenance,
-    QuantizationRequest,
-    read_export_quantization,
-)
+from src.quantization.checkpoint import copy_source_assets, validate_checkpoint, CHECKPOINT_VALIDATION_ERRORS
+from config.model.quantization import TRT_ENGINE, INT4_AWQ_FORMAT, BINARY_FLAG_VALUES, QUANTIZATIONS_BY_ENGINE
+from src.quantization.provenance import cache_matches, write_provenance, QuantizationRequest, read_export_quantization
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -73,7 +59,7 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
 
     cache_parser = subparsers.add_parser("cache")
     _add_request_arguments(cache_parser)
-    cache_parser.add_argument("--force-rebuild", action="store_true")
+    cache_parser.add_argument("--force-rebuild", dest="is_rebuild_forced", action="store_true")
 
     finalize_parser = subparsers.add_parser("finalize")
     _add_request_arguments(finalize_parser)

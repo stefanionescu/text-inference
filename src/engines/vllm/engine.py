@@ -11,11 +11,11 @@ Key Features:
 from __future__ import annotations
 
 import logging
-from src.state.engines import EngineOutput
 from typing import TYPE_CHECKING, Protocol
+from src.engines.protocol import EngineOutput
 
 if TYPE_CHECKING:
-    from src.engines.sampling import SamplingParametersRequest
+    from src.engines.protocol import SamplingParametersRequest
     from collections.abc import AsyncGenerator, AsyncIterator, Callable, Sequence
 
     type SamplingParametersFactory = Callable[..., object]

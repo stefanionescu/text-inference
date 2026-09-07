@@ -1,21 +1,20 @@
 """Unit tests for session history accounting invariants."""
 
 from __future__ import annotations
-
 import pytest
+from dataclasses import replace
 from unittest.mock import AsyncMock
-import src.tokens.history as history_tokens
+from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from src.state.settings import HistorySettings
 from src.tokens.tokenizer import ThreadSafeTokenizer
-from src.state.session import HistoryMessage, SessionState
+from src.session.state import HistoryMessage, SessionState
 import src.session.history.transcript as history_transcript
 from tests.harness.environment.tokenizer import use_local_tokenizers
 from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, MESSAGES
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 EXPECTED_MESSAGE_COUNT = 4
 TURN_MESSAGE_COUNT = 2
-EXPECTED_TOKEN_COUNT = 2
 
 
 def _history_config(
@@ -45,15 +44,14 @@ def _build_session(
     target_tokens: int = 800,
     tokenizer: ThreadSafeTokenizer,
 ) -> SessionRuntime:
-    engine = AsyncMock()
+    AsyncMock()
     history_config = _history_config(
         trigger_tokens=trigger_tokens,
         target_tokens=target_tokens,
     )
     return SessionRuntime(
-        engine=engine,
         tokenizer=tokenizer,
-        history_config=history_config,
+        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
     )
 
 
@@ -179,9 +177,18 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
         return list(range(token_count))
 
 
-def test_count_uses_tokenizer() -> None:
-    """Test count tokens uses supplied tokenizer."""
-    tokenizer = _SpecialAwareTokenizer()
-    token_count = history_tokens.count_tokens("one two", tokenizer)
-
-    assert token_count == EXPECTED_TOKEN_COUNT
+def test_history_uses_tokenizer() -> None:
+    """Trim history using the supplied tokenizer's token counts."""
+    messages = [
+        HistoryMessage(role="user", content="one"),
+        HistoryMessage(role="assistant", content="two"),
+        HistoryMessage(role="user", content="three"),
+        HistoryMessage(role="assistant", content="four"),
+    ]
+    state = SessionState(meta={}, history_messages=messages)
+    history_transcript.trim_history(
+        state,
+        config=HistorySettings(trigger_tokens=6, target_tokens=4),
+        tokenizer=_SpecialAwareTokenizer(),
+    )
+    assert state.history_messages == messages[-2:]

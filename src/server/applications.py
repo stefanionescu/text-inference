@@ -8,9 +8,9 @@ import contextlib
 from typing import TYPE_CHECKING
 from src.logging import configure_logging
 from fastapi.responses import JSONResponse
-from src.state.readiness import ReadinessState
 from src.telemetry.sentry import capture_error
 from fastapi import FastAPI, Request, WebSocket
+from src.server.readiness import ReadinessState
 from src.runtime.validation import validate_settings
 from src.websocket.connections import ConnectionRegistry
 from src.runtime.bootstrap import build_runtime_dependencies
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from src.telemetry.gpu import GPUProvider
     from src.runtime.bootstrap import EngineBuilder
     from contextlib import AbstractAsyncContextManager
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
     from collections.abc import AsyncGenerator, Callable
 
 logger = logging.getLogger(__name__)

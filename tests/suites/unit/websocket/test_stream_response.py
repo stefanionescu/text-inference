@@ -1,18 +1,17 @@
 """Unit tests for stream history commit behavior."""
 
 from __future__ import annotations
-
 import pytest
 import asyncio
-from unittest.mock import AsyncMock
 from typing import TYPE_CHECKING, cast
 from fastapi import WebSocketDisconnect
-from dataclasses import dataclass, field
-from src.state.session import SessionState
+from src.session.state import SessionState
+from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from src.state.settings import HistorySettings
+from dataclasses import replace, dataclass, field
+from src.execution.turn import StreamResponseRequest, stream_response
 from tests.harness.environment.tokenizer import build_local_tokenizer
-from src.websocket.transport import StreamResponseRequest, stream_response
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
@@ -43,11 +42,13 @@ class _DisconnectSecondSendWS:
 
 def _build_session() -> SessionRuntime:
     return SessionRuntime(
-        engine=AsyncMock(),
         tokenizer=build_local_tokenizer(),
-        history_config=HistorySettings(
-            trigger_tokens=1000,
-            target_tokens=800,
+        settings=replace(
+            DEFAULT_APPLICATION_SETTINGS,
+            history=HistorySettings(
+                trigger_tokens=1000,
+                target_tokens=800,
+            ),
         ),
     )
 

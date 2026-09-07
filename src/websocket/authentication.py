@@ -8,36 +8,16 @@ import logging
 from collections import deque
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
-from config.security import API_KEY
-from fastapi.security.api_key import APIKeyHeader
-from fastapi import HTTPException, Request, Security, WebSocket
-from src.state.settings import AuthenticationSettings, WebSocketSettings
-from config.runtime.websocket import (
-    AUTHENTICATION_FAILURE_LIMIT,
-    WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS,
-)
 
 if TYPE_CHECKING:
+    from fastapi import WebSocket
     from collections.abc import Callable
+    from src.runtime.config import AuthenticationSettings, WebSocketSettings
 
 logger = logging.getLogger(__name__)
 
 # API Key can be provided via explicit header or Authorization bearer token.
-api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 _AUTHENTICATION_FAILURES: dict[str, deque[float]] = {}
-DEFAULT_AUTHENTICATION_SETTINGS = AuthenticationSettings(api_key=API_KEY)
-DEFAULT_WEBSOCKET_SETTINGS = WebSocketSettings(
-    maximum_connections=None,
-    idle_timeout_seconds=150.0,
-    watchdog_tick_seconds=10.0,
-    handshake_acquire_timeout_seconds=0.5,
-    protocol_version=1,
-    maximum_message_bytes=65536,
-    rate_limit_window_seconds=WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS,
-    maximum_messages_per_window=20,
-    maximum_cancels_per_window=20,
-    authentication_failures_per_window=AUTHENTICATION_FAILURE_LIMIT,
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,17 +30,10 @@ class AuthenticationPolicy:
     clock: Callable[[], float] = time.monotonic
 
 
-DEFAULT_AUTHENTICATION_POLICY = AuthenticationPolicy(
-    authentication_settings=DEFAULT_AUTHENTICATION_SETTINGS,
-    websocket_settings=DEFAULT_WEBSOCKET_SETTINGS,
-    authentication_failures=_AUTHENTICATION_FAILURES,
-)
-
-
 def build_authentication_policy(
     *,
-    authentication_settings: AuthenticationSettings = DEFAULT_AUTHENTICATION_SETTINGS,
-    websocket_settings: WebSocketSettings = DEFAULT_WEBSOCKET_SETTINGS,
+    authentication_settings: AuthenticationSettings,
+    websocket_settings: WebSocketSettings,
     authentication_failures: dict[str, deque[float]] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> AuthenticationPolicy:
@@ -170,13 +143,6 @@ def _clear_authentication_failures(client_key: str, *, authentication_failures: 
         failures.pop(client_key, None)
 
 
-def _request_client_key(request: Request) -> str:
-    """Return the auth failure key for an HTTP request."""
-    client = request.client
-    host = client.host if client else None
-    return _client_failure_key(host)
-
-
 def _websocket_client_key(websocket: WebSocket) -> str:
     """Return the auth failure key for a WebSocket request."""
     client = websocket.client
@@ -187,7 +153,7 @@ def _websocket_client_key(websocket: WebSocket) -> str:
 def validate_api_key(
     provided_key: str,
     *,
-    configured_api_key: str | None = API_KEY,
+    configured_api_key: str | None,
 ) -> bool:
     """Validate provided API key against configured key.
 
@@ -205,52 +171,10 @@ def validate_api_key(
     return hmac.compare_digest(provided_key, expected_key)
 
 
-async def get_api_key(
-    request: Request,
-    api_key_header: str | None = Security(api_key_header),
-    *,
-    policy: AuthenticationPolicy = DEFAULT_AUTHENTICATION_POLICY,
-) -> str:
-    """FastAPI dependency to extract and validate API key from request."""
-    client_key = _request_client_key(request)
-    if _is_authentication_throttled(
-        client_key,
-        websocket_settings=policy.websocket_settings,
-        authentication_failures=policy.authentication_failures,
-        clock=policy.clock,
-    ):
-        raise HTTPException(status_code=429, detail="Too many authentication failures. Retry later.")
-
-    bearer_key = _extract_bearer_key(request.headers.get("authorization"))
-    provided_key = _select_api_key(api_key_header, bearer_key)
-    is_valid, validated_key, error_code = _validate_candidate(
-        provided_key,
-        context="HTTP request",
-        authentication_settings=policy.authentication_settings,
-    )
-    if is_valid and validated_key:
-        _clear_authentication_failures(client_key, authentication_failures=policy.authentication_failures)
-        return validated_key
-
-    _record_authentication_failure(
-        client_key,
-        websocket_settings=policy.websocket_settings,
-        authentication_failures=policy.authentication_failures,
-        clock=policy.clock,
-    )
-
-    if error_code == "missing":
-        raise HTTPException(
-            status_code=401,
-            detail="API key required. Provide via 'X-API-Key' header or 'Authorization: Bearer <key>'.",
-        )
-    raise HTTPException(status_code=401, detail="Invalid API key.")
-
-
 async def authenticate_websocket(
     websocket: WebSocket,
     *,
-    policy: AuthenticationPolicy = DEFAULT_AUTHENTICATION_POLICY,
+    policy: AuthenticationPolicy,
 ) -> bool:
     """Authenticate WebSocket connection using API key.
 
@@ -295,12 +219,8 @@ async def authenticate_websocket(
 
 
 __all__ = [
-    "DEFAULT_AUTHENTICATION_POLICY",
-    "DEFAULT_AUTHENTICATION_SETTINGS",
-    "DEFAULT_WEBSOCKET_SETTINGS",
     "AuthenticationPolicy",
     "authenticate_websocket",
     "build_authentication_policy",
-    "get_api_key",
     "validate_api_key",
 ]

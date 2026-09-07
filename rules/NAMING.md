@@ -495,13 +495,13 @@ Rules:
 Bad:
 
 ```python
-from src.state.settings import ModelSettings as Thing
+from src.runtime.config import ModelSettings as Thing
 ```
 
 Good:
 
 ```python
-from src.state.settings import ModelSettings
+from src.runtime.config import ModelSettings
 ```
 
 ### Python Types and Dataclasses

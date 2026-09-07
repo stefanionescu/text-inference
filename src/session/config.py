@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from src.state.session import SessionState
+    from src.session.state import SessionState
 
 
 def update_session_config(

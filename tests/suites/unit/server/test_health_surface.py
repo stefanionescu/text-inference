@@ -5,9 +5,9 @@ from __future__ import annotations
 from http import HTTPStatus
 from unittest.mock import AsyncMock
 from fastapi.testclient import TestClient
-from src.state.readiness import ReadinessState
-from src.runtime import DEFAULT_APPLICATION_SETTINGS
+from src.server.readiness import ReadinessState
 from src.server import create_probe_application, create_public_application
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 NOT_FOUND_STATUS = 404
 NOT_READY_STATUS = 503

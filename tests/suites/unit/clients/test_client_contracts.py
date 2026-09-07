@@ -7,12 +7,12 @@ import importlib.util
 from dataclasses import fields
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
-from src.runtime import DEFAULT_APPLICATION_SETTINGS
 from src.execution.runner import build_sampling_overrides
 from tests.harness.client.cli import build_sampling_payload
 from config.tests.defaults import TRANSACTION_TIMEOUT_SECONDS
 from tests.harness.client.websocket import build_websocket_url
 from tests.harness.logic.live.profiles import PromptProfileRegistry
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.logic.live.commands import COMMAND_CALLBACKS, dispatch_command
 
 EXPECTED_TIMEOUT_SECONDS = 120.0

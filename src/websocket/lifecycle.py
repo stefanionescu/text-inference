@@ -14,7 +14,7 @@ The watchdog runs periodically (WEBSOCKET_WATCHDOG_TICK_SECONDS) and compares
 the last activity time against the idle timeout (WEBSOCKET_IDLE_TIMEOUT_SECONDS).
 
 Usage:
-    lifecycle = WebSocketLifecycle(websocket)
+    lifecycle = WebSocketLifecycle(websocket, idle_timeout_seconds=150.0, watchdog_tick_seconds=10.0)
     lifecycle.start()  # Start watchdog
 
     # In receiver:
@@ -33,12 +33,7 @@ import contextlib
 from typing import TYPE_CHECKING
 from ..telemetry.sentry import add_breadcrumb
 from ..telemetry.instruments import get_metrics
-from config.runtime.websocket import (
-    WEBSOCKET_CLOSE_IDLE_CODE,
-    WEBSOCKET_CLOSE_IDLE_REASON,
-    WEBSOCKET_IDLE_TIMEOUT_SECONDS,
-    WEBSOCKET_WATCHDOG_TICK_SECONDS,
-)
+from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_CODE, WEBSOCKET_CLOSE_IDLE_REASON
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
@@ -63,14 +58,14 @@ class WebSocketLifecycle:
     def __init__(
         self,
         websocket: WebSocket,
-        idle_timeout_seconds: float | None = None,
-        watchdog_tick_seconds: float | None = None,
+        idle_timeout_seconds: float,
+        watchdog_tick_seconds: float,
         idle_close_code: int | None = None,
     ) -> None:
         """Initialize lifecycle timers for one WebSocket."""
         self._websocket = websocket
-        self._idle_timeout_seconds = float(idle_timeout_seconds or WEBSOCKET_IDLE_TIMEOUT_SECONDS)
-        self._watchdog_tick_seconds = float(watchdog_tick_seconds or WEBSOCKET_WATCHDOG_TICK_SECONDS)
+        self._idle_timeout_seconds = float(idle_timeout_seconds)
+        self._watchdog_tick_seconds = float(watchdog_tick_seconds)
         self._idle_close_code = idle_close_code if idle_close_code is not None else WEBSOCKET_CLOSE_IDLE_CODE
         self._idle_close_reason = WEBSOCKET_CLOSE_IDLE_REASON
         self._last_activity_time = time.monotonic()

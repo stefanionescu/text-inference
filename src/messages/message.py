@@ -6,8 +6,8 @@ import copy
 import time
 import uuid
 from typing import TYPE_CHECKING
-from src.state.turn import TurnPlan
 from .validators import ValidationError
+from src.execution.turn import TurnRequest
 from src.websocket.errors import send_error
 from .sampling import extract_sampling_overrides
 from src.telemetry.instruments import get_metrics
@@ -17,7 +17,7 @@ from config.runtime.websocket import WEBSOCKET_ERROR_INVALID_MESSAGE, WEBSOCKET_
 if TYPE_CHECKING:
     from fastapi import WebSocket
     from collections.abc import Mapping
-    from src.state.session import SessionState
+    from src.session.state import SessionState
     from src.session.runtime import SessionRuntime
 
 
@@ -41,10 +41,10 @@ def _build_message_turn_plan(
     *,
     sampling_overrides: dict[str, float | int | bool],
     session_runtime: SessionRuntime,
-) -> TurnPlan:
+) -> TurnRequest:
     """Build a turn plan for a validated follow-up message."""
     prompt = config.get("prompt")
-    return TurnPlan(
+    return TurnRequest(
         state=state,
         request_id=f"message-{uuid.uuid4().hex}",
         static_prefix=prompt if isinstance(prompt, str) else "",
@@ -61,7 +61,7 @@ async def plan_message_turn(
     state: SessionState,
     *,
     session_runtime: SessionRuntime,
-) -> TurnPlan | None:
+) -> TurnRequest | None:
     """Build a validated turn plan from a follow-up message payload."""
     started_at = time.perf_counter()
     try:

@@ -1,16 +1,21 @@
 """Unit tests for session request tracking utilities."""
 
 from __future__ import annotations
-
 import pytest
 import asyncio
-from typing import Any, cast
 from unittest.mock import Mock
+from typing import cast, TYPE_CHECKING
 from dataclasses import dataclass, field
-from src.state.session import SessionState
-from src.session.runtime import SessionRuntime
-from tests.harness.environment.tokenizer import build_local_tokenizer
-from src.session.requests import cancel_session_requests, cleanup_session_requests, is_request_cancelled
+from src.session.state import SessionState
+from src.session.requests import (
+    is_request_cancelled,
+    abort_session_requests,
+    cancel_session_requests,
+    cleanup_session_requests,
+)
+
+if TYPE_CHECKING:
+    from src.engines.protocol import Engine
 
 
 def _make_state(
@@ -97,10 +102,9 @@ class _RecordingEngine:
 def test_abort_active_request() -> None:
     """Test abort session requests aborts engine with active id."""
     engine = _RecordingEngine()
-    session_runtime = SessionRuntime(engine=cast("Any", engine), tokenizer=build_local_tokenizer())
     state = _make_state(active_request_id="req-123")
 
-    asyncio.run(session_runtime.abort_session_requests(state))
+    asyncio.run(abort_session_requests(state, cast("Engine", engine)))
 
     assert engine.aborted_request_ids == ["req-123"]
     if state.active_request_id is not None:

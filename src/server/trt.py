@@ -5,7 +5,7 @@ from __future__ import annotations
 from .listeners import run_applications
 from src.telemetry.cuda import GPU_PROVIDER
 from src.runtime.settings import read_settings
-from src.state.readiness import ReadinessState
+from src.server.readiness import ReadinessState
 from config.model.quantization import TRT_ENGINE
 from src.engines.trt.factory import create_trt_engine
 from .applications import create_probe_application, create_public_application

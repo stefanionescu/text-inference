@@ -7,7 +7,6 @@
         "../../../src/scripts/guard.py",
         "../../../src/scripts/validation/trt.py",
         "../../../src/server/trt.py",
-        "../../../src/server/probe.py",
         "../../../src/server/listeners.py",
         "../../../src/telemetry/cuda.py"
     ],

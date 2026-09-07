@@ -517,7 +517,7 @@ from pathlib import Path
 from .runtime import RuntimeConfig
 from transformers import AutoTokenizer
 from src.config.model.selection import MODEL
-from src.state.settings import ModelSettings
+from src.runtime.config import ModelSettings
 from collections.abc import Iterable, Sequence
 ```
 
@@ -539,7 +539,7 @@ and typing symbols when they make the call site clearer:
 from pathlib import Path
 from typing import Literal
 from dataclasses import dataclass
-from src.state.settings import ModelSettings
+from src.runtime.config import ModelSettings
 ```
 
 Use module imports when the module prefix makes ownership clearer:
@@ -2057,8 +2057,11 @@ Rules:
 
 - Prefer functions and data structures unless a class owns real state,
   invariants, or behavior.
-- Keep one top-level non-dataclass class per file.
-- Related dataclasses may live together when they form one small data contract.
+- Keep related classes together when they form one cohesive contract, including
+  schemas, exceptions, protocols, and their input/output records.
+- Split modules by independent responsibilities, not by class count.
+- Treat size limits as review prompts: document a justified limit adjustment
+  rather than extracting forwarding wrappers only to reduce line counts.
 - Do not create classes only to group static functions.
 - Avoid `Manager`, `Processor`, `Helper`, and similar vague class names.
 - Decide deliberately which attributes are public and which are internal.

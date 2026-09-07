@@ -13,7 +13,6 @@
         "src/engines/vllm/factory.py",
         "src/quantization/vllm/quantize.py",
         "src/scripts/guard.py",
-        "src/server/probe.py",
         "src/server/listeners.py",
         "src/scripts/validation/trt.py",
         "src/server/trt.py",

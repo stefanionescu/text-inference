@@ -247,13 +247,6 @@
             "structural_prefix_regexes": ["^DEFAULT_WEBSOCKET_PING_"]
         },
         {
-            "path_regexes": ["^src/logging/dedupe\\.py$"],
-            "languages": ["python"],
-            "categories": ["functions"],
-            "names": ["info_unique"],
-            "is_excluded": true
-        },
-        {
             "path_regexes": [".*"],
             "names": ["i", "j", "k", "x", "y"],
             "is_excluded": true

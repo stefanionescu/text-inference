@@ -1,10 +1,10 @@
 """Unit tests for websocket client message parsing."""
 
 from __future__ import annotations
-
 import json
 import pytest
 from src.websocket.parser import parse_client_message
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from config.runtime.websocket import WEBSOCKET_MAX_MESSAGE_BYTES, WEBSOCKET_PROTOCOL_VERSION
 
 
@@ -23,37 +23,46 @@ def _valid_start(**overrides: object) -> str:
 def test_rejects_message_envelopes() -> None:
     """Test invalid message envelopes are rejected."""
     with pytest.raises(ValueError, match="Empty message"):
-        parse_client_message("")
+        parse_client_message("", websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     with pytest.raises(ValueError, match="Empty message"):
-        parse_client_message("   ")
+        parse_client_message("   ", websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     with pytest.raises(ValueError, match="valid JSON"):
-        parse_client_message("{bad json")
+        parse_client_message("{bad json", websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     with pytest.raises(TypeError, match="JSON object"):
-        parse_client_message('"hello"')
+        parse_client_message('"hello"', websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     with pytest.raises(TypeError, match="JSON object"):
-        parse_client_message("[1, 2]")
+        parse_client_message("[1, 2]", websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
 
 
 def test_rejects_start_metadata() -> None:
     """Test start payload metadata validation."""
     with pytest.raises(ValueError, match="Missing 'type'"):
-        parse_client_message(json.dumps({"v": WEBSOCKET_PROTOCOL_VERSION, "gender": "female"}))
+        parse_client_message(
+            json.dumps({"v": WEBSOCKET_PROTOCOL_VERSION, "gender": "female"}),
+            websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket,
+        )
     with pytest.raises(ValueError, match=r"Invalid payload field 'start\.v'"):
-        parse_client_message(json.dumps({"type": "start", "gender": "female"}))
+        parse_client_message(
+            json.dumps({"type": "start", "gender": "female"}), websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket
+        )
     with pytest.raises(ValueError, match="unsupported protocol version"):
-        parse_client_message(json.dumps({"type": "start", "v": WEBSOCKET_PROTOCOL_VERSION + 1, "gender": "female"}))
+        parse_client_message(
+            json.dumps({"type": "start", "v": WEBSOCKET_PROTOCOL_VERSION + 1, "gender": "female"}),
+            websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket,
+        )
 
 
 def test_valid_socket_payloads() -> None:
     """Test valid start and message payload normalization."""
-    result = parse_client_message(_valid_start(type="START"))
+    result = parse_client_message(_valid_start(type="START"), websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     assert result["type"] == "start"
-    result = parse_client_message(_valid_start())
+    result = parse_client_message(_valid_start(), websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
     assert result["type"] == "start"
     assert result["v"] == WEBSOCKET_PROTOCOL_VERSION
     assert result["gender"] == "female"
     result = parse_client_message(
         json.dumps({"type": "message", "v": WEBSOCKET_PROTOCOL_VERSION, "user_utterance": "hello"}),
+        websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket,
     )
     assert result["type"] == "message"
     assert result["user_utterance"] == "hello"
@@ -67,7 +76,7 @@ def test_start_history_size() -> None:
 
     assert len(payload.encode()) < WEBSOCKET_MAX_MESSAGE_BYTES
 
-    result = parse_client_message(payload)
+    result = parse_client_message(payload, websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)
 
     assert result["history"] == history
 
@@ -75,7 +84,9 @@ def test_start_history_size() -> None:
 def test_rejects_start_fields() -> None:
     """Test invalid start-only field combinations are rejected."""
     with pytest.raises(ValueError, match="user_utterance"):
-        parse_client_message(_valid_start(user_utterance="hello"))
+        parse_client_message(
+            _valid_start(user_utterance="hello"), websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket
+        )
     with pytest.raises(ValueError, match="custom_field"):
         parse_client_message(
             json.dumps(
@@ -88,6 +99,7 @@ def test_rejects_start_fields() -> None:
                     "custom_field": "value",
                 },
             ),
+            websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket,
         )
 
 
@@ -95,4 +107,4 @@ def test_message_size_limit() -> None:
     """Test message payload size limit."""
     huge = "x" * (WEBSOCKET_MAX_MESSAGE_BYTES + 1)
     with pytest.raises(ValueError, match="exceeds max size"):
-        parse_client_message(huge)
+        parse_client_message(huge, websocket_settings=DEFAULT_APPLICATION_SETTINGS.websocket)

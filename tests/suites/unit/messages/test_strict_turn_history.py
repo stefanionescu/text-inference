@@ -1,17 +1,18 @@
 """Unit tests for start/message planning flow."""
 
 from __future__ import annotations
-
 import json
 import pytest
 import asyncio
+from dataclasses import replace
 from unittest.mock import AsyncMock
 from typing import TYPE_CHECKING, cast
+from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from src.state.settings import HistorySettings
 from src.messages.message import plan_message_turn
 from src.messages.start import bootstrap_start_turn
-from src.state.session import HistoryMessage, SessionState
+from src.session.state import HistoryMessage, SessionState
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.environment.tokenizer import build_local_tokenizer, use_local_tokenizers
 from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, ASSISTANT_FIRST_PAYLOAD, HISTORY_PAYLOAD, MESSAGES
 
@@ -45,15 +46,14 @@ def _build_session(
     target_tokens: int = 800,
     tokenizer: ThreadSafeTokenizer,
 ) -> SessionRuntime:
-    engine = AsyncMock()
+    AsyncMock()
     history_config = HistorySettings(
         trigger_tokens=trigger_tokens,
         target_tokens=target_tokens,
     )
     return SessionRuntime(
-        engine=engine,
         tokenizer=tokenizer,
-        history_config=history_config,
+        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
     )
 
 

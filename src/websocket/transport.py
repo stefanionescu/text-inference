@@ -1,127 +1,15 @@
-"""WebSocket streaming and communication utilities.
-
-This module provides helper functions for safe WebSocket communication
-and streaming model responses. It handles:
-
-1. Safe Sending:
-   - Catching WebSocketDisconnect during send operations
-   - Returning boolean success indicators for flow control
-
-2. Streaming Infrastructure:
-   - Forwarding async streams to WebSocket clients
-   - Sending token/final/done message frames
-   - Recording conversation history on completion
-
-Message Protocol:
-    All messages use a flat format: {"type": "...", "status": N, ...fields}
-"""
+"""Send flat WebSocket frames with disconnect handling and latency metrics."""
 
 from __future__ import annotations
 
 import json
 import time
 import logging
-from typing import TYPE_CHECKING
-from dataclasses import dataclass
 from src.telemetry.instruments import get_metrics
 from fastapi import WebSocket, WebSocketDisconnect
-from config.runtime.websocket import WEBSOCKET_STATUS_OK
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from src.state.session import SessionState
-    from src.session.runtime import SessionRuntime
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class _StreamState:
-    """Internal state for stream_response."""
-
-    completion_text: str
-    is_text_visible: bool
-    is_interrupted: bool = False
-
-
-@dataclass(frozen=True)
-class StreamResponseRequest:
-    """Inputs for streaming one model response to a websocket."""
-
-    websocket: WebSocket
-    stream: AsyncIterator[str]
-    connection_state: SessionState
-    user_utterance: str
-    session_runtime: SessionRuntime
-    initial_text: str = ""
-    is_initial_text_sent: bool = True
-    history_user_utterance: str | None = None
-
-
-# ============================================================================
-# Private helpers
-# ============================================================================
-
-
-async def _send_initial_text(
-    websocket: WebSocket,
-    initial_text: str,
-    state: _StreamState,
-    *,
-    is_already_sent: bool,
-) -> None:
-    """Send initial text when it was not already emitted."""
-    if not initial_text or is_already_sent:
-        return
-    sent = await safe_send_flat(websocket, "token", text=initial_text)
-    if sent:
-        state.is_text_visible = True
-    else:
-        state.is_interrupted = True
-
-
-async def _forward_stream_chunks(
-    websocket: WebSocket,
-    stream: AsyncIterator[str],
-    state: _StreamState,
-) -> None:
-    """Forward generated stream chunks to the client."""
-    async for chunk in stream:
-        sent = await safe_send_flat(websocket, "token", text=chunk)
-        if not sent:
-            state.is_interrupted = True
-            break
-        state.completion_text += chunk
-        state.is_text_visible = True
-
-
-async def _send_completion_frames(websocket: WebSocket, state: _StreamState) -> None:
-    """Send final and done frames for a completed stream."""
-    sent_completion = await safe_send_flat(websocket, "final", status=WEBSOCKET_STATUS_OK, text=state.completion_text)
-    if not sent_completion:
-        state.is_interrupted = True
-        return
-    sent_done = await safe_send_flat(websocket, "done", status=WEBSOCKET_STATUS_OK)
-    if not sent_done:
-        state.is_interrupted = True
-
-
-async def _handle_empty_output(websocket: WebSocket) -> None:
-    """Report an empty model output to metrics and client."""
-    logger.warning("empty model output")
-    get_metrics().empty_model_output_total.add(1)
-    await safe_send_flat(
-        websocket,
-        "error",
-        status=500,
-        code="internal_error",
-        message="Model produced no output",
-    )
-
-
-# ============================================================================
-# Public API
-# ============================================================================
 
 
 def build_flat_message(message_type: str, *, status: int | None = None, **fields: object) -> dict[str, object]:
@@ -165,54 +53,9 @@ async def safe_send_flat(
     return await safe_send_json(websocket, payload)
 
 
-async def stream_response(request: StreamResponseRequest) -> str:
-    """Stream chunks, emit final/done messages, and record history."""
-    history_user = (
-        request.history_user_utterance if request.history_user_utterance is not None else request.user_utterance
-    )
-    state = _StreamState(
-        completion_text=request.initial_text,
-        is_text_visible=bool(request.initial_text) and request.is_initial_text_sent,
-    )
-    is_history_committed = False
-
-    def _commit_history() -> None:
-        """Commit streamed text to history at most once."""
-        nonlocal is_history_committed
-        is_history_commit_needed = bool(state.is_text_visible and state.completion_text)
-        if is_history_committed or not is_history_commit_needed:
-            return
-        request.session_runtime.history.append_response(
-            request.connection_state,
-            history_user,
-            state.completion_text,
-        )
-        is_history_committed = True
-
-    try:
-        await _send_initial_text(
-            request.websocket,
-            request.initial_text,
-            state,
-            is_already_sent=request.is_initial_text_sent,
-        )
-        if not state.is_interrupted:
-            await _forward_stream_chunks(request.websocket, request.stream, state)
-        if not state.is_interrupted:
-            if not state.completion_text:
-                await _handle_empty_output(request.websocket)
-                return state.completion_text
-            await _send_completion_frames(request.websocket, state)
-    finally:
-        _commit_history()
-    return state.completion_text
-
-
 __all__ = [
-    "StreamResponseRequest",
     "build_flat_message",
     "safe_send_flat",
     "safe_send_json",
     "safe_send_text",
-    "stream_response",
 ]

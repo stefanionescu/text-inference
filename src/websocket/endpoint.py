@@ -15,29 +15,26 @@ from dataclasses import dataclass
 from .receiver import run_receiver
 from ..logging import set_log_context
 from .lifecycle import WebSocketLifecycle
+from src.session.state import SessionState
 from ..telemetry.traces import session_span
 from ..telemetry.instruments import get_metrics
 from .errors import reject_connection, send_error
 from fastapi import WebSocket, WebSocketDisconnect
-from src.session.requests import close_session_requests
 from .disconnects import is_expected_websocket_disconnect
 from .rate_limiting.window import SlidingWindowRateLimiter
 from ..telemetry.error_classification import classify_error
 from ..telemetry.sentry import add_breadcrumb, capture_error
 from .authentication import authenticate_websocket, build_authentication_policy
+from src.session.requests import abort_session_requests, close_session_requests
 from config.runtime.websocket import (
     WEBSOCKET_ERROR_INTERNAL,
     WEBSOCKET_CLOSE_BUSY_CODE,
     AUTHENTICATION_FAILURE_CODE,
     WEBSOCKET_ERROR_SERVER_BUSY,
-    WEBSOCKET_CANCELS_PER_WINDOW,
-    WEBSOCKET_MESSAGES_PER_WINDOW,
     WEBSOCKET_CLOSE_UNAUTHORIZED_CODE,
-    WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS,
 )
 
 if TYPE_CHECKING:
-    from src.state.session import SessionState
     from src.runtime.dependencies import RuntimeDependencies
 
 logger = getLogger(__name__)
@@ -97,37 +94,31 @@ async def _prepare_connection(websocket: WebSocket, runtime_dependencies: Runtim
 async def _cleanup_session(runtime_dependencies: RuntimeDependencies, state: SessionState) -> float:
     """Clean up session resources on disconnect and return duration."""
     started_at = time.perf_counter()
-    session_runtime = runtime_dependencies.session_runtime
     duration = max(0.0, time.monotonic() - state.created_at)
-    await session_runtime.abort_session_requests(state)
-    async with state.request_lock:
-        close_session_requests(state)
+    try:
+        await abort_session_requests(state, runtime_dependencies.engine)
+    finally:
+        async with state.request_lock:
+            close_session_requests(state)
     get_metrics().phase_latency.record(max(0.0, time.perf_counter() - started_at), {"phase": "cleanup"})
     return duration
 
 
 def _create_rate_limiters(
-    runtime_dependencies: RuntimeDependencies | None = None,
+    runtime_dependencies: RuntimeDependencies,
 ) -> tuple[SlidingWindowRateLimiter, SlidingWindowRateLimiter]:
-    """Initialize per-connection rate limiters."""
-    websocket_settings = None if runtime_dependencies is None else runtime_dependencies.settings.websocket
-    message_limiter = SlidingWindowRateLimiter(
-        limit=WEBSOCKET_MESSAGES_PER_WINDOW
-        if websocket_settings is None
-        else websocket_settings.maximum_messages_per_window,
-        window_seconds=WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS
-        if websocket_settings is None
-        else websocket_settings.rate_limit_window_seconds,
+    """Initialize per-connection rate limiters from startup settings."""
+    settings = runtime_dependencies.settings.websocket
+    return (
+        SlidingWindowRateLimiter(
+            limit=settings.maximum_messages_per_window,
+            window_seconds=settings.rate_limit_window_seconds,
+        ),
+        SlidingWindowRateLimiter(
+            limit=settings.maximum_cancels_per_window,
+            window_seconds=settings.rate_limit_window_seconds,
+        ),
     )
-    cancel_limiter = SlidingWindowRateLimiter(
-        limit=WEBSOCKET_CANCELS_PER_WINDOW
-        if websocket_settings is None
-        else websocket_settings.maximum_cancels_per_window,
-        window_seconds=WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS
-        if websocket_settings is None
-        else websocket_settings.rate_limit_window_seconds,
-    )
-    return message_limiter, cancel_limiter
 
 
 async def _stop_lifecycle(lifecycle: WebSocketLifecycle | None) -> None:
@@ -203,8 +194,8 @@ async def _run_accepted_connection(
     websocket: WebSocket,
     runtime_dependencies: RuntimeDependencies,
     lifecycle: WebSocketLifecycle,
-    client_id: str,
-) -> SessionState | None:
+    state: SessionState,
+) -> None:
     """Run the receiver for an admitted WebSocket connection."""
     metrics = get_metrics()
     metrics.active_connections.add(1)
@@ -217,20 +208,20 @@ async def _run_accepted_connection(
     )
 
     try:
-        with session_span(client_id=client_id):
-            return await run_receiver(
+        with session_span(client_id=str(state.meta["client_id"])):
+            await run_receiver(
                 websocket,
                 lifecycle,
-                message_limiter,
-                cancel_limiter,
+                (message_limiter, cancel_limiter),
                 runtime_dependencies,
+                state=state,
             )
     except WebSocketDisconnect:
-        return None
+        return
     except (RuntimeError, OSError, ValueError) as exception:
         if lifecycle.has_idle_timed_out() or is_expected_websocket_disconnect(exception):
             logger.info("WebSocket disconnected (%s)", exception.__class__.__name__)
-            return None
+            return
         capture_error(exception)
         metrics.errors_total.add(1, {"error.type": classify_error(exception)})
         logger.exception("WebSocket error")
@@ -240,7 +231,7 @@ async def _run_accepted_connection(
                 code=WEBSOCKET_ERROR_INTERNAL,
                 message="An unexpected server error occurred.",
             )
-        return None
+        return
 
 
 async def handle_websocket_connection(websocket: WebSocket, runtime_dependencies: RuntimeDependencies) -> None:
@@ -257,11 +248,12 @@ async def handle_websocket_connection(websocket: WebSocket, runtime_dependencies
 
         is_admitted = True
         lifecycle = _start_lifecycle(websocket, runtime_dependencies)
-        state = await _run_accepted_connection(
+        state = SessionState(meta={"client_id": client_id})
+        await _run_accepted_connection(
             websocket,
             runtime_dependencies,
             lifecycle,
-            client_id,
+            state,
         )
     finally:
         await _finalize_connection(

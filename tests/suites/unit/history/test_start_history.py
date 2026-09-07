@@ -1,15 +1,16 @@
 """Unit tests for start-message history helpers."""
 
 from __future__ import annotations
-
 import pytest
+from dataclasses import replace
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
+from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from src.state.settings import HistorySettings
-from src.messages.history import history_messages
-from src.state.session import HistoryMessage, SessionState
+from src.messages.start import history_messages
+from src.session.state import HistoryMessage, SessionState
 from tests.harness.environment.tokenizer import use_local_tokenizers
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, ASSISTANT_FIRST_PAYLOAD, HISTORY_PAYLOAD, MESSAGES
 
 if TYPE_CHECKING:
@@ -27,15 +28,14 @@ def _build_session(
     target_tokens: int = 800,
     tokenizer: ThreadSafeTokenizer,
 ) -> SessionRuntime:
-    engine = AsyncMock()
+    AsyncMock()
     history_config = HistorySettings(
         trigger_tokens=trigger_tokens,
         target_tokens=target_tokens,
     )
     return SessionRuntime(
-        engine=engine,
         tokenizer=tokenizer,
-        history_config=history_config,
+        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
     )
 
 

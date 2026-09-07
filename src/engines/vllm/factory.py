@@ -13,7 +13,7 @@ from src.tokens.validation import require_local_model_directory
 from src.quantization.vllm.policy import choose_quantization_backend
 
 if TYPE_CHECKING:
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
 
 
 async def create_vllm_engine(settings: ApplicationSettings) -> VLLMEngine:

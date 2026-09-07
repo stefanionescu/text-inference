@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from src.state.execution import PromptBudgetRequest
-from src.execution.budget import fit_prompt_to_budget
+from src.execution.budget import PromptBudgetRequest, fit_prompt_to_budget
 from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, MESSAGES
 from tests.harness.environment.tokenizer import use_local_tokenizers, use_punctuation_aware_tokenizers
 

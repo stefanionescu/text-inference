@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from fastapi import WebSocket
     from src.engines.protocol import Engine
     from src.session.runtime import SessionRuntime
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
     from src.engines.vllm.cache import CacheResetEngine
     from src.tokens.tokenizer import ThreadSafeTokenizer
     from src.runtime.dependencies import ConnectionRegistryProtocol

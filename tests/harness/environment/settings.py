@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from src.runtime.settings import read_settings
 from tests.harness.environment.variables import read_environment_float, read_environment_integer
 from config.tests.defaults import (
     GENDER_DEFAULT,
@@ -14,6 +15,8 @@ from config.tests.defaults import (
     WEBSOCKET_PING_TIMEOUT_SECONDS_DEFAULT,
     WEBSOCKET_PING_INTERVAL_SECONDS_DEFAULT,
 )
+
+DEFAULT_APPLICATION_SETTINGS = read_settings(environment={})
 
 DEFAULT_SERVER_URL = os.getenv("SERVER_URL", SERVER_URL_DEFAULT)
 DEFAULT_GENDER = os.getenv("GENDER", GENDER_DEFAULT)
@@ -39,6 +42,7 @@ IDLE_EXPECT_SECONDS = read_environment_float("IDLE_EXPECT_SECONDS", _IDLE_EXPECT
 IDLE_GRACE_SECONDS = read_environment_float("IDLE_GRACE_SECONDS", IDLE_GRACE_SECONDS_DEFAULT)
 
 __all__ = [
+    "DEFAULT_APPLICATION_SETTINGS",
     "DEFAULT_GENDER",
     "DEFAULT_PERSONALITY",
     "DEFAULT_SERVER_URL",

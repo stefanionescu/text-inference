@@ -1,17 +1,33 @@
-"""Run the public and loopback ASGI listeners."""
+"""Public and loopback ASGI listeners with shared signal ownership."""
 
 from __future__ import annotations
-
 import asyncio
 import uvicorn
+import contextlib
 from typing import TYPE_CHECKING
 from config.runtime import listeners
-from src.server.probe import ProbeServer
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+
+class ProbeServer(uvicorn.Server):
+    """Run without competing for process signal ownership."""
+
+    def install_signal_handlers(self) -> None:
+        """Leave signal ownership with the public server."""
+
+    @contextlib.contextmanager
+    def capture_signals(self) -> Generator[None, None, None]:
+        """Leave signal ownership with the public server."""
+        yield
+
 
 if TYPE_CHECKING:
     import socket
     from fastapi import FastAPI
-    from src.state.readiness import ReadinessState
+    from src.server.readiness import ReadinessState
 
 
 class _PublicServer(uvicorn.Server):
@@ -112,4 +128,4 @@ def run_applications(
     )
 
 
-__all__ = ["run_applications", "serve_applications"]
+__all__ = ["ProbeServer", "run_applications", "serve_applications"]

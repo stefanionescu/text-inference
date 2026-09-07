@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.tokens.history import count_tokens
 from src.session.history.turns import flatten_turns, group_turns
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from src.state.settings import HistorySettings
+    from src.runtime.config import HistorySettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.state.session import HistoryMessage, SessionState
+    from src.session.state import HistoryMessage, SessionState
 
 
 def _trim_oldest_turns(
@@ -69,7 +68,7 @@ def trim_history(
 
     def _count(candidate_turns: list[list[HistoryMessage]]) -> int:
         """Count tokens in grouped history turns."""
-        return count_tokens(format_history(flatten_turns(candidate_turns)), tokenizer)
+        return tokenizer.count(format_history(flatten_turns(candidate_turns)))
 
     if _count(turns) <= effective_trigger:
         return

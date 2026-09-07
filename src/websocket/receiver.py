@@ -10,22 +10,17 @@ from dataclasses import dataclass
 from .transport import safe_send_flat
 from typing import TYPE_CHECKING, Any
 from .parser import parse_client_message
-from src.state.session import SessionState
 from ..telemetry.instruments import get_metrics
-from src.session.requests import has_running_task
 from .disconnects import is_expected_websocket_disconnect
 from ..messages.turn import TurnMessageRequest, handle_turn_message
 from .rate_limiting.messages import consume_limiter, select_rate_limiter
-from config.runtime.websocket import (
-    WEBSOCKET_STATUS_OK,
-    WEBSOCKET_CLIENT_CLOSE_CODE,
-    WEBSOCKET_ERROR_INVALID_MESSAGE,
-)
+from src.session.requests import abort_session_requests, has_running_task
+from config.runtime.websocket import WEBSOCKET_STATUS_OK, WEBSOCKET_CLIENT_CLOSE_CODE, WEBSOCKET_ERROR_INVALID_MESSAGE
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
     from .lifecycle import WebSocketLifecycle
-    from src.session.runtime import SessionRuntime
+    from src.session.state import SessionState
     from src.runtime.dependencies import RuntimeDependencies
     from .rate_limiting.window import SlidingWindowRateLimiter
 
@@ -41,7 +36,6 @@ class SessionDispatch:
     message: dict[str, Any]
     state: SessionState
     is_started: bool
-    session_runtime: SessionRuntime
     runtime_dependencies: RuntimeDependencies
 
 
@@ -109,7 +103,6 @@ async def _handle_start_command(dispatch: SessionDispatch) -> bool:
             message=dispatch.message,
             state=dispatch.state,
             message_type="start",
-            session_runtime=dispatch.session_runtime,
             runtime_dependencies=dispatch.runtime_dependencies,
         ),
     )
@@ -126,14 +119,13 @@ async def _handle_message_command(dispatch: SessionDispatch) -> bool:
         return False
     get_metrics().requests_total.add(1, {"status": "continued"})
     if has_running_task(dispatch.state):
-        await dispatch.session_runtime.abort_session_requests(dispatch.state)
+        await abort_session_requests(dispatch.state, dispatch.runtime_dependencies.engine)
     await handle_turn_message(
         TurnMessageRequest(
             websocket=dispatch.websocket,
             message=dispatch.message,
             state=dispatch.state,
             message_type="message",
-            session_runtime=dispatch.session_runtime,
             runtime_dependencies=dispatch.runtime_dependencies,
         ),
     )
@@ -156,7 +148,7 @@ async def _dispatch_session_message(dispatch: SessionDispatch) -> bool:
     if dispatch.message_type == "cancel":
         get_metrics().cancellation_total.add(1)
         logger.info("WS recv: cancel")
-        await dispatch.session_runtime.abort_session_requests(dispatch.state)
+        await abort_session_requests(dispatch.state, dispatch.runtime_dependencies.engine)
         await safe_send_flat(dispatch.websocket, "cancelled")
         return True
     await send_error(
@@ -170,20 +162,14 @@ async def _dispatch_session_message(dispatch: SessionDispatch) -> bool:
 async def run_receiver(
     websocket: WebSocket,
     lifecycle: WebSocketLifecycle,
-    message_limiter: SlidingWindowRateLimiter,
-    cancel_limiter: SlidingWindowRateLimiter,
+    rate_limiters: tuple[SlidingWindowRateLimiter, SlidingWindowRateLimiter],
     runtime_dependencies: RuntimeDependencies,
-) -> SessionState:
-    """Receive, validate, and dispatch client messages.
-
-    Creates a per-connection SessionState and passes it to all handlers.
-    Returns the state for cleanup.
-    """
-    client = websocket.client
-    client_id = f"{client.host}:{client.port}" if client else "unknown"
-    state = SessionState(meta={"client_id": client_id})
+    *,
+    state: SessionState,
+) -> None:
+    """Receive and dispatch messages using the connection-owned session state."""
+    message_limiter, cancel_limiter = rate_limiters
     is_started = False
-    session_runtime = runtime_dependencies.session_runtime
 
     while True:
         try:
@@ -213,12 +199,9 @@ async def run_receiver(
                 message=message,
                 state=state,
                 is_started=is_started,
-                session_runtime=session_runtime,
                 runtime_dependencies=runtime_dependencies,
             ),
         )
-
-    return state
 
 
 __all__ = ["run_receiver"]

@@ -5,12 +5,33 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from src.execution.templates import build_prefixed_prompt
-from src.state.execution import PromptBudgetRequest, PromptFitResult
 from src.session.history.turns import copy_messages, flatten_turns, group_turns
 
 if TYPE_CHECKING:
-    from src.state.session import HistoryMessage
+    from src.session.state import HistoryMessage
     from src.tokens.tokenizer import ThreadSafeTokenizer
+
+
+@dataclass(frozen=True, slots=True)
+class PromptFitResult:
+    """Exact prompt-fit result used before engine calls."""
+
+    history_messages: list[HistoryMessage]
+    user_utterance: str
+    prompt: str
+    prompt_tokens: int
+
+
+@dataclass(frozen=True, slots=True)
+class PromptBudgetRequest:
+    """Inputs required to fit a prompt into the context budget."""
+
+    static_prefix: str
+    runtime_text: str
+    history_messages: list[HistoryMessage]
+    user_utterance: str
+    maximum_prompt_tokens: int
+    maximum_user_tokens: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

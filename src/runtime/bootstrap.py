@@ -17,7 +17,7 @@ from src.engines.vllm.cache import CacheResetCoordinator
 if TYPE_CHECKING:
     from src.engines.protocol import Engine
     from collections.abc import Awaitable, Callable
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
     from src.runtime.dependencies import ConnectionRegistryProtocol
 
     type EngineBuilder = Callable[[ApplicationSettings], Awaitable[Engine]]
@@ -44,7 +44,6 @@ async def build_runtime_dependencies(
 
     session_runtime = SessionRuntime(
         settings=settings,
-        engine=engine,
         tokenizer=tokenizer,
     )
     cache_reset_coordinator = None

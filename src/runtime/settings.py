@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import os
 from config.security import API_KEY
-from src.runtime.limits import read_limit_settings
 from config.model.trt import TRT_DTYPE, TRT_MAX_BATCH_SIZE
 from config.runtime.cache import CACHE_RESET_INTERVAL_SECONDS
 from config.runtime.timeouts import GENERATION_TIMEOUT_SECONDS
+from src.runtime.limits import LimitSettings, read_limit_settings
 from config.runtime.gpu import GPU_MEMORY_FRACTION, GPU_SM_ARCH, KV_DTYPE
 from config.limits import (
     MIN_P_MAX,
@@ -25,7 +25,7 @@ from config.limits import (
     REPETITION_PENALTY_MAX,
     REPETITION_PENALTY_MIN,
 )
-from src.state.settings import (
+from src.runtime.config import (
     GPUSettings,
     ModelSettings,
     EngineSettings,
@@ -121,9 +121,8 @@ def _build_model_settings(environment: EnvironmentValues) -> ModelSettings:
     )
 
 
-def _build_history_settings(environment: EnvironmentValues) -> HistorySettings:
+def _build_history_settings(limits: LimitSettings) -> HistorySettings:
     """Build history trimming settings from environment values."""
-    limits = read_limit_settings(environment=environment)
     trigger_tokens = int(limits["HISTORY_MAX_TOKENS"])
     target_tokens = int(limits["TRIMMED_HISTORY_LENGTH"])
     return HistorySettings(
@@ -132,9 +131,8 @@ def _build_history_settings(environment: EnvironmentValues) -> HistorySettings:
     )
 
 
-def _build_session_settings(environment: EnvironmentValues) -> SessionSettings:
+def _build_session_settings(environment: EnvironmentValues, limits: LimitSettings) -> SessionSettings:
     """Build session limits and cache settings from environment values."""
-    limits = read_limit_settings(environment=environment)
     maximum_context_length = int(limits["MAXIMUM_CONTEXT_LENGTH"])
     maximum_output_tokens = int(limits["MAXIMUM_OUTPUT_TOKENS"])
     maximum_prompt_tokens = int(limits["PROMPT_MAX_TOKENS"])
@@ -183,9 +181,8 @@ def _build_sampling_settings(environment: EnvironmentValues) -> SamplingSettings
     )
 
 
-def _build_websocket_settings(environment: EnvironmentValues) -> WebSocketSettings:
+def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSettings) -> WebSocketSettings:
     """Build WebSocket settings from environment values."""
-    limits = read_limit_settings(environment=environment)
     return WebSocketSettings(
         maximum_connections=limits["MAX_CONCURRENT_CONNECTIONS"],
         idle_timeout_seconds=_read_environment_float(
@@ -235,6 +232,7 @@ def _build_websocket_settings(environment: EnvironmentValues) -> WebSocketSettin
 def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSettings:
     """Resolve environment variables into one typed settings object."""
     active_environment = os.environ if environment is None else environment
+    limits = read_limit_settings(environment=active_environment)
     inference_engine = active_environment.get("INFERENCE_ENGINE", "trt")
     if inference_engine not in {"trt", "vllm"}:
         message = f"INFERENCE_ENGINE must be 'trt' or 'vllm', got {inference_engine!r}"
@@ -273,15 +271,12 @@ def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSe
         model=_build_model_settings(active_environment),
         engine=engine_settings,
         gpu=gpu_settings,
-        history=_build_history_settings(active_environment),
-        session=_build_session_settings(active_environment),
+        history=_build_history_settings(limits),
+        session=_build_session_settings(active_environment, limits),
         sampling=_build_sampling_settings(active_environment),
         timeouts=timeout_settings,
-        websocket=_build_websocket_settings(active_environment),
+        websocket=_build_websocket_settings(active_environment, limits),
     )
 
 
-DEFAULT_APPLICATION_SETTINGS = read_settings(environment={})
-
-
-__all__ = ["DEFAULT_APPLICATION_SETTINGS", "read_settings"]
+__all__ = ["read_settings"]

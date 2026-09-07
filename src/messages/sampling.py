@@ -1,107 +1,44 @@
-"""Sampling parameter extraction and validation.
-
-This module handles the extraction and validation of sampling parameters
-from incoming WebSocket messages. Supported parameters:
-
-- temperature: Controls randomness (float)
-- top_p: Nucleus sampling threshold (float)
-- top_k: Top-K sampling limit (int)
-- min_p: Minimum probability threshold (float)
-- repetition_penalty: Repetition penalty factor (float)
-- presence_penalty: Presence penalty factor (float)
-- frequency_penalty: Frequency penalty factor (float)
-- sanitize_output: Whether to sanitize output (bool)
-
-Each parameter is validated against configured min/max bounds and
-type-checked before being included in the overrides dict.
-"""
+"""Sampling override validation and its field metadata."""
 
 from __future__ import annotations
-
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
-from .validators import ValidationError
-from src.state.sampling import DynamicSamplingField, NumericSamplingValue, SamplingCaster, SamplingFieldSpec
-from config.limits import (
-    MIN_P_MAX,
-    MIN_P_MIN,
-    TOP_K_MAX,
-    TOP_K_MIN,
-    TOP_P_MAX,
-    TOP_P_MIN,
-    TEMPERATURE_MAX,
-    TEMPERATURE_MIN,
-    PRESENCE_PENALTY_MAX,
-    PRESENCE_PENALTY_MIN,
-    FREQUENCY_PENALTY_MAX,
-    FREQUENCY_PENALTY_MIN,
-    REPETITION_PENALTY_MAX,
-    REPETITION_PENALTY_MIN,
-)
+from src.messages.validators import ValidationError
+
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from src.state.settings import SamplingSettings
+    from src.runtime.config import SamplingSettings
+
+NumericSamplingValue = float | int
+SamplingCaster = type[float | int]
+
+
+@dataclass(frozen=True)
+class SamplingFieldSpec:
+    """Validation metadata for a numeric sampling field."""
+
+    name: str
+    caster: SamplingCaster
+    minimum: NumericSamplingValue
+    maximum: NumericSamplingValue
+    invalid_code: str
+    range_code: str
+
+
+@dataclass(frozen=True)
+class DynamicSamplingField:
+    """Sampling field metadata resolved from runtime settings."""
+
+    name: str
+    caster: SamplingCaster
+    minimum_attribute: str
+    maximum_attribute: str
+    invalid_code: str
+    range_code: str
+
 
 SamplingValue = float | int | bool
-
-DEFAULT_SAMPLING_FIELDS: tuple[SamplingFieldSpec, ...] = (
-    SamplingFieldSpec(
-        name="temperature",
-        caster=float,
-        minimum=TEMPERATURE_MIN,
-        maximum=TEMPERATURE_MAX,
-        invalid_code="invalid_temperature",
-        range_code="temperature_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="top_p",
-        caster=float,
-        minimum=TOP_P_MIN,
-        maximum=TOP_P_MAX,
-        invalid_code="invalid_top_p",
-        range_code="top_p_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="top_k",
-        caster=int,
-        minimum=TOP_K_MIN,
-        maximum=TOP_K_MAX,
-        invalid_code="invalid_top_k",
-        range_code="top_k_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="min_p",
-        caster=float,
-        minimum=MIN_P_MIN,
-        maximum=MIN_P_MAX,
-        invalid_code="invalid_min_p",
-        range_code="min_p_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="repetition_penalty",
-        caster=float,
-        minimum=REPETITION_PENALTY_MIN,
-        maximum=REPETITION_PENALTY_MAX,
-        invalid_code="invalid_repetition_penalty",
-        range_code="repetition_penalty_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="presence_penalty",
-        caster=float,
-        minimum=PRESENCE_PENALTY_MIN,
-        maximum=PRESENCE_PENALTY_MAX,
-        invalid_code="invalid_presence_penalty",
-        range_code="presence_penalty_out_of_range",
-    ),
-    SamplingFieldSpec(
-        name="frequency_penalty",
-        caster=float,
-        minimum=FREQUENCY_PENALTY_MIN,
-        maximum=FREQUENCY_PENALTY_MAX,
-        invalid_code="invalid_frequency_penalty",
-        range_code="frequency_penalty_out_of_range",
-    ),
-)
 
 DYNAMIC_SAMPLING_FIELDS: tuple[DynamicSamplingField, ...] = (
     DynamicSamplingField(
@@ -210,11 +147,9 @@ def _parse_int(value: object) -> int:
 
 
 def _sampling_fields(
-    sampling_settings: SamplingSettings | None,
+    sampling_settings: SamplingSettings,
 ) -> tuple[SamplingFieldSpec, ...]:
-    """Return sampling field metadata from resolved settings or config defaults."""
-    if sampling_settings is None:
-        return DEFAULT_SAMPLING_FIELDS
+    """Return sampling field metadata from resolved settings."""
     return tuple(
         SamplingFieldSpec(
             name=field.name,
@@ -273,7 +208,7 @@ def _extract_numeric_overrides(
     message: Mapping[str, object],
     sampling_block: Mapping[str, object],
     *,
-    sampling_settings: SamplingSettings | None,
+    sampling_settings: SamplingSettings,
 ) -> dict[str, NumericSamplingValue]:
     """Extract numeric sampling overrides from a message."""
     overrides: dict[str, NumericSamplingValue] = {}
@@ -305,7 +240,7 @@ def _extract_sanitize_override(
 def extract_sampling_overrides(
     message: Mapping[str, object],
     *,
-    sampling_settings: SamplingSettings | None = None,
+    sampling_settings: SamplingSettings,
 ) -> dict[str, SamplingValue]:
     """Extract and validate sampling parameter overrides from a message.
 
@@ -314,7 +249,7 @@ def extract_sampling_overrides(
 
     Args:
         message: The message mapping to extract parameters from.
-        sampling_settings: Optional resolved sampling bounds.
+        sampling_settings: Resolved sampling bounds.
 
     Returns:
         Dict of validated sampling overrides.
@@ -338,4 +273,10 @@ def extract_sampling_overrides(
     return overrides
 
 
-__all__ = ["extract_sampling_overrides"]
+__all__ = [
+    "DynamicSamplingField",
+    "NumericSamplingValue",
+    "SamplingCaster",
+    "SamplingFieldSpec",
+    "extract_sampling_overrides",
+]

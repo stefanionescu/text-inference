@@ -19,14 +19,14 @@ from src.text import StreamingSanitizer
 from src.telemetry.instruments import get_metrics
 from src.session.requests import is_request_cancelled
 from .controller import StreamConfig, StreamController
-from src.engines.sampling import SamplingParametersRequest
+from src.engines.protocol import SamplingParametersRequest
 
 if TYPE_CHECKING:
     from src.engines.protocol import Engine
     from collections.abc import AsyncGenerator
-    from src.state.session import SessionState
+    from src.session.state import SessionState
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.state.settings import SamplingSettings, SessionSettings, TimeoutSettings
+    from src.runtime.config import SamplingSettings, SessionSettings, TimeoutSettings
 
 
 @dataclass(frozen=True)

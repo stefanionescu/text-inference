@@ -5,7 +5,7 @@ CONFIG_IMPORT_ROOTS = {
     "collections.abc",
     "quality.config",
     "config",
-    "src.state",
+    "src.runtime.config",
     "config.tests",
     "typing",
 }

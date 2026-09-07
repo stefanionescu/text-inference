@@ -43,30 +43,36 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from src.errors import StreamCancelledError
 from src.telemetry.sentry import capture_error
+from collections.abc import Awaitable, Callable
 from config.runtime.logging import STREAM_LABEL
 from src.telemetry.traces import generation_span
 from src.telemetry.instruments import get_metrics
 from config.runtime.numerics import FLOAT_ZERO_ABS_TOL
-from src.state.execution import CancelCheck, StreamConfig
 from src.telemetry.error_classification import classify_error
 
 if TYPE_CHECKING:
-    from src.engines.protocol import Engine
-    from src.state.engines import EngineOutput
+    from src.engines.protocol import Engine, EngineOutput
     from collections.abc import AsyncGenerator, AsyncIterator
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class TimeoutStreamRequest:
-    """Inputs needed to stream with timeout and cancellation."""
+CancelCheck = Callable[[], bool | Awaitable[bool]] | None
+CompletionCounter = Callable[[str], int]
 
-    engine: Engine
+
+@dataclass(slots=True)
+class StreamConfig:
+    """Configuration for streaming."""
+
+    session_id: str
+    request_id: str
     prompt: str
     sampling_parameters: object
-    request_id: str
+    engine: Engine
     timeout_seconds: float
+    count_completion_tokens: CompletionCounter
+    flush_milliseconds: float = 0.0
     cancellation_check: CancelCheck = None
 
 
@@ -121,16 +127,7 @@ class StreamController:
 
     async def _iter_emitted_chunks(self) -> AsyncGenerator[str, None]:
         """Yield buffered chunks produced from engine deltas."""
-        config = self._config
-        request = TimeoutStreamRequest(
-            engine=config.engine,
-            prompt=config.prompt,
-            sampling_parameters=config.sampling_parameters,
-            request_id=config.request_id,
-            timeout_seconds=config.timeout_seconds,
-            cancellation_check=config.cancellation_check,
-        )
-        async for output in _stream_timed(request):
+        async for output in _stream_timed(self._config):
             delta = self._extract_delta(output)
             if not delta:
                 continue
@@ -307,7 +304,7 @@ class StreamController:
 
 
 async def _stream_timed(
-    request: TimeoutStreamRequest,
+    request: StreamConfig,
 ) -> AsyncGenerator[EngineOutput, None]:
     """Stream generation with timeout and cancellation support."""
     stream = request.engine.generate_stream(

@@ -11,7 +11,7 @@ from tensorrt_llm import LLM, SamplingParams, logger
 from src.tokens.validation import require_local_model_directory
 
 if TYPE_CHECKING:
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
 
 
 async def create_trt_engine(settings: ApplicationSettings) -> TRTEngine:

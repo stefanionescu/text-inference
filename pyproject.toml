@@ -454,10 +454,10 @@ root_packages = [
 include_external_packages = true
 
 [[tool.importlinter.contracts]]
-name = "state must not depend on hf push modules"
+name = "runtime settings records must not depend on hf push modules"
 type = "forbidden"
 source_modules = [
-  "src.state",
+  "src.runtime.config",
 ]
 forbidden_modules = [
   "src.hf.trt",
@@ -473,7 +473,9 @@ source_modules = [
 forbidden_modules = [
   "src.websocket",
   "src.messages",
-  "src.runtime",
+  "src.runtime.bootstrap",
+  "src.runtime.dependencies",
+  "src.runtime.settings",
   "src.server",
 ]
 
@@ -490,7 +492,7 @@ forbidden_modules = [
 ]
 
 [[tool.importlinter.contracts]]
-name = "config may only import config and state inside src"
+name = "config must not import application implementation"
 type = "forbidden"
 source_modules = [
   "config",
@@ -563,7 +565,6 @@ forbidden_modules = [
   "src.scripts",
   "src.server",
   "src.session",
-  "src.state",
   "src.websocket",
 ]
 

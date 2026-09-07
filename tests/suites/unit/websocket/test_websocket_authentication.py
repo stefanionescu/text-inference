@@ -8,7 +8,7 @@ import asyncio
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 import src.websocket.authentication as authentication_module
-from src.state.settings import AuthenticationSettings, WebSocketSettings
+from src.runtime.config import AuthenticationSettings, WebSocketSettings
 
 if TYPE_CHECKING:
     from collections import deque

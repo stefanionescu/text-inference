@@ -4,20 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 from .time import format_session_timestamp
-from src.state.execution import PromptBudgetRequest
-from src.execution.budget import fit_prompt_to_budget
-from .history import HistoryController, build_history_runtime_config
-from .defaults import DEFAULT_MODEL_SETTINGS, DEFAULT_SAMPLING_SETTINGS, DEFAULT_SESSION_SETTINGS
-from .requests import (
-    cancel_session_requests,
-    cleanup_session_requests,
-)
+from .history.controller import HistoryController
+from src.execution.budget import PromptBudgetRequest, fit_prompt_to_budget
 
 if TYPE_CHECKING:
-    from src.engines.protocol import Engine
+    from src.runtime.config import ApplicationSettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.state.session import HistoryMessage, SessionState
-    from src.state.settings import ApplicationSettings, HistorySettings
+    from src.session.state import HistoryMessage, SessionState
 
 
 class SessionRuntime:
@@ -31,19 +24,14 @@ class SessionRuntime:
         self,
         *,
         tokenizer: ThreadSafeTokenizer,
-        engine: Engine,
-        settings: ApplicationSettings | None = None,
-        history_config: HistorySettings | None = None,
+        settings: ApplicationSettings,
     ) -> None:
-        """Initialize runtime dependency defaults."""
-        self._engine = engine
+        """Initialize the session services with resolved startup settings."""
         self.tokenizer = tokenizer
-        self.history_config = history_config or (
-            settings.history if settings is not None else build_history_runtime_config()
-        )
-        self.session_settings = settings.session if settings is not None else DEFAULT_SESSION_SETTINGS
-        self.model_settings = settings.model if settings is not None else DEFAULT_MODEL_SETTINGS
-        self.sampling_settings = settings.sampling if settings is not None else DEFAULT_SAMPLING_SETTINGS
+        self.history_config = settings.history
+        self.session_settings = settings.session
+        self.model_settings = settings.model
+        self.sampling_settings = settings.sampling
         self.history = HistoryController(
             config=self.history_config,
             tokenizer=tokenizer,
@@ -102,23 +90,6 @@ class SessionRuntime:
 
         message = "seed history exceeds exact context budget at session start"
         raise ValueError(message)
-
-    async def abort_session_requests(
-        self,
-        state: SessionState | None,
-    ) -> dict[str, str]:
-        """Cancel tracked requests and abort active engine work."""
-        if not state:
-            return {"active": ""}
-
-        active_request_id = state.active_request_id or ""
-        async with state.request_lock:
-            cancel_session_requests(state)
-        if active_request_id:
-            await self._engine.abort(active_request_id)
-
-        async with state.request_lock:
-            return cleanup_session_requests(state, is_forced=True)
 
 
 __all__ = ["SessionRuntime"]

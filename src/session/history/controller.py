@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 from .transcript import format_history, trim_history
-from src.state.session import HistoryMessage, SessionState
+from src.session.state import HistoryMessage, SessionState
 
 if TYPE_CHECKING:
-    from src.state.settings import HistorySettings
+    from src.runtime.config import HistorySettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
 
 

@@ -4,13 +4,18 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from src.runtime import bootstrap
 from typing import TYPE_CHECKING, cast
+from unittest.mock import AsyncMock, Mock
 from src.engines.trt.engine import TRTEngine
-from src.engines.sampling import SamplingParametersRequest
+from src.engines.protocol import SamplingParametersRequest
+from tests.harness.environment.tokenizer import build_local_tokenizer
+from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 if TYPE_CHECKING:
+    import pytest
     from collections.abc import AsyncIterator
-    from src.state.engines import EngineOutput
+    from src.engines.protocol import EngineOutput
 
 
 @dataclass
@@ -139,3 +144,20 @@ def test_trt_logit_bias() -> None:
     )
 
     assert parameters.values["embedding_bias"] == [0.0, -100.0, 0.0, 0.0, 2.5]
+
+
+def test_trt_startup(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Bootstrap a TRT adapter without creating a cache reset coordinator."""
+    engine = TRTEngine(_FakeLLM(_FakeGeneration(chunks=[])), _FakeSamplingParams, 8)
+    tokenizer = build_local_tokenizer()
+    monkeypatch.setattr(bootstrap, "_build_tokenizer", AsyncMock(return_value=tokenizer))
+    dependencies = asyncio.run(
+        bootstrap.build_runtime_dependencies(
+            DEFAULT_APPLICATION_SETTINGS,
+            connections=Mock(),
+            engine_builder=AsyncMock(return_value=engine),
+        ),
+    )
+    assert dependencies.engine is engine
+    assert dependencies.cache_reset_coordinator is None
+    assert not dependencies.can_reset_cache()

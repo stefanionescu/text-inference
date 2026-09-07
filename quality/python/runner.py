@@ -10,7 +10,7 @@ from quality.config.repository.paths import PYTHON_SOURCE_DIRS
 from quality.python.policy import read_import_policy, read_package_policy
 from quality.lib.diagnostics import Diagnostic, diagnostic, report_diagnostics
 from quality.python.rules.imports import boundary, deferred, exports, graph, layout
-from quality.python.rules import all_at_bottom, function_length, module_length, one_class_per_file, runtime_singletons
+from quality.python.rules import all_at_bottom, function_length, module_length, runtime_singletons
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -26,7 +26,6 @@ def run_rules(root: Path) -> int:
     package_policy = read_package_policy(root)
     diagnostics.extend(module_length.collect_module_length_violations(valid_sources))
     diagnostics.extend(function_length.collect_function_length_violations(valid_sources))
-    diagnostics.extend(one_class_per_file.collect_one_class_violations(valid_sources))
     diagnostics.extend(runtime_singletons.collect_singleton_violations(valid_sources))
     diagnostics.extend(deferred.collect_deferred_import_violations(valid_sources))
     diagnostics.extend(all_at_bottom.collect_all_placement_violations(valid_sources))

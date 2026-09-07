@@ -8,11 +8,9 @@ from src.telemetry.instruments import get_metrics
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
-    from src.state.turn import TurnPlan
-    from collections.abc import Awaitable
     from src.engines.protocol import Engine
     from src.session.runtime import SessionRuntime
-    from src.state.settings import ApplicationSettings
+    from src.runtime.config import ApplicationSettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
     from src.engines.vllm.cache import CacheResetCoordinator
 
@@ -31,19 +29,6 @@ class ConnectionRegistryProtocol(Protocol):
         raise NotImplementedError(websocket)
 
 
-class TurnDispatcher(Protocol):
-    """Asynchronous turn-dispatch behavior injected into the runtime."""
-
-    def __call__(
-        self,
-        websocket: WebSocket,
-        plan: TurnPlan,
-        runtime_dependencies: RuntimeDependencies,
-    ) -> Awaitable[None]:
-        """Dispatch one validated turn."""
-        raise NotImplementedError(websocket, plan, runtime_dependencies)
-
-
 @dataclass(slots=True)
 class RuntimeDependencies:
     """Process-wide runtime services initialized during startup."""
@@ -54,7 +39,6 @@ class RuntimeDependencies:
     cache_reset_coordinator: CacheResetCoordinator | None
     tokenizer: ThreadSafeTokenizer
     settings: ApplicationSettings
-    turn_dispatch: TurnDispatcher | None = None
 
     def can_reset_cache(self) -> bool:
         """Return whether engine cache reset is available."""
@@ -108,4 +92,4 @@ class RuntimeDependencies:
         await self.engine.shutdown()
 
 
-__all__ = ["ConnectionRegistryProtocol", "RuntimeDependencies", "TurnDispatcher"]
+__all__ = ["ConnectionRegistryProtocol", "RuntimeDependencies"]

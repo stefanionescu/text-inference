@@ -13,16 +13,12 @@ Validation is strict:
 from __future__ import annotations
 
 import json
-from typing import Annotated, cast
-from .schemas.end import EndMessage
-from .schemas.ping import PingMessage
-from .schemas.pong import PongMessage
-from .schemas.start import StartMessage
-from .schemas.message import TurnMessage
-from .schemas.cancel import CancelMessage
-from src.state.settings import WebSocketSettings
+from typing import Annotated, cast, TYPE_CHECKING
 from pydantic import Field, TypeAdapter, ValidationError
-from config.runtime.websocket import WEBSOCKET_MAX_MESSAGE_BYTES, WEBSOCKET_PROTOCOL_VERSION
+from src.websocket.schemas import EndMessage, PingMessage, PongMessage, StartMessage, TurnMessage, CancelMessage
+
+if TYPE_CHECKING:
+    from src.runtime.config import WebSocketSettings
 
 _client_message_model_type = StartMessage | TurnMessage | CancelMessage | PingMessage | PongMessage | EndMessage
 _client_message_type = Annotated[
@@ -30,18 +26,6 @@ _client_message_type = Annotated[
     Field(discriminator="type"),
 ]
 _MESSAGE_ADAPTER: TypeAdapter[_client_message_model_type] = TypeAdapter(_client_message_type)
-_DEFAULT_WEBSOCKET_SETTINGS = WebSocketSettings(
-    maximum_connections=None,
-    idle_timeout_seconds=150.0,
-    watchdog_tick_seconds=10.0,
-    handshake_acquire_timeout_seconds=0.5,
-    protocol_version=WEBSOCKET_PROTOCOL_VERSION,
-    maximum_message_bytes=WEBSOCKET_MAX_MESSAGE_BYTES,
-    rate_limit_window_seconds=60.0,
-    maximum_messages_per_window=20,
-    maximum_cancels_per_window=20,
-    authentication_failures_per_window=10,
-)
 
 
 def _format_validation_error(exception: ValidationError) -> str:
@@ -110,7 +94,7 @@ def _validate_protocol_version(payload: dict[str, object], websocket_settings: W
 def parse_client_message(
     raw: str,
     *,
-    websocket_settings: WebSocketSettings = _DEFAULT_WEBSOCKET_SETTINGS,
+    websocket_settings: WebSocketSettings,
 ) -> dict[str, object]:
     """Parse and normalize a client WebSocket message.
 

@@ -26,16 +26,16 @@ model snapshot inside the image reproducible.
 
 ## Common build inputs
 
-| Variable          | Required | Default        | Purpose                                                   |
-| ----------------- | :------: | -------------- | --------------------------------------------------------- |
-| `DOCKER_USERNAME` |   Yes    | None           | Selects the Docker Hub namespace.                         |
-| `DOCKER_TOKEN`    |   Yes    | None           | Authenticates the image push without storing a password.  |
-| `TAG`             |   Yes    | None           | Selects the engine-prefixed image tag.                    |
-| `MODEL`           |   Yes    | None           | Selects an allowlisted Hugging Face repository.           |
-| `MODEL_REVISION`  |   Yes    | None           | Selects an immutable 40-character commit SHA.             |
+| Variable          | Required | Default          | Purpose                                                   |
+| ----------------- | :------: | ---------------- | --------------------------------------------------------- |
+| `DOCKER_USERNAME` |   Yes    | None             | Selects the Docker Hub namespace.                         |
+| `DOCKER_TOKEN`    |   Yes    | None             | Authenticates the image push without storing a password.  |
+| `TAG`             |   Yes    | None             | Selects the engine-prefixed image tag.                    |
+| `MODEL`           |   Yes    | None             | Selects an allowlisted Hugging Face repository.           |
+| `MODEL_REVISION`  |   Yes    | None             | Selects an immutable 40-character commit SHA.             |
 | `IMAGE_NAME`      |    No    | `text-inference` | Selects the image repository name.                        |
-| `HF_TOKEN`        |    No    | None           | Reads a private or gated model through a BuildKit secret. |
-| `NO_CACHE`        |    No    | `0`            | Disables Docker layer reuse when set to `1`.              |
+| `HF_TOKEN`        |    No    | None             | Reads a private or gated model through a BuildKit secret. |
+| `NO_CACHE`        |    No    | `0`              | Disables Docker layer reuse when set to `1`.              |
 
 `TAG` must start with `vllm-` for vLLM or `trt-` for TensorRT-LLM. The pushed
 image is `<DOCKER_USERNAME>/<IMAGE_NAME>:<TAG>`.

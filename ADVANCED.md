@@ -1071,7 +1071,7 @@ metrics objects but does not configure remote exporters.
 | `AXIOM_TRACES_ENDPOINT`                     | `https://api.axiom.co/v1/traces`  | Trace endpoint.                   |
 | `AXIOM_METRICS_ENDPOINT`                    | `https://api.axiom.co/v1/metrics` | Metric endpoint.                  |
 | `CLOUD_PLATFORM`                            | None                              | Optional deployment platform tag. |
-| `OTEL_RESOURCE_NAME`                        | `text-inference-api`          | Service resource name.            |
+| `OTEL_RESOURCE_NAME`                        | `text-inference-api`              | Service resource name.            |
 | `OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS`  | `5000`                            | Span export interval.             |
 | `OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS` | `15000`                           | Metric export interval.           |
 | `OTEL_TRACES_BATCH_SIZE`                    | `512`                             | Max spans per export batch.       |

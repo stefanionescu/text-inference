@@ -6,7 +6,6 @@
         "../../../src/engines/vllm/factory.py",
         "../../../src/scripts/guard.py",
         "../../../src/server/vllm.py",
-        "../../../src/server/probe.py",
         "../../../src/server/listeners.py",
         "../../../src/telemetry/cuda.py"
     ],

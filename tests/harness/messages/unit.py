@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.state.session import HistoryMessage
+from src.session.state import HistoryMessage
 
 MESSAGES: list[HistoryMessage] = [
     HistoryMessage(

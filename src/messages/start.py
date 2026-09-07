@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import time
 import logging
-from .history import history_messages
-from typing import TYPE_CHECKING, Any
 from src.websocket.errors import send_error
+from src.session.state import HistoryMessage
 from src.telemetry.sentry import capture_error
 from .sampling import extract_sampling_overrides
 from src.telemetry.instruments import get_metrics
 from src.websocket.transport import safe_send_flat
 from src.session.config import update_session_config
+from typing import Literal, cast, TYPE_CHECKING, Any
 from .validators import (
     PromptLimit,
     require_prompt,
@@ -30,10 +30,26 @@ from config.runtime.websocket import (
 if TYPE_CHECKING:
     from fastapi import WebSocket
     from collections.abc import Callable
-    from src.state.session import SessionState
+    from src.session.state import SessionState
     from src.session.runtime import SessionRuntime
 
 logger = logging.getLogger(__name__)
+
+
+def history_messages(
+    session_runtime: SessionRuntime,
+    state: SessionState,
+    message: dict[str, Any],
+) -> list[HistoryMessage]:
+    """Import schema-validated start history through the history controller."""
+    if state.history_messages or not isinstance(message.get("history"), list):
+        return session_runtime.history.get_messages(state)
+    imported = [
+        HistoryMessage(role=cast('Literal["user", "assistant"]', item["role"]), content=item["content"])
+        for item in message["history"]
+    ]
+    session_runtime.history.set_mode_histories(state, history_messages=imported)
+    return session_runtime.history.get_messages(state)
 
 
 async def _close_validation_error(
@@ -192,4 +208,4 @@ async def bootstrap_start_turn(
         get_metrics().phase_latency.record(max(0.0, time.perf_counter() - started_at), {"phase": "validate"})
 
 
-__all__ = ["bootstrap_start_turn"]
+__all__ = ["bootstrap_start_turn", "history_messages"]

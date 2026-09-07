@@ -8,7 +8,7 @@ from config.prompt.templates import IS_TEMPLATE_THINKING_ENABLED
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from src.state.session import HistoryMessage
+    from src.session.state import HistoryMessage
     from src.tokens.tokenizer import ThreadSafeTokenizer
 
 
@@ -58,20 +58,6 @@ def _build_messages(
     return messages
 
 
-def _apply_template(
-    tokenizer: ThreadSafeTokenizer,
-    messages: list[dict[str, str]],
-    *,
-    is_generation_prompt_added: bool = True,
-) -> str:
-    """Apply the model tokenizer's chat template."""
-    return tokenizer.apply_chat_template(
-        messages,
-        is_generation_prompt_added=is_generation_prompt_added,
-        **_TEMPLATE_DEFAULT_OPTIONS,
-    )
-
-
 def _compose_system_prompt(static_prefix: str, runtime_text: str) -> str:
     """Join static and runtime system prompt text."""
     parts = [segment.strip() for segment in (static_prefix, runtime_text) if segment and segment.strip()]
@@ -88,19 +74,11 @@ def build_prefixed_prompt(
     """Build a prompt including the current user turn."""
     system_prompt = _compose_system_prompt(static_prefix, runtime_text)
     messages = _build_messages(system_prompt, history_messages, user_utterance)
-    return _apply_template(tokenizer, messages, is_generation_prompt_added=True)
+    return tokenizer.apply_chat_template(
+        messages,
+        is_generation_prompt_added=True,
+        **_TEMPLATE_DEFAULT_OPTIONS,
+    )
 
 
-def build_warm_prompt(
-    static_prefix: str,
-    runtime_text: str,
-    history_messages: list[HistoryMessage],
-    tokenizer: ThreadSafeTokenizer,
-) -> str:
-    """Build a prompt that warms the profile and history without a new user turn."""
-    system_prompt = _compose_system_prompt(static_prefix, runtime_text)
-    messages = _build_messages(system_prompt, history_messages, user_utterance=None)
-    return _apply_template(tokenizer, messages, is_generation_prompt_added=True)
-
-
-__all__ = ["build_prefixed_prompt", "build_warm_prompt"]
+__all__ = ["build_prefixed_prompt"]

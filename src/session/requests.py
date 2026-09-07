@@ -20,11 +20,14 @@ and proper cleanup when connections close.
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import asyncio
-    from src.state.session import SessionState
+    from src.engines.protocol import Engine
+    from src.session.state import SessionState
+    from collections.abc import Awaitable, Callable
 
 
 def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:
@@ -128,7 +131,59 @@ def close_session_requests(state: SessionState) -> None:
     state.active_request_task = None
 
 
+async def _run_request(
+    state: SessionState,
+    request_id: str,
+    operation: Callable[[], Awaitable[None]],
+) -> None:
+    """Release matching request state when its task finishes."""
+    try:
+        await operation()
+    finally:
+        async with state.request_lock:
+            if state.lifecycle_state != "cancelling":
+                cleanup_session_requests(state, request_id=request_id)
+
+
+async def spawn_session_task(
+    state: SessionState,
+    *,
+    request_id: str,
+    operation: Callable[[], Awaitable[None]],
+) -> asyncio.Task[None] | None:
+    """Atomically create and attach a supervised session request."""
+    async with state.request_lock:
+        if state.lifecycle_state != "idle" or has_running_task(state):
+            return None
+        begin_session_request(state, request_id)
+        task = asyncio.create_task(
+            _run_request(state, request_id, operation),
+        )
+        attach_request_task(state, request_id=request_id, task=task)
+        return task
+
+
+async def abort_session_requests(state: SessionState | None, engine: Engine) -> None:
+    """Cancel and await active work, then clear only the captured request."""
+    if state is None:
+        return
+    async with state.request_lock:
+        request_id = state.active_request_id
+        task = state.active_request_task
+        cancel_session_requests(state)
+    try:
+        if request_id:
+            await engine.abort(request_id)
+    finally:
+        if task is not None:
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+        async with state.request_lock:
+            cleanup_session_requests(state, request_id=request_id)
+
+
 __all__ = [
+    "abort_session_requests",
     "attach_request_task",
     "begin_session_request",
     "cancel_session_requests",
@@ -136,4 +191,5 @@ __all__ = [
     "close_session_requests",
     "has_running_task",
     "is_request_cancelled",
+    "spawn_session_task",
 ]
