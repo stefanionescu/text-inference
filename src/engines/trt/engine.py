@@ -117,20 +117,24 @@ class TRTEngine:
         sampling_parameters: object,
         request_id: str,
     ) -> AsyncGenerator[EngineOutput, None]:
-        """Stream generation through the public asynchronous result API."""
+        """Stream results and abort unfinished work when its consumer exits."""
         generation = self._llm.generate_async(prompt, sampling_parameters, streaming=True)
         self._inflight[request_id] = generation
+        is_finished = False
 
         try:
             async for chunk in generation:
                 completion = chunk.outputs[0]
+                is_finished = chunk.finished
                 yield EngineOutput(
                     text=completion.text,
                     token_ids=list(completion.token_ids) if completion.token_ids is not None else None,
                     is_finished=chunk.finished,
                 )
         finally:
-            self._inflight.pop(request_id, None)
+            pending = self._inflight.pop(request_id, None)
+            if pending is not None and not is_finished:
+                pending.abort()
 
     async def abort(self, request_id: str) -> None:
         """Abort an in-flight request through its public result object."""

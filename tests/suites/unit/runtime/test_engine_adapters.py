@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 import asyncio
 from dataclasses import dataclass
 from src.runtime import bootstrap
@@ -13,7 +14,6 @@ from tests.harness.environment.tokenizer import build_local_tokenizer
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 if TYPE_CHECKING:
-    import pytest
     from collections.abc import AsyncIterator
     from src.engines.protocol import EngineOutput
 
@@ -34,6 +34,7 @@ class _FakeChunk:
 class _FakeGeneration:
     chunks: list[_FakeChunk]
     is_aborted: bool = False
+    completion_event: asyncio.Event | None = None
 
     def __aiter__(self) -> AsyncIterator[_FakeChunk]:
         """Iterate over test generation chunks."""
@@ -41,6 +42,8 @@ class _FakeGeneration:
         async def _chunks() -> AsyncIterator[_FakeChunk]:
             for chunk in self.chunks:
                 yield chunk
+            if self.completion_event is not None:
+                await self.completion_event.wait()
 
         return _chunks()
 
@@ -100,6 +103,7 @@ def test_trt_stream_outputs() -> None:
         ("hello", [1], False),
         ("hello world", [1, 2], True),
     ]
+    assert not generation.is_aborted
 
 
 def test_trt_aborts_generation() -> None:
@@ -118,6 +122,37 @@ def test_trt_aborts_generation() -> None:
     asyncio.run(_abort())
 
     assert generation.is_aborted
+
+
+def test_trt_closing_stream_aborts_unfinished_generation() -> None:
+    """Closing a consumer must release its unfinished backend request."""
+    generation = _FakeGeneration(
+        chunks=[_FakeChunk(outputs=[_FakeCompletion(text="waiting", token_ids=[7])], finished=False)],
+    )
+    engine = TRTEngine(_FakeLLM(generation), _FakeSamplingParams, 8)
+
+    async def _close() -> None:
+        stream = engine.generate_stream("prompt", object(), "request")
+        await anext(stream)
+        await stream.aclose()
+
+    asyncio.run(_close())
+
+    assert generation.is_aborted
+
+
+def test_trt_timeout_aborts_unfinished_generation() -> None:
+    """A timed-out consumer must abort work before releasing its request."""
+
+    async def _timeout() -> None:
+        generation = _FakeGeneration(chunks=[], completion_event=asyncio.Event())
+        engine = TRTEngine(_FakeLLM(generation), _FakeSamplingParams, 8)
+        stream = engine.generate_stream("prompt", object(), "request")
+        with pytest.raises(TimeoutError):
+            await asyncio.wait_for(anext(stream), timeout=0.01)
+        assert generation.is_aborted
+
+    asyncio.run(_timeout())
 
 
 def test_trt_shutdown_backend() -> None:

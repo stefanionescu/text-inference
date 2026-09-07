@@ -150,7 +150,7 @@ async def _dispatch_session_message(dispatch: SessionDispatch) -> bool:
         logger.info("WS recv: cancel")
         await abort_session_requests(dispatch.state, dispatch.runtime_dependencies.engine)
         await safe_send_flat(dispatch.websocket, "cancelled")
-        return True
+        return dispatch.is_started
     await send_error(
         dispatch.websocket,
         code=WEBSOCKET_ERROR_INVALID_MESSAGE,
