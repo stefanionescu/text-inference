@@ -17,22 +17,6 @@ class TokenizerValidationResult:
     has_tokenizer_config: bool
 
 
-def _missing_tokenizer_message(model_path: str, tokenizer_json: str, tokenizer_config: str) -> str:
-    """Build the missing-tokenizer validation message."""
-    return (
-        f"Tokenizer files not found in model directory: {model_path}\n"
-        "Expected at least one of:\n"
-        f"  - {tokenizer_json}\n"
-        f"  - {tokenizer_config}\n"
-        "\n"
-        "If using a pre-quantized model from HuggingFace:\n"
-        "  Ensure the download completed successfully and includes tokenizer files.\n"
-        "\n"
-        "If using a locally quantized model:\n"
-        "  Re-run quantization to regenerate the tokenizer files."
-    )
-
-
 def require_local_model_directory(model_path: str | Path) -> Path:
     """Return an existing resolved local model directory."""
     if not str(model_path):
@@ -89,7 +73,18 @@ def validate_tokenizer_exists(model_path: str) -> TokenizerValidationResult:
         else:
             result = TokenizerValidationResult(
                 is_valid=False,
-                error_message=_missing_tokenizer_message(model_path, str(tokenizer_json), str(tokenizer_config)),
+                error_message=(
+                    f"Tokenizer files not found in model directory: {model_path}\n"
+                    "Expected at least one of:\n"
+                    f"  - {tokenizer_json}\n"
+                    f"  - {tokenizer_config}\n"
+                    "\n"
+                    "If using a pre-quantized model from HuggingFace:\n"
+                    "  Ensure the download completed successfully and includes tokenizer files.\n"
+                    "\n"
+                    "If using a locally quantized model:\n"
+                    "  Re-run quantization to regenerate the tokenizer files."
+                ),
                 model_path=model_path,
                 has_tokenizer_json=False,
                 has_tokenizer_config=False,

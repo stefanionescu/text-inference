@@ -5,14 +5,8 @@
 
 set -euo pipefail
 
-DEPLOY_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly DEPLOY_FOLDER
-SCRIPTS_FOLDER="$(CDPATH='' cd -- "${DEPLOY_FOLDER}/.." && pwd -P)" || exit 1
-readonly SCRIPTS_FOLDER
-ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPTS_FOLDER}/.." && pwd -P)" || exit 1
-readonly ROOT_FOLDER
-export ROOT_FOLDER
-
+# shellcheck source=scripts/lib/foundation/folders.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/../lib/foundation/folders.sh"
 # shellcheck source=scripts/config/values/runtime.sh
 source "${SCRIPTS_FOLDER}/config/values/runtime.sh"
 # shellcheck source=scripts/lib/restart/workflow.sh

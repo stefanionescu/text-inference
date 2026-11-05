@@ -37,21 +37,6 @@ def _string_key_mapping(value: object) -> dict[str, object]:
     return cast("dict[str, object]", value)
 
 
-def _build_recipe(policy: QuantizationPolicy) -> list[object]:
-    """Build the model-aware LLM Compressor recipe."""
-    awq_modifier = (
-        AWQModifier(duo_scaling=policy.awq_duo_scaling) if policy.awq_duo_scaling is not None else AWQModifier()
-    )
-    return [
-        awq_modifier,
-        QuantizationModifier(
-            scheme=policy.scheme,
-            targets=list(policy.targets),
-            ignore=list(policy.ignored_modules),
-        ),
-    ]
-
-
 class _LLMCompressorRuntime:
     """Expose concrete LLM Compressor behavior to the portable workflow."""
 
@@ -93,12 +78,22 @@ class _LLMCompressorRuntime:
                 device_map=None,
                 local_files_only=True,
             )
+        awq_modifier = (
+            AWQModifier(duo_scaling=policy.awq_duo_scaling) if policy.awq_duo_scaling is not None else AWQModifier()
+        )
         oneshot(
             model=model,
             processor=str(source.path),
             trust_remote_code_model=True,
             dataset=settings.dataset,
-            recipe=_build_recipe(policy),
+            recipe=[
+                awq_modifier,
+                QuantizationModifier(
+                    scheme=policy.scheme,
+                    targets=list(policy.targets),
+                    ignore=list(policy.ignored_modules),
+                ),
+            ],
             output_dir=str(checkpoint_folder),
             max_seq_length=settings.sequence_length,
             num_calibration_samples=settings.samples,

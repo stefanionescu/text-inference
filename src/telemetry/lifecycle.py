@@ -1,4 +1,4 @@
-"""Telemetry initialization and shutdown."""
+"""Telemetry initialization."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import logging
 from src.runtime.environment import read_environment_text
 from config.runtime.telemetry import SENTRY_DSN, AXIOM_API_TOKEN
 
-from .sentry import shutdown_sentry, initialize_sentry
-from .open_telemetry import shutdown_open_telemetry, initialize_open_telemetry
+from .sentry import initialize_sentry
+from .open_telemetry import initialize_open_telemetry
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +26,4 @@ def initialize_telemetry() -> None:
         logger.info("Sentry disabled (SENTRY_DSN not set)")
 
 
-def shutdown_telemetry() -> None:
-    """Flush and shutdown all telemetry backends. Idempotent."""
-    shutdown_sentry()
-    shutdown_open_telemetry()
-
-
-__all__ = ["initialize_telemetry", "shutdown_telemetry"]
+__all__ = ["initialize_telemetry"]

@@ -34,11 +34,6 @@ def normalize_gender(value: str | None) -> str | None:
     return normalized_value if normalized_value in VALID_GENDERS else None
 
 
-def is_gender_blank(value: str | None) -> bool:
-    """Check if gender is empty or null (before normalization)."""
-    return value is None or not value.strip()
-
-
 def normalize_personality(value: str | None) -> str | None:
     """Normalize personality: letters-only, length-limited, lowercased."""
     if value is None:
@@ -54,14 +49,9 @@ def normalize_personality(value: str | None) -> str | None:
     return normalized_value.lower()
 
 
-def is_personality_blank(value: str | None) -> bool:
-    """Check if personality is empty or null (before normalization)."""
-    return value is None or not value.strip()
-
-
 def validate_required_gender(raw_gender: str | None) -> str:
     """Validate and normalize the required gender field."""
-    if is_gender_blank(raw_gender):
+    if raw_gender is None or not raw_gender.strip():
         message = "missing_gender"
         raise ValidationError(
             message,
@@ -79,7 +69,7 @@ def validate_required_gender(raw_gender: str | None) -> str:
 
 def validate_required_personality(raw_personality: str | None) -> str:
     """Validate and normalize the required personality field."""
-    if is_personality_blank(raw_personality):
+    if raw_personality is None or not raw_personality.strip():
         message = "missing_personality"
         raise ValidationError(
             message,
@@ -125,8 +115,6 @@ def sanitize_prompt_limit(raw_prompt: str, limit: PromptLimit) -> str:
 __all__ = [
     "PromptLimit",
     "ValidationError",
-    "is_gender_blank",
-    "is_personality_blank",
     "normalize_gender",
     "normalize_personality",
     "require_prompt",

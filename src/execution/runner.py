@@ -68,32 +68,6 @@ def _build_logit_bias_map(tokenizer: ThreadSafeTokenizer, *, sampling_settings: 
     return id_bias
 
 
-def _build_sampling_parameters(
-    overrides: dict[str, float | int | bool],
-    engine: Engine,
-    tokenizer: ThreadSafeTokenizer,
-    *,
-    sampling_settings: SamplingSettings,
-    session_settings: SessionSettings,
-) -> object:
-    """Build engine sampling parameters from resolved overrides."""
-    logit_bias = _build_logit_bias_map(tokenizer, sampling_settings=sampling_settings)
-    return engine.create_sampling_parameters(
-        SamplingParametersRequest(
-            temperature=float(overrides["temperature"]),
-            top_p=float(overrides["top_p"]),
-            top_k=int(overrides["top_k"]),
-            min_p=float(overrides["min_p"]),
-            repetition_penalty=float(overrides["repetition_penalty"]),
-            presence_penalty=float(overrides["presence_penalty"]),
-            frequency_penalty=float(overrides["frequency_penalty"]),
-            maximum_tokens=session_settings.maximum_output_tokens,
-            stop=list(sampling_settings.inference_stop),
-            logit_bias=logit_bias or None,
-        ),
-    )
-
-
 async def _stream_sanitized(
     stream: StreamController,
     *,
@@ -140,12 +114,20 @@ async def run_generation(request: GenerationRequest) -> AsyncGenerator[str, None
         request.sampling_overrides or {},
         sampling_settings=request.sampling_settings,
     )
-    parameters = _build_sampling_parameters(
-        overrides,
-        request.engine,
-        request.tokenizer,
-        sampling_settings=request.sampling_settings,
-        session_settings=request.session_settings,
+    logit_bias = _build_logit_bias_map(request.tokenizer, sampling_settings=request.sampling_settings)
+    parameters = request.engine.create_sampling_parameters(
+        SamplingParametersRequest(
+            temperature=float(overrides["temperature"]),
+            top_p=float(overrides["top_p"]),
+            top_k=int(overrides["top_k"]),
+            min_p=float(overrides["min_p"]),
+            repetition_penalty=float(overrides["repetition_penalty"]),
+            presence_penalty=float(overrides["presence_penalty"]),
+            frequency_penalty=float(overrides["frequency_penalty"]),
+            maximum_tokens=request.session_settings.maximum_output_tokens,
+            stop=list(request.sampling_settings.inference_stop),
+            logit_bias=logit_bias or None,
+        ),
     )
 
     get_metrics().phase_latency.record(0.0, {"phase": "prompt_build"})

@@ -37,15 +37,13 @@ class HistoryItem(BaseModel):
         return value
 
 
-class StartMessage(VersionedMessage):
-    """Strict schema for start messages."""
+class _SamplingOverrideMessage(VersionedMessage):
+    """Top-level sampling overrides, typed loosely so `extract_sampling_overrides` reports bad values.
 
-    type: Literal["start"]
-    gender: str | None = None
-    personality: str | None = None
-    history: list[HistoryItem] = Field(default_factory=list)
-    prompt: str | None = None
-    sampling: dict[str, object] | None = None
+    Each subclass declares `sampling` itself, because it is the only override
+    Pydantic can reject and the parser reports the first failing field in order.
+    """
+
     temperature: object | None = None
     top_p: object | None = None
     top_k: object | None = None
@@ -54,6 +52,17 @@ class StartMessage(VersionedMessage):
     presence_penalty: object | None = None
     frequency_penalty: object | None = None
     sanitize_output: object | None = None
+
+
+class StartMessage(_SamplingOverrideMessage):
+    """Strict schema for start messages."""
+
+    type: Literal["start"]
+    gender: str | None = None
+    personality: str | None = None
+    history: list[HistoryItem] = Field(default_factory=list)
+    prompt: str | None = None
+    sampling: dict[str, object] | None = None
 
     @field_validator("history", mode="before")
     @staticmethod
@@ -64,20 +73,12 @@ class StartMessage(VersionedMessage):
         return value
 
 
-class TurnMessage(VersionedMessage):
+class TurnMessage(_SamplingOverrideMessage):
     """Strict schema for message turn payloads."""
 
     type: Literal["message"]
     user_utterance: str | None = None
     sampling: dict[str, object] | None = None
-    temperature: object | None = None
-    top_p: object | None = None
-    top_k: object | None = None
-    min_p: object | None = None
-    repetition_penalty: object | None = None
-    presence_penalty: object | None = None
-    frequency_penalty: object | None = None
-    sanitize_output: object | None = None
 
 
 class CancelMessage(VersionedMessage):

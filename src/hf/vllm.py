@@ -6,11 +6,8 @@ import os
 import sys
 import json
 from typing import TYPE_CHECKING
-from pathlib import Path
-import argparse
 
-from huggingface_hub import HfApi
-
+from src.hf.upload import publish_checkpoint, parse_upload_arguments, require_checkpoint_folder
 from config.model.vllm import VLLM_VERSION
 from src.hf.model_card import (
     format_model_card,
@@ -23,9 +20,6 @@ from config.model.publishing import (
     ENABLED_LABEL,
     DISABLED_LABEL,
     ALL_EXPERTS_LABEL,
-    HF_MODEL_REPO_TYPE,
-    HF_DEFAULT_REVISION,
-    MODEL_CARD_FILENAME,
     VLLM_UPLOAD_MESSAGE,
     NOT_APPLICABLE_LABEL,
     MODEL_CARD_JSON_INDENT,
@@ -40,21 +34,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
 
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the stable checkpoint-upload command."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
-    parser.add_argument("--repo-id", required=True)
-    parser.add_argument("--private", action="store_true")
-    return parser.parse_args(argument_values)
-
-
-def build_model_card(
-    metadata: Mapping[str, object],
-    repo_id: str,
-    *,
-    hf_token: str | None,
-) -> str:
+def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: str | None) -> str:
     """Build the detailed compressed-tensors model card."""
     card_fields = build_provenance_fields(metadata, repo_id, hf_token=hf_token)
     recipe = read_metadata_section(metadata, "quantization")
@@ -96,12 +76,8 @@ def build_model_card(
 
 def main(argument_values: Sequence[str] | None = None) -> int:
     """Upload the configured checkpoint."""
-    arguments = _parse_arguments(argument_values)
-
-    checkpoint_folder = Path(arguments.checkpoint_folder).resolve(strict=True)
-    if not checkpoint_folder.is_dir():
-        message = "Checkpoint must be a directory"
-        raise NotADirectoryError(message)
+    arguments = parse_upload_arguments(argument_values, __doc__, is_format_required=False)
+    checkpoint_folder = require_checkpoint_folder(arguments.checkpoint_folder)
     validate_checkpoint(checkpoint_folder, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
     metadata = require_provenance(
         checkpoint_folder,
@@ -110,23 +86,7 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     )
     hf_token = os.environ["HF_TOKEN"]
     model_card = build_model_card(metadata, arguments.repo_id, hf_token=hf_token)
-    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
-
-    hf_client = HfApi(token=hf_token)
-    hf_client.create_repo(
-        repo_id=arguments.repo_id,
-        exist_ok=True,
-        repo_type=HF_MODEL_REPO_TYPE,
-        private=arguments.private,
-    )
-    hf_client.upload_folder(
-        folder_path=checkpoint_folder,
-        repo_id=arguments.repo_id,
-        repo_type=HF_MODEL_REPO_TYPE,
-        revision=HF_DEFAULT_REVISION,
-        commit_message=VLLM_UPLOAD_MESSAGE,
-        ignore_patterns=list(VLLM_HF_IGNORE_PATTERNS),
-    )
+    publish_checkpoint(checkpoint_folder, model_card, arguments, hf_token, VLLM_UPLOAD_MESSAGE, VLLM_HF_IGNORE_PATTERNS)
     sys.stdout.write(f"[vllm-hf] Upload complete: {arguments.repo_id}\n")
     return 0
 

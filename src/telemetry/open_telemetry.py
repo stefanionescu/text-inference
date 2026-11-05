@@ -58,21 +58,16 @@ def _build_resource() -> Resource:
     return Resource.create(attributes)
 
 
-def _axiom_headers() -> dict[str, str]:
-    """Build headers for Axiom OTLP exporters."""
-    return {
-        "Authorization": f"Bearer {read_environment_text('AXIOM_API_TOKEN', AXIOM_API_TOKEN)}",
-        "X-Axiom-Dataset": read_environment_text("AXIOM_DATASET", AXIOM_DATASET),
-    }
-
-
 def initialize_open_telemetry() -> None:
     """Create and register global TracerProvider + MeterProvider. Idempotent."""
     if _OPEN_TELEMETRY_STATE.tracer_provider is not None:
         return
 
     resource = _build_resource()
-    headers = _axiom_headers()
+    headers = {
+        "Authorization": f"Bearer {read_environment_text('AXIOM_API_TOKEN', AXIOM_API_TOKEN)}",
+        "X-Axiom-Dataset": read_environment_text("AXIOM_DATASET", AXIOM_DATASET),
+    }
 
     # Traces
     traces_endpoint = read_environment_text("AXIOM_TRACES_ENDPOINT", AXIOM_TRACES_ENDPOINT)

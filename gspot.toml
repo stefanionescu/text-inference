@@ -304,6 +304,56 @@ paths = [
 ]
 reason = "These modules import GPU-only or engine-only packages that no single environment installs alongside the local extra, the same files the previous pyrightconfig excluded."
 
+[[ignore]]
+check = "structure/trivial-functions"
+paths = [
+  "src/engines/trt/engine.py",
+  "src/engines/vllm/engine.py",
+  "src/engines/vllm/cache.py",
+  "src/quantization/vllm/runner.py",
+  "src/quantization/vllm/quantize.py",
+  "src/telemetry/gpu.py",
+  "src/telemetry/cuda.py",
+  "src/scripts/cuda.py",
+  "src/tokens/tokenizer.py",
+]
+reason = "These are Protocol stubs and the thin adapters that implement them, so each method must exist by name."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["src/execution/controller.py"]
+reason = "The async for statement calls __aiter__ by name, so it cannot be inlined."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["src/server/listeners.py"]
+reason = "install_signal_handlers overrides a uvicorn method on purpose so the process owns signal handling."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["src/text/verbalize.py"]
+reason = "replace_email is the callback that re.sub calls for each match."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["scripts/lib/runtime/warmup/main.sh"]
+reason = "A trap calls _warmup_clear_lock by name as well as one direct caller."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["src/websocket/endpoint.py"]
+reason = "test_connection_cleanup patches _create_rate_limiters by name to inject limiters."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["src/runtime/settings.py"]
+reason = "Inlining these builders would push read_settings over the function size limit."
+
+[[ignore]]
+check = "structure/trivial-functions"
+paths = ["scripts/lib/runtime/cleanup/artifacts.sh"]
+reason = "runtime_clear_model_transition keeps the destructive path list inside the library that owns cleanup."
+
 [[naming.exception]]
 languages = ["bash"]
 allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]

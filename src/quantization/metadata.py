@@ -1,17 +1,23 @@
-"""Parse checkpoint quantization metadata without runtime dependencies."""
+"""Parse checkpoint metadata and fingerprint local sources without runtime dependencies."""
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
+import hashlib
 
 from config.model.quantization import (
     MODELOPT_METHOD,
     MODEL_CONFIG_FILENAME,
     MODELOPT_ALGORITHM_FIELD,
     QUANTIZATION_CONFIG_FIELD,
+    CHECKPOINT_ASSET_FILENAMES,
     MODELOPT_ALGORITHM_FORMATS,
     QUANTIZATION_METHOD_FIELDS,
+    SOURCE_FINGERPRINT_SUFFIXES,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _mapping(value: object) -> dict[str, object]:
@@ -75,4 +81,28 @@ def detect_payload_formats(payloads: list[tuple[str, object]]) -> str | None:
     return formats.pop()
 
 
-__all__ = ["detect_metadata_format", "detect_payload_formats", "quantization_metadata"]
+def fingerprint_local_source(model_folder: Path) -> str:
+    """Hash the names, sizes, and mtimes of checkpoint files, never reading multi-gigabyte weights."""
+    digest = hashlib.sha256()
+    file_count = 0
+    for path in sorted(model_folder.rglob("*")):
+        if not path.is_file():
+            continue
+        if path.name not in CHECKPOINT_ASSET_FILENAMES and path.suffix not in SOURCE_FINGERPRINT_SUFFIXES:
+            continue
+        file_stat = path.stat()
+        relative_path = path.relative_to(model_folder).as_posix()
+        digest.update(f"{relative_path}\0{file_stat.st_size}\0{file_stat.st_mtime_ns}\n".encode())
+        file_count += 1
+    if file_count == 0:
+        message = "Local model does not contain checkpoint files"
+        raise ValueError(message)
+    return f"local:{digest.hexdigest()}"
+
+
+__all__ = [
+    "detect_metadata_format",
+    "detect_payload_formats",
+    "fingerprint_local_source",
+    "quantization_metadata",
+]

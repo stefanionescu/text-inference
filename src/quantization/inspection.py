@@ -8,7 +8,6 @@ import sys
 from http import HTTPStatus
 import json
 from typing import TYPE_CHECKING, cast
-import hashlib
 from pathlib import Path
 import argparse
 from dataclasses import dataclass
@@ -28,11 +27,9 @@ from config.model.quantization import (
     TRT_ENGINE,
     DEFAULT_MODEL_REVISION,
     HUB_COMMIT_PATTERN_TEXT,
-    CHECKPOINT_ASSET_FILENAMES,
-    SOURCE_FINGERPRINT_SUFFIXES,
     QUANTIZATION_CONFIG_FILENAMES,
 )
-from src.quantization.metadata import detect_payload_formats
+from src.quantization.metadata import detect_payload_formats, fingerprint_local_source
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -85,25 +82,6 @@ def _mapping(value: object) -> dict[str, object]:
         message = "Hugging Face returned an invalid model response"
         raise TypeError(message)
     return cast("dict[str, object]", value)
-
-
-def _local_fingerprint(model_folder: Path) -> str:
-    """Fingerprint checkpoint-relevant local files without hashing weights."""
-    digest = hashlib.sha256()
-    file_count = 0
-    for path in sorted(model_folder.rglob("*")):
-        if not path.is_file():
-            continue
-        if path.name not in CHECKPOINT_ASSET_FILENAMES and path.suffix not in SOURCE_FINGERPRINT_SUFFIXES:
-            continue
-        file_stat = path.stat()
-        relative_path = path.relative_to(model_folder).as_posix()
-        digest.update(f"{relative_path}\0{file_stat.st_size}\0{file_stat.st_mtime_ns}\n".encode())
-        file_count += 1
-    if file_count == 0:
-        message = "Local model does not contain checkpoint files"
-        raise ValueError(message)
-    return f"local:{digest.hexdigest()}"
 
 
 def _local_payloads(model_folder: Path) -> list[tuple[str, object]]:
@@ -229,7 +207,7 @@ def inspect_metadata(
         message = "Model path must be a directory"
         raise NotADirectoryError(message)
     if model_path.is_dir():
-        resolved_revision = _local_fingerprint(model_path.resolve(strict=True))
+        resolved_revision = fingerprint_local_source(model_path.resolve(strict=True))
         payloads = _local_payloads(model_path)
     else:
         resolved_revision, payloads = _remote_metadata(model, revision, token)

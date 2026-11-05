@@ -6,7 +6,6 @@ import os
 import re
 import sys
 from typing import TYPE_CHECKING, cast
-import hashlib
 from pathlib import Path
 import argparse
 from dataclasses import dataclass
@@ -19,9 +18,8 @@ from config.model.quantization import (
     LOCAL_SOURCE_KIND,
     DEFAULT_MODEL_REVISION,
     HUB_COMMIT_PATTERN_TEXT,
-    CHECKPOINT_ASSET_FILENAMES,
-    SOURCE_FINGERPRINT_SUFFIXES,
 )
+from src.quantization.metadata import fingerprint_local_source
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -57,28 +55,6 @@ class SourceSnapshot:
     path: Path
 
 
-def _is_source_asset(path: Path) -> bool:
-    """Return whether a file affects quantization or tokenizer behavior."""
-    return path.name in CHECKPOINT_ASSET_FILENAMES or path.suffix in SOURCE_FINGERPRINT_SUFFIXES
-
-
-def _fingerprint_local_source(model_folder: Path) -> str:
-    """Fingerprint relevant files without reading multi-gigabyte weights."""
-    digest = hashlib.sha256()
-    file_count = 0
-    for path in sorted(model_folder.rglob("*")):
-        if not path.is_file() or not _is_source_asset(path):
-            continue
-        file_stat = path.stat()
-        relative_path = path.relative_to(model_folder).as_posix()
-        digest.update(f"{relative_path}\0{file_stat.st_size}\0{file_stat.st_mtime_ns}\n".encode())
-        file_count += 1
-    if file_count == 0:
-        message = "Local model does not contain checkpoint files"
-        raise ValueError(message)
-    return f"local:{digest.hexdigest()}"
-
-
 def _build_local_source(model_folder: Path) -> SourceSnapshot:
     """Build the identity for a local source directory."""
     path = model_folder.resolve(strict=True)
@@ -87,7 +63,7 @@ def _build_local_source(model_folder: Path) -> SourceSnapshot:
             kind=LOCAL_SOURCE_KIND,
             model=path.name,
             requested_revision=None,
-            resolved_revision=_fingerprint_local_source(path),
+            resolved_revision=fingerprint_local_source(path),
         ),
         path=path,
     )

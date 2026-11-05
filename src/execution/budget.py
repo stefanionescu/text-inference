@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
+from dataclasses import replace, dataclass
 
 from src.execution.templates import build_prefixed_prompt
 from src.session.history.turns import group_turns, copy_messages, flatten_turns
@@ -57,33 +57,6 @@ def _build_prompt(context: _PromptFitContext, user_utterance: str) -> tuple[str,
         context.tokenizer,
     )
     return prompt, len(context.tokenizer.encode_ids(prompt))
-
-
-def _replace_history_turns(
-    context: _PromptFitContext,
-    history_turns: list[list[HistoryMessage]],
-) -> _PromptFitContext:
-    """Return a fit context with a different history window."""
-    return _PromptFitContext(
-        static_prefix=context.static_prefix,
-        runtime_text=context.runtime_text,
-        history_turns=history_turns,
-        tokenizer=context.tokenizer,
-        maximum_prompt_tokens=context.maximum_prompt_tokens,
-        maximum_user_tokens=context.maximum_user_tokens,
-    )
-
-
-def _build_fit_context(request: PromptBudgetRequest, tokenizer: ThreadSafeTokenizer) -> _PromptFitContext:
-    """Create prompt fitting context from a turn request."""
-    return _PromptFitContext(
-        static_prefix=request.static_prefix,
-        runtime_text=request.runtime_text,
-        history_turns=group_turns(copy_messages(request.history_messages)),
-        tokenizer=tokenizer,
-        maximum_prompt_tokens=request.maximum_prompt_tokens,
-        maximum_user_tokens=request.maximum_user_tokens,
-    )
 
 
 def _count_user_tokens(user_utterance: str, tokenizer: ThreadSafeTokenizer) -> int:
@@ -166,7 +139,14 @@ def fit_prompt_to_budget(
     tokenizer: ThreadSafeTokenizer,
 ) -> PromptFitResult:
     """Fit the exact templated prompt to budget with one raw-user fit path."""
-    fit_context = _build_fit_context(request, tokenizer)
+    fit_context = _PromptFitContext(
+        static_prefix=request.static_prefix,
+        runtime_text=request.runtime_text,
+        history_turns=group_turns(copy_messages(request.history_messages)),
+        tokenizer=tokenizer,
+        maximum_prompt_tokens=request.maximum_prompt_tokens,
+        maximum_user_tokens=request.maximum_user_tokens,
+    )
     effective_history = fit_context.history_turns
     limited_user_utterance = _limit_user_utterance(
         request.user_utterance,
@@ -177,7 +157,7 @@ def fit_prompt_to_budget(
 
     while effective_history and prompt_tokens > request.maximum_prompt_tokens:
         effective_history = effective_history[1:]
-        fit_context = _replace_history_turns(fit_context, effective_history)
+        fit_context = replace(fit_context, history_turns=effective_history)
         prompt, prompt_tokens = _build_prompt(fit_context, limited_user_utterance)
 
     fitted_user_utterance, prompt, prompt_tokens = _fit_user_utterance(fit_context, request.user_utterance)

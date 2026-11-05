@@ -148,23 +148,6 @@ def _parse_int(value: object) -> int:
     raise TypeError(message)
 
 
-def _sampling_fields(
-    sampling_settings: SamplingSettings,
-) -> tuple[SamplingFieldSpec, ...]:
-    """Return sampling field metadata from resolved settings."""
-    return tuple(
-        SamplingFieldSpec(
-            name=field.name,
-            caster=field.caster,
-            minimum=getattr(sampling_settings, field.minimum_attribute),
-            maximum=getattr(sampling_settings, field.maximum_attribute),
-            invalid_code=field.invalid_code,
-            range_code=field.range_code,
-        )
-        for field in DYNAMIC_SAMPLING_FIELDS
-    )
-
-
 def _get_sampling_block(message: Mapping[str, object]) -> Mapping[str, object]:
     """Return nested sampling overrides from a message."""
     sampling_block = message.get("sampling")
@@ -214,7 +197,18 @@ def _extract_numeric_overrides(
 ) -> dict[str, NumericSamplingValue]:
     """Extract numeric sampling overrides from a message."""
     overrides: dict[str, NumericSamplingValue] = {}
-    for field in _sampling_fields(sampling_settings):
+    resolved_fields = tuple(
+        SamplingFieldSpec(
+            name=dynamic_field.name,
+            caster=dynamic_field.caster,
+            minimum=getattr(sampling_settings, dynamic_field.minimum_attribute),
+            maximum=getattr(sampling_settings, dynamic_field.maximum_attribute),
+            invalid_code=dynamic_field.invalid_code,
+            range_code=dynamic_field.range_code,
+        )
+        for dynamic_field in DYNAMIC_SAMPLING_FIELDS
+    )
+    for field in resolved_fields:
         raw_value = _read_field_value(field.name, message, sampling_block)
         if raw_value is None:
             continue

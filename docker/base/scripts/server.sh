@@ -2,6 +2,8 @@
 #
 # Run one engine server, raw capture, filtered console, and readiness warmup.
 
+# shellcheck source=docker/base/scripts/logs.sh
+source "/app/base/scripts/logs.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "/app/scripts/lib/foundation/log.sh"
 
@@ -21,6 +23,36 @@ Usage: /app/scripts/main.sh [--logs]
 Requires API_KEY. The image runs its baked checkpoint unchanged, exposes the
 WebSocket service on port 8000, and keeps readiness on loopback port 8001.
 EOF
+}
+
+# container_read_arguments: Export LOGS_ENABLED from the command line, or print usage and exit.
+# Arguments:
+#   All arguments: The container command line.
+container_read_arguments() {
+  local is_logging_enabled=0
+
+  case "$#" in
+    0) ;;
+    1)
+      case "$1" in
+        --logs) is_logging_enabled=1 ;;
+        --help | -h)
+          container_show_usage
+          exit 0
+          ;;
+        *)
+          container_show_usage >&2
+          exit 2
+          ;;
+      esac
+      ;;
+    *)
+      container_show_usage >&2
+      exit 2
+      ;;
+  esac
+  LOGS_ENABLED="${is_logging_enabled}"
+  export LOGS_ENABLED
 }
 
 # _container_follow_log: Print the server log through a private FIFO until the server stops.

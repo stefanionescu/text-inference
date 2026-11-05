@@ -5,22 +5,18 @@
 
 set -euo pipefail
 
-SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly SCRIPT_FOLDER
-ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPT_FOLDER}/.." && pwd -P)" || exit 1
-readonly ROOT_FOLDER
-export ROOT_FOLDER
-
+# shellcheck source=scripts/lib/foundation/folders.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/lib/foundation/folders.sh"
 # shellcheck source=scripts/config/defaults.sh
-source "${SCRIPT_FOLDER}/config/defaults.sh"
+source "${SCRIPTS_FOLDER}/config/defaults.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${SCRIPT_FOLDER}/config/values/deployment.sh"
+source "${SCRIPTS_FOLDER}/config/values/deployment.sh"
 # shellcheck source=scripts/lib/env/runtime.sh
-source "${SCRIPT_FOLDER}/lib/env/runtime.sh"
+source "${SCRIPTS_FOLDER}/lib/env/runtime.sh"
 # shellcheck source=scripts/lib/env/warmup.sh
-source "${SCRIPT_FOLDER}/lib/env/warmup.sh"
+source "${SCRIPTS_FOLDER}/lib/env/warmup.sh"
 # shellcheck source=scripts/lib/runtime/warmup/main.sh
-source "${SCRIPT_FOLDER}/lib/runtime/warmup/main.sh"
+source "${SCRIPTS_FOLDER}/lib/runtime/warmup/main.sh"
 
 # _warmup_usage: Print the warmup command contract.
 _warmup_usage() {

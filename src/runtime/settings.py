@@ -113,15 +113,6 @@ def _read_environment_boolean(environment: EnvironmentValues, name: str) -> bool
     raise ValueError(message)
 
 
-def _build_model_settings(environment: EnvironmentValues) -> ModelSettings:
-    """Build model settings from environment values."""
-    model_source = _read_nullable_environment_text(environment, "MODEL", None)
-    return ModelSettings(
-        source=model_source,
-        runtime_quantization=_read_nullable_environment_text(environment, "RUNTIME_QUANTIZATION", None),
-    )
-
-
 def _build_history_settings(limits: LimitSettings) -> HistorySettings:
     """Build history trimming settings from environment values."""
     trigger_tokens = int(limits["HISTORY_MAX_TOKENS"])
@@ -269,7 +260,10 @@ def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSe
         authentication=AuthenticationSettings(
             api_key=_read_nullable_environment_text(active_environment, "API_KEY", API_KEY),
         ),
-        model=_build_model_settings(active_environment),
+        model=ModelSettings(
+            source=_read_nullable_environment_text(active_environment, "MODEL", None),
+            runtime_quantization=_read_nullable_environment_text(active_environment, "RUNTIME_QUANTIZATION", None),
+        ),
         engine=engine_settings,
         gpu=gpu_settings,
         history=_build_history_settings(limits),

@@ -33,20 +33,6 @@ def _read_card_field(card_metadata: object, field_name: str) -> str | None:
     return value.strip() if isinstance(value, str) and value.strip() else None
 
 
-def _build_default_license(
-    model_name: str,
-    source_kind: str,
-    source_revision: str,
-) -> LicenseMetadata:
-    """Return the selected `other` license fallback."""
-    link = (
-        HUGGING_FACE_MODEL_URL.format(model_name=model_name, source_revision=source_revision)
-        if source_kind == HUB_SOURCE_KIND
-        else LOCAL_LICENSE_PATH
-    )
-    return LicenseMetadata(identifier=DEFAULT_LICENSE, name=DEFAULT_LICENSE, link=link)
-
-
 def read_license(
     model_name: str,
     source_kind: str,
@@ -55,7 +41,12 @@ def read_license(
     hf_token: str | None,
 ) -> LicenseMetadata:
     """Read source license fields or return the selected `other` fallback."""
-    default_license = _build_default_license(model_name, source_kind, source_revision)
+    default_link = (
+        HUGGING_FACE_MODEL_URL.format(model_name=model_name, source_revision=source_revision)
+        if source_kind == HUB_SOURCE_KIND
+        else LOCAL_LICENSE_PATH
+    )
+    default_license = LicenseMetadata(identifier=DEFAULT_LICENSE, name=DEFAULT_LICENSE, link=default_link)
     if source_kind != HUB_SOURCE_KIND:
         return default_license
     try:

@@ -13,25 +13,20 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 import logging
 
-from src.engines.protocol import EngineOutput
+from src.engines.protocol import EngineOutput, CompletionText
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence, AsyncIterator, AsyncGenerator
+    from collections.abc import Callable, Sequence, AsyncIterator
 
-    from src.engines.protocol import SamplingParametersRequest
+    from src.engines.protocol import EngineOutputStream, SamplingParametersRequest
 
     type SamplingParametersFactory = Callable[..., object]
 
 logger = logging.getLogger(__name__)
 
 
-class _VLLMCompletion(Protocol):
+class _VLLMCompletion(CompletionText, Protocol):
     """vLLM completion fields consumed by the adapter."""
-
-    @property
-    def text(self) -> str:
-        """Cumulative completion text."""
-        raise NotImplementedError
 
     @property
     def token_ids(self) -> Sequence[int]:
@@ -118,12 +113,7 @@ class VLLMEngine:
             logit_bias=request.logit_bias,
         )
 
-    async def generate_stream(
-        self,
-        prompt: str,
-        sampling_parameters: object,
-        request_id: str,
-    ) -> AsyncGenerator[EngineOutput, None]:
+    async def generate_stream(self, prompt: str, sampling_parameters: object, request_id: str) -> EngineOutputStream:
         """Stream generation using vLLM's generate API.
 
         Args:

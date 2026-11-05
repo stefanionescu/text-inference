@@ -65,6 +65,7 @@ class CompressorRuntime(Protocol):
         checkpoint_folder: Path,
         policy: QuantizationPolicy,
         settings: QuantizationSettings,
+        /,
     ) -> None:
         """Create a compressed-tensors checkpoint."""
         raise NotImplementedError(source, checkpoint_folder, policy, settings)

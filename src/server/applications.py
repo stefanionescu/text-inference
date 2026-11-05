@@ -12,13 +12,14 @@ from fastapi.responses import JSONResponse
 
 from src.logs.context import configure_logging
 from src.server.readiness import ReadinessState
-from src.telemetry.sentry import capture_error
+from src.telemetry.sentry import capture_error, shutdown_sentry
 from src.runtime.bootstrap import build_runtime_dependencies
 from src.runtime.validation import validate_settings
 from src.websocket.endpoint import handle_websocket_connection
-from src.telemetry.lifecycle import shutdown_telemetry, initialize_telemetry
+from src.telemetry.lifecycle import initialize_telemetry
 from src.telemetry.instruments import get_metrics, initialize_metrics
 from src.websocket.connections import ConnectionRegistry
+from src.telemetry.open_telemetry import shutdown_open_telemetry
 
 if TYPE_CHECKING:
     from contextlib import AbstractAsyncContextManager
@@ -40,7 +41,8 @@ async def _shutdown_runtime(application: FastAPI) -> None:
         if runtime_dependencies is not None:
             await runtime_dependencies.shutdown()
     finally:
-        shutdown_telemetry()
+        shutdown_sentry()
+        shutdown_open_telemetry()
 
 
 def _build_public_lifespan(

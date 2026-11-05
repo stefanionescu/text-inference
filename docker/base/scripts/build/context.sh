@@ -38,7 +38,7 @@ prepare_shared_build_context() {
   cp -a "${root_folder}/scripts/lib/env/trt.sh" "${TEMPORARY_BUILD_FOLDER}/scripts/lib/env/trt.sh"
 
   mkdir -p "${TEMPORARY_BUILD_FOLDER}/base/scripts"
-  cp -a "${root_folder}/docker/base/scripts"/* "${TEMPORARY_BUILD_FOLDER}/shared/scripts/"
+  cp -a "${root_folder}/docker/base/scripts"/* "${TEMPORARY_BUILD_FOLDER}/base/scripts/"
 
   mkdir -p "${TEMPORARY_BUILD_FOLDER}/docker/base/download"
   cp -a "${root_folder}/docker/base/download/snapshot.py" "${TEMPORARY_BUILD_FOLDER}/docker/base/download/snapshot.py"

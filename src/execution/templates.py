@@ -60,12 +60,6 @@ def _build_messages(
     return messages
 
 
-def _compose_system_prompt(static_prefix: str, runtime_text: str) -> str:
-    """Join static and runtime system prompt text."""
-    parts = [segment.strip() for segment in (static_prefix, runtime_text) if segment and segment.strip()]
-    return "\n\n".join(parts)
-
-
 def build_prefixed_prompt(
     static_prefix: str,
     runtime_text: str,
@@ -74,8 +68,8 @@ def build_prefixed_prompt(
     tokenizer: ThreadSafeTokenizer,
 ) -> str:
     """Build a prompt including the current user turn."""
-    system_prompt = _compose_system_prompt(static_prefix, runtime_text)
-    messages = _build_messages(system_prompt, history_messages, user_utterance)
+    system_parts = [segment.strip() for segment in (static_prefix, runtime_text) if segment and segment.strip()]
+    messages = _build_messages("\n\n".join(system_parts), history_messages, user_utterance)
     return tokenizer.apply_chat_template(
         messages,
         is_generation_prompt_added=True,

@@ -25,32 +25,6 @@ _runtime_clear_owned_paths() {
   return "${status}"
 }
 
-# _runtime_clear_model_artifacts: Clear model data and engine runtime caches.
-# Globals:
-#   None.
-# Arguments:
-#   $1: Repository root.
-# Outputs:
-#   None.
-# Returns:
-#   0 when every owned path is removed, non-zero otherwise.
-_runtime_clear_model_artifacts() {
-  local root_folder="$1"
-
-  _runtime_clear_owned_paths \
-    "${root_folder}" \
-    ".compressed-tensors" \
-    ".flashinfer" \
-    ".hf" \
-    ".modelopt-repo" \
-    ".torch_inductor" \
-    ".triton" \
-    ".trt_cache" \
-    ".vllm_cache" \
-    ".xformers" \
-    "models"
-}
-
 # runtime_clear_model_transition: Clear runtime caches while retaining
 # repository exports long enough for their provenance validator to decide reuse.
 # Globals:
@@ -89,7 +63,18 @@ runtime_clear_engine_artifacts() {
   local root_folder="$1"
   local status=0
 
-  _runtime_clear_model_artifacts "${root_folder}" || status=1
+  _runtime_clear_owned_paths \
+    "${root_folder}" \
+    ".compressed-tensors" \
+    ".flashinfer" \
+    ".hf" \
+    ".modelopt-repo" \
+    ".torch_inductor" \
+    ".triton" \
+    ".trt_cache" \
+    ".vllm_cache" \
+    ".xformers" \
+    "models" || status=1
   _runtime_clear_owned_paths \
     "${root_folder}" \
     ".pip_cache" \

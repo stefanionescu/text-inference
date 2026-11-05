@@ -114,7 +114,8 @@ class MetricInstruments:
         """Initialize all metric instruments from one meter."""
         self._initialize_histograms(meter)
         self._initialize_counters(meter)
-        self._initialize_updown_counters(meter)
+        self.active_connections = _updown(meter, METRIC_ACTIVE_CONNECTIONS)
+        self.active_generations = _updown(meter, METRIC_ACTIVE_GENERATIONS)
 
     def _initialize_histograms(self, meter: metrics.Meter) -> None:
         """Initialize request and lifecycle duration histograms."""
@@ -149,11 +150,6 @@ class MetricInstruments:
         self.early_cancel_total = _counter(meter, METRIC_EARLY_CANCEL_TOTAL)
         self.empty_model_output_total = _counter(meter, METRIC_EMPTY_OUTPUT_TOTAL)
         self.engine_abort_retryable_total = _counter(meter, METRIC_RETRYABLE_ABORT_TOTAL)
-
-    def _initialize_updown_counters(self, meter: metrics.Meter) -> None:
-        """Initialize gauges represented by up-down counters."""
-        self.active_connections = _updown(meter, METRIC_ACTIVE_CONNECTIONS)
-        self.active_generations = _updown(meter, METRIC_ACTIVE_GENERATIONS)
 
 
 @dataclass(slots=True)

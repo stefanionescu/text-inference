@@ -72,13 +72,8 @@ class StreamingSanitizer:
         # Whether we've dropped the true stream start from the raw tail window
         self._has_trimmed_stream_start = False
 
-    def push(self, chunk: str) -> str:
-        """Process a new raw chunk and return the sanitized delta."""
-        if not chunk:
-            return ""
-
-        self._raw_tail += chunk
-
+    def _sanitize_raw_tail(self) -> str:
+        """Sanitize the whole raw tail and record which one-shot steps stay pending."""
         is_prefix_context_active = self._is_prefix_pending or (not self._has_trimmed_stream_start)
         is_capital_context_active = self._is_capital_pending or (not self._has_trimmed_stream_start)
         sanitized, is_prefix_pending, is_capital_pending = _sanitize_stream_chunk(
@@ -89,6 +84,16 @@ class StreamingSanitizer:
         )
         self._is_prefix_pending = is_prefix_pending
         self._is_capital_pending = is_capital_pending
+        return sanitized
+
+    def push(self, chunk: str) -> str:
+        """Process a new raw chunk and return the sanitized delta."""
+        if not chunk:
+            return ""
+
+        self._raw_tail += chunk
+
+        sanitized = self._sanitize_raw_tail()
 
         stable_length, tail_length = compute_tail_lengths(
             raw_tail=self._raw_tail,
@@ -118,16 +123,7 @@ class StreamingSanitizer:
         if not self._raw_tail and not self._sanitized_tail:
             return ""
 
-        is_prefix_context_active = self._is_prefix_pending or (not self._has_trimmed_stream_start)
-        is_capital_context_active = self._is_capital_pending or (not self._has_trimmed_stream_start)
-        sanitized, is_prefix_pending, is_capital_pending = _sanitize_stream_chunk(
-            self._raw_tail,
-            is_prefix_pending=is_prefix_context_active,
-            is_capital_pending=is_capital_context_active,
-            is_leading_whitespace_stripped=is_prefix_context_active,
-        )
-        self._is_prefix_pending = is_prefix_pending
-        self._is_capital_pending = is_capital_pending
+        sanitized = self._sanitize_raw_tail()
 
         emitted_text = "".join(self._emitted_parts)
         shared_prefix_length = _shared_prefix_length(emitted_text, sanitized)

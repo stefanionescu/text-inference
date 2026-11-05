@@ -38,27 +38,6 @@ async def _send_turn_error(
         await websocket.close(code=1008)
 
 
-def _build_message_turn_plan(
-    state: SessionState,
-    config: Mapping[str, object],
-    incoming_user_utterance: str,
-    *,
-    sampling_overrides: dict[str, float | int | bool],
-    session_runtime: SessionRuntime,
-) -> TurnRequest:
-    """Build a turn plan for a validated follow-up message."""
-    prompt = config.get("prompt")
-    return TurnRequest(
-        state=state,
-        request_id=f"message-{uuid.uuid4().hex}",
-        static_prefix=prompt if isinstance(prompt, str) else "",
-        runtime_text="",
-        history_messages=session_runtime.history.get_messages(state),
-        user_utterance=incoming_user_utterance,
-        sampling_overrides=sampling_overrides or None,
-    )
-
-
 async def plan_message_turn(
     websocket: WebSocket,
     message: Mapping[str, object],
@@ -107,12 +86,15 @@ async def plan_message_turn(
                 sampling=sampling_overrides,
             )
 
-        return _build_message_turn_plan(
-            state,
-            config,
-            incoming_user_utterance,
-            sampling_overrides=sampling_overrides,
-            session_runtime=session_runtime,
+        prompt = config.get("prompt")
+        return TurnRequest(
+            state=state,
+            request_id=f"message-{uuid.uuid4().hex}",
+            static_prefix=prompt if isinstance(prompt, str) else "",
+            runtime_text="",
+            history_messages=session_runtime.history.get_messages(state),
+            user_utterance=incoming_user_utterance,
+            sampling_overrides=sampling_overrides or None,
         )
     finally:
         get_metrics().phase_latency.record(max(0.0, time.perf_counter() - started_at), {"phase": "validate"})

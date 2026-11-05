@@ -6,25 +6,20 @@ from typing import TYPE_CHECKING, Protocol
 import asyncio
 import logging
 
-from src.engines.protocol import EngineOutput
+from src.engines.protocol import EngineOutput, CompletionText
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence, AsyncIterator, AsyncGenerator
+    from collections.abc import Callable, Sequence, AsyncIterator
 
-    from src.engines.protocol import SamplingParametersRequest
+    from src.engines.protocol import EngineOutputStream, SamplingParametersRequest
 
     type SamplingParametersFactory = Callable[..., object]
 
 logger = logging.getLogger(__name__)
 
 
-class _TRTCompletion(Protocol):
+class _TRTCompletion(CompletionText, Protocol):
     """TensorRT completion fields consumed by the adapter."""
-
-    @property
-    def text(self) -> str:
-        """Cumulative completion text."""
-        raise NotImplementedError
 
     @property
     def token_ids(self) -> Sequence[int] | None:
@@ -113,12 +108,7 @@ class TRTEngine:
             embedding_bias=embedding_bias,
         )
 
-    async def generate_stream(
-        self,
-        prompt: str,
-        sampling_parameters: object,
-        request_id: str,
-    ) -> AsyncGenerator[EngineOutput, None]:
+    async def generate_stream(self, prompt: str, sampling_parameters: object, request_id: str) -> EngineOutputStream:
         """Stream results and abort unfinished work when its consumer exits."""
         generation = self._llm.generate_async(prompt, sampling_parameters, streaming=True)
         self._inflight[request_id] = generation

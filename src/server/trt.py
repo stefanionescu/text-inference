@@ -28,16 +28,8 @@ readiness_application = create_readiness_application(readiness_state)
 
 def main() -> None:
     """Run the TensorRT public and probe listeners."""
-    run_applications(
-        public_application,
-        readiness_application,
-        readiness_state,
-        is_logging_enabled=settings.engine.is_logging_enabled,
-    )
+    run_applications(public_application, readiness_application, readiness_state, settings=settings)
 
 
 if __name__ == "__main__":
     main()
-
-
-__all__ = ["main", "public_application", "readiness_application"]

@@ -2,34 +2,9 @@
 set -euo pipefail
 
 SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=docker/base/scripts/logs.sh
-source "/app/base/scripts/logs.sh"
 # shellcheck source=docker/base/scripts/server.sh
 source "/app/base/scripts/server.sh"
-
-is_logging_enabled=0
-case "$#" in
-  0) ;;
-  1)
-    case "$1" in
-      --logs) is_logging_enabled=1 ;;
-      --help | -h)
-        container_show_usage
-        exit 0
-        ;;
-      *)
-        container_show_usage >&2
-        exit 2
-        ;;
-    esac
-    ;;
-  *)
-    container_show_usage >&2
-    exit 2
-    ;;
-esac
-LOGS_ENABLED="${is_logging_enabled}"
-export LOGS_ENABLED
+container_read_arguments "$@"
 
 # shellcheck source=docker/trt/scripts/env.sh
 source "${SCRIPT_FOLDER}/env.sh"

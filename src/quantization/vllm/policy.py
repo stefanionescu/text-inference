@@ -60,16 +60,6 @@ class QuantizationPolicy:
         }
 
 
-def _has_multiple_experts(expert_count: object) -> bool:
-    """Return whether a config value declares multiple experts."""
-    return isinstance(expert_count, int) and not isinstance(expert_count, bool) and expert_count > 1
-
-
-def is_moe_config(text_config: Mapping[str, object]) -> bool:
-    """Detect MoE architecture from explicit model configuration fields."""
-    return any(_has_multiple_experts(text_config.get(field_name)) for field_name in MOE_EXPERT_FIELDS)
-
-
 def choose_quantization_backend(
     quantization_format: str | None,
     model_config: Mapping[str, object],
@@ -103,7 +93,8 @@ def select_policy(
         message = "Model configuration must declare a model type"
         raise TypeError(message)
 
-    if is_moe_config(text_config):
+    expert_counts = (text_config.get(field_name) for field_name in MOE_EXPERT_FIELDS)
+    if any(isinstance(count, int) and not isinstance(count, bool) and count > 1 for count in expert_counts):
         ignored_modules = MOE_IGNORES_BY_TYPE.get(model_type)
         if ignored_modules is None:
             message = f"MoE model type {model_type!r} is not supported for local compressed-tensors export"
@@ -137,7 +128,6 @@ def select_policy(
 __all__ = [
     "QuantizationPolicy",
     "choose_quantization_backend",
-    "is_moe_config",
     "select_policy",
     "validate_sequence_length",
 ]

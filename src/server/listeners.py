@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
     from fastapi import FastAPI
 
+    from src.runtime.config import ApplicationSettings
     from src.server.readiness import ReadinessState
 
 
@@ -119,7 +120,7 @@ def run_applications(
     readiness_application: FastAPI,
     readiness_state: ReadinessState,
     *,
-    is_logging_enabled: bool,
+    settings: ApplicationSettings,
 ) -> None:
     """Run both listeners in the process event loop."""
     asyncio.run(
@@ -127,7 +128,7 @@ def run_applications(
             public_application,
             readiness_application,
             readiness_state,
-            is_logging_enabled=is_logging_enabled,
+            is_logging_enabled=settings.engine.is_logging_enabled,
         ),
     )
 

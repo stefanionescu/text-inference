@@ -5,30 +5,26 @@
 
 set -euo pipefail
 
-SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly SCRIPT_FOLDER
-ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPT_FOLDER}/.." && pwd -P)" || exit 1
-readonly ROOT_FOLDER
-export ROOT_FOLDER
-
+# shellcheck source=scripts/lib/foundation/folders.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/lib/foundation/folders.sh"
 # shellcheck source=scripts/config/defaults.sh
-source "${SCRIPT_FOLDER}/config/defaults.sh"
+source "${SCRIPTS_FOLDER}/config/defaults.sh"
 # shellcheck source=scripts/config/messages/main.sh
-source "${SCRIPT_FOLDER}/config/messages/main.sh"
+source "${SCRIPTS_FOLDER}/config/messages/main.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${SCRIPT_FOLDER}/config/values/deployment.sh"
+source "${SCRIPTS_FOLDER}/config/values/deployment.sh"
 # shellcheck source=scripts/lib/restart/engine.sh
-source "${SCRIPT_FOLDER}/lib/restart/engine.sh"
+source "${SCRIPTS_FOLDER}/lib/restart/engine.sh"
 # shellcheck source=scripts/lib/runtime/background.sh
-source "${SCRIPT_FOLDER}/lib/runtime/background.sh"
+source "${SCRIPTS_FOLDER}/lib/runtime/background.sh"
 # shellcheck source=scripts/lib/runtime/warmup/process.sh
-source "${SCRIPT_FOLDER}/lib/runtime/warmup/process.sh"
+source "${SCRIPTS_FOLDER}/lib/runtime/warmup/process.sh"
 # shellcheck source=scripts/lib/foundation/deployment.sh
-source "${SCRIPT_FOLDER}/lib/foundation/deployment.sh"
+source "${SCRIPTS_FOLDER}/lib/foundation/deployment.sh"
 # shellcheck source=scripts/lib/foundation/inspection.sh
-source "${SCRIPT_FOLDER}/lib/foundation/inspection.sh"
+source "${SCRIPTS_FOLDER}/lib/foundation/inspection.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
-source "${SCRIPT_FOLDER}/lib/foundation/log.sh"
+source "${SCRIPTS_FOLDER}/lib/foundation/log.sh"
 
 # _main_usage: Print deployment command help and terminate.
 _main_usage() {
@@ -128,7 +124,7 @@ main() {
   runtime_start_background \
     "${ROOT_FOLDER}" \
     "Starting ${INFERENCE_ENGINE} deployment" \
-    bash "${SCRIPT_FOLDER}/deploy/main.sh"
+    bash "${SCRIPTS_FOLDER}/deploy/main.sh"
 }
 
 main "$@"

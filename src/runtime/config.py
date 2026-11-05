@@ -15,7 +15,11 @@ type EnvironmentValues = Mapping[str, str]
 
 @dataclass(frozen=True, slots=True)
 class AuthenticationSettings:
-    """Authentication settings."""
+    """Hold the server API key that every WebSocket handshake must present.
+
+    `validate_settings` rejects startup when the key is missing, and
+    `authenticate_websocket` compares each client's key against it.
+    """
 
     api_key: str | None
 

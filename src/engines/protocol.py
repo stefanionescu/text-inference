@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Protocol
 from dataclasses import dataclass
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, AsyncGenerator
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,18 @@ class EngineOutput:
     text: str
     token_ids: list[int] | None = None
     is_finished: bool = False
+
+
+type EngineOutputStream = AsyncGenerator[EngineOutput, None]
+
+
+class CompletionText(Protocol):
+    """Completion text that every backend adapter reads from its runtime."""
+
+    @property
+    def text(self) -> str:
+        """Cumulative completion text."""
+        raise NotImplementedError
 
 
 class Engine(Protocol):
@@ -80,4 +92,4 @@ class Engine(Protocol):
         raise NotImplementedError(reason)
 
 
-__all__ = ["Engine", "EngineOutput", "SamplingParametersRequest"]
+__all__ = ["CompletionText", "Engine", "EngineOutput", "EngineOutputStream", "SamplingParametersRequest"]

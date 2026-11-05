@@ -71,11 +71,6 @@ async def _send_turn_error(
         await websocket.close(code=1008)
 
 
-def _validate_profile_fields(message: dict[str, Any]) -> tuple[str, str]:
-    """Validate required gender and personality fields from a start message."""
-    return validate_required_gender(message.get("gender")), validate_required_personality(message.get("personality"))
-
-
 def _extract_prompt(
     message: dict[str, Any],
     *,
@@ -108,7 +103,8 @@ def _start_inputs(
     session_runtime: SessionRuntime,
 ) -> tuple[str, str, str, dict[str, float | int | bool]]:
     """Resolve profile fields, prompt, and sampling overrides for start."""
-    gender, personality = _validate_profile_fields(message)
+    gender = validate_required_gender(message.get("gender"))
+    personality = validate_required_personality(message.get("personality"))
     prompt = _extract_prompt(
         message,
         count_tokens=count_tokens,

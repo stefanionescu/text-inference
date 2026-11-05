@@ -6,11 +6,8 @@ import os
 import sys
 import json
 from typing import TYPE_CHECKING
-from pathlib import Path
-import argparse
 
-from huggingface_hub import HfApi
-
+from src.hf.upload import publish_checkpoint, parse_upload_arguments, require_checkpoint_folder
 from config.model.trt import TRT_VERSION
 from src.hf.model_card import (
     format_model_card,
@@ -20,10 +17,7 @@ from src.hf.model_card import (
 )
 from config.model.publishing import (
     TRT_FORMAT_LABELS,
-    HF_MODEL_REPO_TYPE,
     TRT_UPLOAD_MESSAGE,
-    HF_DEFAULT_REVISION,
-    MODEL_CARD_FILENAME,
     NOT_APPLICABLE_LABEL,
     TRT_GPU_REQUIREMENTS,
     TRT_WEIGHT_PRECISIONS,
@@ -39,23 +33,10 @@ from src.quantization.provenance import require_provenance
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the stable checkpoint-upload command."""
-    parser = argparse.ArgumentParser(description="Push a TensorRT-LLM ModelOpt checkpoint")
-    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
-    parser.add_argument("--repo-id", required=True)
-    parser.add_argument("--format", dest="quantization_format", required=True)
-    parser.add_argument("--private", action="store_true")
-    return parser.parse_args(argument_values)
+_COMMAND_DESCRIPTION = "Push a TensorRT-LLM ModelOpt checkpoint"
 
 
-def build_model_card(
-    metadata: Mapping[str, object],
-    repo_id: str,
-    *,
-    hf_token: str | None,
-) -> str:
+def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: str | None) -> str:
     """Build the detailed checkpoint-only TensorRT model card."""
     card_fields = build_provenance_fields(metadata, repo_id, hf_token=hf_token)
     quantization = read_metadata_section(metadata, "quantization")
@@ -104,11 +85,8 @@ def build_model_card(
 
 def main(argument_values: Sequence[str] | None = None) -> int:
     """Generate a model card and upload one ModelOpt checkpoint."""
-    arguments = _parse_arguments(argument_values)
-    checkpoint_folder = Path(arguments.checkpoint_folder).resolve(strict=True)
-    if not checkpoint_folder.is_dir():
-        message = "Checkpoint must be a directory"
-        raise NotADirectoryError(message)
+    arguments = parse_upload_arguments(argument_values, _COMMAND_DESCRIPTION, is_format_required=True)
+    checkpoint_folder = require_checkpoint_folder(arguments.checkpoint_folder)
     validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)
     metadata = require_provenance(
         checkpoint_folder,
@@ -117,23 +95,8 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     )
     hf_token = os.environ["HF_TOKEN"]
     model_card = build_model_card(metadata, arguments.repo_id, hf_token=hf_token)
-    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
-
-    hf_client = HfApi(token=hf_token)
-    hf_client.create_repo(
-        repo_id=arguments.repo_id,
-        exist_ok=True,
-        repo_type=HF_MODEL_REPO_TYPE,
-        private=arguments.private,
-    )
-    hf_client.upload_folder(
-        folder_path=checkpoint_folder,
-        repo_id=arguments.repo_id,
-        repo_type=HF_MODEL_REPO_TYPE,
-        revision=HF_DEFAULT_REVISION,
-        commit_message=TRT_UPLOAD_MESSAGE.format(quantization_format=arguments.quantization_format),
-        ignore_patterns=list(TRT_HF_IGNORE_PATTERNS),
-    )
+    commit_message = TRT_UPLOAD_MESSAGE.format(quantization_format=arguments.quantization_format)
+    publish_checkpoint(checkpoint_folder, model_card, arguments, hf_token, commit_message, TRT_HF_IGNORE_PATTERNS)
     sys.stdout.write(f"[trt-hf] Upload complete: {arguments.repo_id}\n")
     return 0
 

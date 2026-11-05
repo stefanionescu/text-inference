@@ -5,22 +5,18 @@
 
 set -euo pipefail
 
-SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly SCRIPT_FOLDER
-ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPT_FOLDER}/.." && pwd -P)" || exit 1
-readonly ROOT_FOLDER
-export ROOT_FOLDER
-
+# shellcheck source=scripts/lib/foundation/folders.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/lib/foundation/folders.sh"
 # shellcheck source=scripts/config/defaults.sh
-source "${SCRIPT_FOLDER}/config/defaults.sh"
+source "${SCRIPTS_FOLDER}/config/defaults.sh"
 # shellcheck source=scripts/config/messages/restart.sh
-source "${SCRIPT_FOLDER}/config/messages/restart.sh"
+source "${SCRIPTS_FOLDER}/config/messages/restart.sh"
 # shellcheck source=scripts/lib/restart/workflow.sh
-source "${SCRIPT_FOLDER}/lib/restart/workflow.sh"
+source "${SCRIPTS_FOLDER}/lib/restart/workflow.sh"
 # shellcheck source=scripts/lib/foundation/deployment.sh
-source "${SCRIPT_FOLDER}/lib/foundation/deployment.sh"
+source "${SCRIPTS_FOLDER}/lib/foundation/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
-source "${SCRIPT_FOLDER}/lib/foundation/log.sh"
+source "${SCRIPTS_FOLDER}/lib/foundation/log.sh"
 
 # _restart_usage: Print restart command help and terminate.
 _restart_usage() {
@@ -111,7 +107,7 @@ main() {
   _restart_parse_args "$@" || _restart_usage 2
   deployment_require_environment
   log_write "[restart] Restarting Text Inference Server"
-  restart_run "${ROOT_FOLDER}" "${SCRIPT_FOLDER}"
+  restart_run "${ROOT_FOLDER}" "${SCRIPTS_FOLDER}"
 }
 
 main "$@"
