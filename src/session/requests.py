@@ -31,6 +31,20 @@ if TYPE_CHECKING:
     from src.engines.protocol import Engine
 
 
+async def _run_request(
+    state: SessionState,
+    request_id: str,
+    operation: Callable[[], Awaitable[None]],
+) -> None:
+    """Release matching request state when its task finishes."""
+    try:
+        await operation()
+    finally:
+        async with state.request_lock:
+            if state.lifecycle_state != "cancelling":
+                cleanup_session_requests(state, request_id=request_id)
+
+
 def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:
     """Check if a request has been cancelled or superseded.
 
@@ -130,20 +144,6 @@ def close_session_requests(state: SessionState) -> None:
     state.is_cancel_requested = True
     state.active_request_id = None
     state.active_request_task = None
-
-
-async def _run_request(
-    state: SessionState,
-    request_id: str,
-    operation: Callable[[], Awaitable[None]],
-) -> None:
-    """Release matching request state when its task finishes."""
-    try:
-        await operation()
-    finally:
-        async with state.request_lock:
-            if state.lifecycle_state != "cancelling":
-                cleanup_session_requests(state, request_id=request_id)
 
 
 async def spawn_session_task(

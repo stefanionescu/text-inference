@@ -291,6 +291,19 @@ check = "secrets/environment-examples"
 paths = ["tests/suites/unit/dependency_logging/test_dependency_output.py"]
 reason = "The test asserts a variable the code sets for a dependency; nobody configures it."
 
+[[ignore]]
+check = "python/basedpyright"
+paths = [
+  "src/engines/trt/factory.py",
+  "src/engines/vllm/factory.py",
+  "src/quantization/vllm/quantize.py",
+  "src/scripts/guard.py",
+  "src/scripts/validation/trt.py",
+  "src/server/listeners.py",
+  "src/telemetry/cuda.py",
+]
+reason = "These modules import GPU-only or engine-only packages that no single environment installs alongside the local extra, the same files the previous pyrightconfig excluded."
+
 [[naming.exception]]
 languages = ["bash"]
 allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]
@@ -317,4 +330,3 @@ paths = ["src/server/listeners.py"]
 languages = ["python"]
 allowed_names = ["install_signal_handlers"]
 reason = "This method overrides uvicorn.Server.install_signal_handlers, so the name must match."
-

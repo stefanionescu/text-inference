@@ -11,11 +11,11 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
-from src.server import create_public_application
 from tests.state import SessionContext
 from src.execution.turn import StreamResponseRequest, stream_response
 from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
+from src.server.applications import create_public_application
 from src.runtime.dependencies import RuntimeDependencies
 from src.websocket.connections import ConnectionRegistry
 from tests.harness.client.websocket import build_start_payload, build_cancel_payload, build_message_payload

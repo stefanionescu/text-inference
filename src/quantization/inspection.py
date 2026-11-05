@@ -192,6 +192,16 @@ def _validate_allowlist(model: str, engine: str) -> None:
         raise ValueError(message)
 
 
+def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
+    """Parse the internal early-inspection command."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", required=True)
+    parser.add_argument("--engine", required=True, choices=("trt", "vllm"))
+    parser.add_argument("--quantization")
+    parser.add_argument("--revision", default=DEFAULT_MODEL_REVISION)
+    return parser.parse_args(argument_values)
+
+
 def inspect_model(
     model: str,
     engine: str,
@@ -225,16 +235,6 @@ def inspect_metadata(
         resolved_revision, payloads = _remote_metadata(model, revision, token)
     detected_format = detect_payload_formats(payloads)
     return resolved_revision, detected_format
-
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the internal early-inspection command."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True)
-    parser.add_argument("--engine", required=True, choices=("trt", "vllm"))
-    parser.add_argument("--quantization")
-    parser.add_argument("--revision", default=DEFAULT_MODEL_REVISION)
-    return parser.parse_args(argument_values)
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:

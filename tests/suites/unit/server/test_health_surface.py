@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 
-from src.server import create_public_application, create_readiness_application
 from src.server.readiness import ReadinessState
+from src.server.applications import create_public_application, create_readiness_application
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
 NOT_FOUND_STATUS = 404

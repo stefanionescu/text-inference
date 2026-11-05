@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from src.logs import set_log_context
+from src.logs.context import set_log_context
 from src.session.state import SessionState
 from src.session.requests import abort_session_requests, close_session_requests
 from src.telemetry.sentry import capture_error, add_breadcrumb
@@ -166,13 +166,6 @@ async def _disconnect_admitted(finalization: ConnectionFinalization, session_dur
     return remaining
 
 
-async def clear_after_last_disconnect(finalization: ConnectionFinalization, remaining: int) -> None:
-    """Clear engine caches when the last client disconnects."""
-    if remaining == 0:
-        with contextlib.suppress(RuntimeError):
-            await finalization.runtime_dependencies.clear_caches_on_disconnect()
-
-
 async def _finalize_connection(finalization: ConnectionFinalization) -> None:
     """Run teardown actions after the connection loop exits."""
     await _stop_lifecycle(finalization.lifecycle)
@@ -235,6 +228,13 @@ async def _run_accepted_connection(
                 message="An unexpected server error occurred.",
             )
         return
+
+
+async def clear_after_last_disconnect(finalization: ConnectionFinalization, remaining: int) -> None:
+    """Clear engine caches when the last client disconnects."""
+    if remaining == 0:
+        with contextlib.suppress(RuntimeError):
+            await finalization.runtime_dependencies.clear_caches_on_disconnect()
 
 
 async def handle_websocket_connection(websocket: WebSocket, runtime_dependencies: RuntimeDependencies) -> None:

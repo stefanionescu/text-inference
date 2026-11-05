@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 from opentelemetry import trace
 
-from src.text import StreamingSanitizer
+from src.text.stream import StreamingSanitizer
 from src.engines.protocol import SamplingParametersRequest
 from src.session.requests import is_request_cancelled
 from src.telemetry.instruments import get_metrics
@@ -47,24 +47,6 @@ class GenerationRequest:
     request_id: str | None = None
     sampling_overrides: dict[str, float | int | bool] | None = None
     prompt_token_count: int | None = None
-
-
-def build_sampling_overrides(
-    overrides: dict[str, float | int | bool],
-    *,
-    sampling_settings: SamplingSettings,
-) -> dict[str, float | int | bool]:
-    """Resolve request sampling overrides against configured defaults."""
-    return {
-        "temperature": float(overrides.get("temperature", sampling_settings.temperature)),
-        "top_p": float(overrides.get("top_p", sampling_settings.top_p)),
-        "top_k": int(overrides.get("top_k", sampling_settings.top_k)),
-        "min_p": float(overrides.get("min_p", sampling_settings.min_p)),
-        "repetition_penalty": float(overrides.get("repetition_penalty", sampling_settings.repetition_penalty)),
-        "presence_penalty": float(overrides.get("presence_penalty", sampling_settings.presence_penalty)),
-        "frequency_penalty": float(overrides.get("frequency_penalty", sampling_settings.frequency_penalty)),
-        "sanitize_output": bool(overrides.get("sanitize_output", False)),
-    }
 
 
 def _build_logit_bias_map(tokenizer: ThreadSafeTokenizer, *, sampling_settings: SamplingSettings) -> dict[int, float]:
@@ -130,6 +112,24 @@ async def _stream_sanitized(
         tail = sanitizer.flush()
         if tail:
             yield tail
+
+
+def build_sampling_overrides(
+    overrides: dict[str, float | int | bool],
+    *,
+    sampling_settings: SamplingSettings,
+) -> dict[str, float | int | bool]:
+    """Resolve request sampling overrides against configured defaults."""
+    return {
+        "temperature": float(overrides.get("temperature", sampling_settings.temperature)),
+        "top_p": float(overrides.get("top_p", sampling_settings.top_p)),
+        "top_k": int(overrides.get("top_k", sampling_settings.top_k)),
+        "min_p": float(overrides.get("min_p", sampling_settings.min_p)),
+        "repetition_penalty": float(overrides.get("repetition_penalty", sampling_settings.repetition_penalty)),
+        "presence_penalty": float(overrides.get("presence_penalty", sampling_settings.presence_penalty)),
+        "frequency_penalty": float(overrides.get("frequency_penalty", sampling_settings.frequency_penalty)),
+        "sanitize_output": bool(overrides.get("sanitize_output", False)),
+    }
 
 
 async def run_generation(request: GenerationRequest) -> AsyncGenerator[str, None]:

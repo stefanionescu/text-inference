@@ -40,6 +40,15 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
 
+def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
+    """Parse the stable checkpoint-upload command."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
+    parser.add_argument("--repo-id", required=True)
+    parser.add_argument("--private", action="store_true")
+    return parser.parse_args(argument_values)
+
+
 def build_model_card(
     metadata: Mapping[str, object],
     repo_id: str,
@@ -83,15 +92,6 @@ def build_model_card(
         },
     )
     return format_model_card(VLLM_MODEL_CARD_TEMPLATE, card_fields)
-
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the stable checkpoint-upload command."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
-    parser.add_argument("--repo-id", required=True)
-    parser.add_argument("--private", action="store_true")
-    return parser.parse_args(argument_values)
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:

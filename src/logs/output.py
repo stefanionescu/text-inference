@@ -24,6 +24,15 @@ class _OutputState:
 _OUTPUT_STATE = _OutputState()
 
 
+def _build_capture_sink(log_path: str | None) -> logging.Handler:
+    """Create a raw dependency handler or a quiet sink."""
+    if log_path == "-":
+        return logging.StreamHandler()
+    if log_path:
+        return logging.FileHandler(log_path, encoding="utf-8")
+    return logging.NullHandler()
+
+
 def is_raw_output_enabled(environment: Mapping[str, str] | None = None) -> bool:
     """Return the exact debug-output flag, rejecting ambiguous values."""
     active_environment = os.environ if environment is None else environment
@@ -32,15 +41,6 @@ def is_raw_output_enabled(environment: Mapping[str, str] | None = None) -> bool:
         message = f"LOGS_ENABLED must be 0 or 1, got {configured_value!r}"
         raise ValueError(message)
     return configured_value == "1"
-
-
-def _build_capture_sink(log_path: str | None) -> logging.Handler:
-    """Create a raw dependency handler or a quiet sink."""
-    if log_path == "-":
-        return logging.StreamHandler()
-    if log_path:
-        return logging.FileHandler(log_path, encoding="utf-8")
-    return logging.NullHandler()
 
 
 def configure_dependency_output() -> None:

@@ -20,6 +20,20 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Callable, Awaitable, AsyncIterator
 
 
+async def _send_json_frame(websocket: object, payload: dict[str, object]) -> None:
+    serialized_payload = json.dumps(payload)
+    sender = getattr(websocket, "send_text", None)
+    if not callable(sender):
+        sender = getattr(websocket, "send", None)
+    if not callable(sender):
+        message = "websocket-like object must expose send_text() or send()"
+        raise TypeError(message)
+    send = cast("Callable[[str], object]", sender)
+    result = send(serialized_payload)
+    if inspect.isawaitable(result):
+        await result
+
+
 def parse_message(raw_frame: str) -> dict[str, object]:
     """Parse a raw WebSocket frame into a JSON dict."""
     try:
@@ -75,20 +89,6 @@ async def iter_messages(
             if is_invalid_ignored:
                 continue
             raise
-
-
-async def _send_json_frame(websocket: object, payload: dict[str, object]) -> None:
-    serialized_payload = json.dumps(payload)
-    sender = getattr(websocket, "send_text", None)
-    if not callable(sender):
-        sender = getattr(websocket, "send", None)
-    if not callable(sender):
-        message = "websocket-like object must expose send_text() or send()"
-        raise TypeError(message)
-    send = cast("Callable[[str], object]", sender)
-    result = send(serialized_payload)
-    if inspect.isawaitable(result):
-        await result
 
 
 async def bootstrap_session(

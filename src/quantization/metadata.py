@@ -22,16 +22,6 @@ def _mapping(value: object) -> dict[str, object]:
     return cast("dict[str, object]", value)
 
 
-def quantization_metadata(filename: str, payload: object) -> dict[str, object] | None:
-    """Extract quantization metadata from one supported configuration payload."""
-    config = _mapping(payload)
-    if filename == MODEL_CONFIG_FILENAME:
-        quantization = config.get(QUANTIZATION_CONFIG_FIELD)
-        return None if quantization is None else _mapping(quantization)
-    quantization = config.get(QUANTIZATION_CONFIG_FIELD)
-    return _mapping(quantization) if quantization is not None else config
-
-
 def _declared_method(metadata: dict[str, object]) -> str:
     """Read one exact declared quantization method."""
     methods = {value for field in QUANTIZATION_METHOD_FIELDS if isinstance((value := metadata.get(field)), str)}
@@ -42,6 +32,16 @@ def _declared_method(metadata: dict[str, object]) -> str:
         message = f"Conflicting quantization methods were declared: {sorted(methods)}"
         raise ValueError(message)
     return methods.pop()
+
+
+def quantization_metadata(filename: str, payload: object) -> dict[str, object] | None:
+    """Extract quantization metadata from one supported configuration payload."""
+    config = _mapping(payload)
+    if filename == MODEL_CONFIG_FILENAME:
+        quantization = config.get(QUANTIZATION_CONFIG_FIELD)
+        return None if quantization is None else _mapping(quantization)
+    quantization = config.get(QUANTIZATION_CONFIG_FIELD)
+    return _mapping(quantization) if quantization is not None else config
 
 
 def detect_metadata_format(metadata: dict[str, object]) -> str:

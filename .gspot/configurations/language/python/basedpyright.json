@@ -57,6 +57,13 @@
         "../../../../**/.idea/**",
         "../../../../**/.claude/**",
         "../../../../**/.vscode/**",
-        "../../../../**/.cursor/**"
+        "../../../../**/.cursor/**",
+        "../../../../src/engines/trt/factory.py",
+        "../../../../src/engines/vllm/factory.py",
+        "../../../../src/quantization/vllm/quantize.py",
+        "../../../../src/scripts/guard.py",
+        "../../../../src/scripts/validation/trt.py",
+        "../../../../src/server/listeners.py",
+        "../../../../src/telemetry/cuda.py"
     ]
 }

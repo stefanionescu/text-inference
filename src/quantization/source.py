@@ -122,6 +122,14 @@ def _acquire_hub_source(
     )
 
 
+def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
+    """Parse source acquisition arguments."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", required=True)
+    parser.add_argument("--revision", default=DEFAULT_MODEL_REVISION)
+    return parser.parse_args(argument_values)
+
+
 def acquire_source(
     model: str,
     revision: str,
@@ -159,14 +167,6 @@ def derive_source_identity(
         requested_revision=revision,
         resolved_revision=resolved_revision,
     )
-
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse source acquisition arguments."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True)
-    parser.add_argument("--revision", default=DEFAULT_MODEL_REVISION)
-    return parser.parse_args(argument_values)
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:

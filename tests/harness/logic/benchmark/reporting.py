@@ -22,19 +22,6 @@ PHASE_SECOND = 2
 # ============================================================================
 
 
-def percentile(values: list[float], fraction: float, *, is_previous_selected: bool = False) -> float:
-    """Return the selected percentile from a list of samples."""
-    if not values:
-        return 0.0
-    sorted_values = sorted(values)
-    sample_count = len(sorted_values)
-    index = int(fraction * sample_count)
-    if is_previous_selected:
-        index = max(index - 1, 0)
-    index = min(index, sample_count - 1)
-    return sorted_values[index]
-
-
 def _is_capacity_error(message: str | None) -> bool:
     if not message:
         return False
@@ -109,6 +96,19 @@ def _print_tagged_section(tag: str, results: list[dict[str, Any]]) -> None:
         return
     write_line(f"\n  {bold(tag.upper())} transaction:")
     _print_latency_section(successful_results)
+
+
+def percentile(values: list[float], fraction: float, *, is_previous_selected: bool = False) -> float:
+    """Return the selected percentile from a list of samples."""
+    if not values:
+        return 0.0
+    sorted_values = sorted(values)
+    sample_count = len(sorted_values)
+    index = int(fraction * sample_count)
+    if is_previous_selected:
+        index = max(index - 1, 0)
+    index = min(index, sample_count - 1)
+    return sorted_values[index]
 
 
 # ============================================================================

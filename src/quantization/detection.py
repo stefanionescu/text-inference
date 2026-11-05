@@ -17,6 +17,13 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
+def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
+    """Parse internal local-checkpoint detection arguments."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("checkpoint")
+    return parser.parse_args(argument_values)
+
+
 def detect_format(
     model: str,
     engine: str,
@@ -41,13 +48,6 @@ def detect_local_format(model_folder: Path) -> str | None:
         message = "Model configuration was not found"
         raise FileNotFoundError(message)
     return detect_payload_formats(payloads)
-
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse internal local-checkpoint detection arguments."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("checkpoint")
-    return parser.parse_args(argument_values)
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:

@@ -8,7 +8,7 @@ from dataclasses import field, dataclass
 
 import sentry_sdk
 
-from src.logs import current_log_context
+from src.logs.context import current_log_context
 from src.runtime.environment import read_environment_text, read_environment_float
 from config.runtime.telemetry import (
     SENTRY_DSN,

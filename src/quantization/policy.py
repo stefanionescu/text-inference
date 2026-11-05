@@ -27,13 +27,6 @@ class QuantizationPlan:
     runtime_format: str | None
 
 
-def validate_engine(engine: str) -> None:
-    """Require one supported inference engine."""
-    if engine not in QUANTIZATIONS_BY_ENGINE:
-        message = f"Inference engine must be one of {tuple(QUANTIZATIONS_BY_ENGINE)}, got {engine!r}"
-        raise ValueError(message)
-
-
 def _validate_requested_format(engine: str, requested_format: str | None) -> None:
     """Require a requested export format supported by the selected engine."""
     if requested_format is None:
@@ -50,6 +43,13 @@ def _validate_existing_format(engine: str, source_format: str | None) -> None:
         return
     message = f"Checkpoint format {source_format!r} is incompatible with the {engine} engine"
     raise ValueError(message)
+
+
+def validate_engine(engine: str) -> None:
+    """Require one supported inference engine."""
+    if engine not in QUANTIZATIONS_BY_ENGINE:
+        message = f"Inference engine must be one of {tuple(QUANTIZATIONS_BY_ENGINE)}, got {engine!r}"
+        raise ValueError(message)
 
 
 def build_quantization_plan(

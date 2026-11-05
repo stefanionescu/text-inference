@@ -34,6 +34,25 @@ class _LoggingState:
 _LOGGING_STATE = _LoggingState()
 
 
+def _configure_log_record_factory() -> None:
+    """Install a LogRecord factory that injects context fields."""
+    if _LOGGING_STATE.is_context_installed:
+        return
+
+    previous_factory = logging.getLogRecordFactory()
+
+    def record_factory(*arguments: object, **keyword_arguments: object) -> logging.LogRecord:
+        """Create a log record with current context fields attached."""
+        record = previous_factory(*arguments, **keyword_arguments)
+        record.session_id = _SESSION_ID.get()
+        record.request_id = _REQUEST_ID.get()
+        record.client_id = _CLIENT_ID.get()
+        return record
+
+    logging.setLogRecordFactory(record_factory)
+    _LOGGING_STATE.is_context_installed = True
+
+
 def set_log_context(
     *,
     session_id: str | None = None,
@@ -57,25 +76,6 @@ def current_log_context() -> LogContext:
     request_id = _REQUEST_ID.get()
     client_id = _CLIENT_ID.get()
     return LogContext(session_id=session_id, request_id=request_id, client_id=client_id)
-
-
-def _configure_log_record_factory() -> None:
-    """Install a LogRecord factory that injects context fields."""
-    if _LOGGING_STATE.is_context_installed:
-        return
-
-    previous_factory = logging.getLogRecordFactory()
-
-    def record_factory(*arguments: object, **keyword_arguments: object) -> logging.LogRecord:
-        """Create a log record with current context fields attached."""
-        record = previous_factory(*arguments, **keyword_arguments)
-        record.session_id = _SESSION_ID.get()
-        record.request_id = _REQUEST_ID.get()
-        record.client_id = _CLIENT_ID.get()
-        return record
-
-    logging.setLogRecordFactory(record_factory)
-    _LOGGING_STATE.is_context_installed = True
 
 
 def configure_logging() -> None:

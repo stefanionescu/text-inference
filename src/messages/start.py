@@ -40,22 +40,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def history_messages(
-    session_runtime: SessionRuntime,
-    state: SessionState,
-    message: dict[str, Any],
-) -> list[HistoryMessage]:
-    """Import schema-validated start history through the history controller."""
-    if state.history_messages or not isinstance(message.get("history"), list):
-        return session_runtime.history.get_messages(state)
-    imported = [
-        HistoryMessage(role=cast('Literal["user", "assistant"]', item["role"]), content=item["content"])
-        for item in message["history"]
-    ]
-    session_runtime.history.set_mode_histories(state, history_messages=imported)
-    return session_runtime.history.get_messages(state)
-
-
 async def _close_validation_error(
     websocket: WebSocket,
     error: ValidationError,
@@ -156,6 +140,22 @@ async def _start_inputs_checked(
         get_metrics().phase_errors_total.add(1, {"phase": "validate", "error.type": "invalid_start"})
         await _close_validation_error(websocket, error)
         return None
+
+
+def history_messages(
+    session_runtime: SessionRuntime,
+    state: SessionState,
+    message: dict[str, Any],
+) -> list[HistoryMessage]:
+    """Import schema-validated start history through the history controller."""
+    if state.history_messages or not isinstance(message.get("history"), list):
+        return session_runtime.history.get_messages(state)
+    imported = [
+        HistoryMessage(role=cast('Literal["user", "assistant"]', item["role"]), content=item["content"])
+        for item in message["history"]
+    ]
+    session_runtime.history.set_mode_histories(state, history_messages=imported)
+    return session_runtime.history.get_messages(state)
 
 
 async def bootstrap_start_turn(

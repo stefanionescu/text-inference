@@ -14,6 +14,14 @@ from functools import partial
 _USE_COLOR = sys.stdout.isatty()
 
 
+def _format_ansi_text(code: str, text: str) -> str:
+    """Wrap text in ANSI color codes if output is a tty."""
+    formatted = f"\033[{code}m{text}\033[0m"
+    if not _USE_COLOR:
+        return text
+    return formatted
+
+
 def write_line(value: object = "") -> None:
     """Write one value followed by a newline."""
     text = f"{value}\n"
@@ -28,14 +36,6 @@ def write_text(value: object = "", *, is_flush_requested: bool = False) -> None:
     sys.stdout.write(text)
     if is_flush_requested:
         sys.stdout.flush()
-
-
-def _format_ansi_text(code: str, text: str) -> str:
-    """Wrap text in ANSI color codes if output is a tty."""
-    formatted = f"\033[{code}m{text}\033[0m"
-    if not _USE_COLOR:
-        return text
-    return formatted
 
 
 dim = partial(_format_ansi_text, "2")

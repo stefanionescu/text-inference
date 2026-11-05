@@ -32,23 +32,6 @@ class AuthenticationPolicy:
     clock: Callable[[], float] = time.monotonic
 
 
-def build_authentication_policy(
-    *,
-    authentication_settings: AuthenticationSettings,
-    websocket_settings: WebSocketSettings,
-    authentication_failures: dict[str, deque[float]] | None = None,
-    clock: Callable[[], float] = time.monotonic,
-) -> AuthenticationPolicy:
-    """Build an auth policy, defaulting to the shared failure store."""
-    failures = _AUTHENTICATION_FAILURES if authentication_failures is None else authentication_failures
-    return AuthenticationPolicy(
-        authentication_settings=authentication_settings,
-        websocket_settings=websocket_settings,
-        authentication_failures=failures,
-        clock=clock,
-    )
-
-
 def _extract_bearer_key(value: str | None) -> str | None:
     """Extract bearer token value from an Authorization header."""
     if not value:
@@ -150,6 +133,23 @@ def _websocket_client_key(websocket: WebSocket) -> str:
     client = websocket.client
     host = client.host if client else None
     return _client_failure_key(host)
+
+
+def build_authentication_policy(
+    *,
+    authentication_settings: AuthenticationSettings,
+    websocket_settings: WebSocketSettings,
+    authentication_failures: dict[str, deque[float]] | None = None,
+    clock: Callable[[], float] = time.monotonic,
+) -> AuthenticationPolicy:
+    """Build an auth policy, defaulting to the shared failure store."""
+    failures = _AUTHENTICATION_FAILURES if authentication_failures is None else authentication_failures
+    return AuthenticationPolicy(
+        authentication_settings=authentication_settings,
+        websocket_settings=websocket_settings,
+        authentication_failures=failures,
+        clock=clock,
+    )
 
 
 def validate_api_key(

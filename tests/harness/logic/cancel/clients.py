@@ -162,38 +162,6 @@ async def _run_normal_session(websocket: WebSocketClientProtocol, request: Norma
     )
 
 
-async def run_normal_client(request: NormalClientRequest) -> NormalClientResult:
-    """Run a client that completes inference normally and waits for coordination.
-
-    Args:
-        request: Normal client connection and flow inputs.
-
-    Returns:
-        Result of the normal client flow.
-
-    """
-    try:
-        async with open_websocket(
-            lambda: connect_websocket(
-                request.server_url,
-                headers=request.authentication_headers,
-                max_queue=None,
-                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
-                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
-            ),
-        ) as websocket:
-            return await _run_normal_session(websocket, request)
-
-    except (OSError, TimeoutError, RuntimeError, ValueError, WebSocketException) as exception:
-        return _normal_result(
-            request,
-            has_passed=False,
-            response_text="",
-            metrics={},
-            error=f"connection failed: {exception}",
-        )
-
-
 def _skipped_drain(error: str) -> DrainPhaseResult:
     return DrainPhaseResult(has_passed=False, spurious_messages=0, error=error)
 
@@ -237,6 +205,38 @@ async def _run_canceling_session(
         drain_phase=drain_result,
         recovery_phase=recovery_result,
     )
+
+
+async def run_normal_client(request: NormalClientRequest) -> NormalClientResult:
+    """Run a client that completes inference normally and waits for coordination.
+
+    Args:
+        request: Normal client connection and flow inputs.
+
+    Returns:
+        Result of the normal client flow.
+
+    """
+    try:
+        async with open_websocket(
+            lambda: connect_websocket(
+                request.server_url,
+                headers=request.authentication_headers,
+                max_queue=None,
+                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
+            ),
+        ) as websocket:
+            return await _run_normal_session(websocket, request)
+
+    except (OSError, TimeoutError, RuntimeError, ValueError, WebSocketException) as exception:
+        return _normal_result(
+            request,
+            has_passed=False,
+            response_text="",
+            metrics={},
+            error=f"connection failed: {exception}",
+        )
 
 
 async def run_canceling_client(request: CancelingClientRequest) -> CancelClientResult:

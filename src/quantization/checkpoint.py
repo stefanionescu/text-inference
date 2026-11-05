@@ -24,6 +24,15 @@ CHECKPOINT_VALIDATION_ERRORS = (ImportError, KeyError, OSError, RuntimeError, Ty
 _CREATE_TOKENIZER: Callable[..., object] = cast("Callable[..., object]", AutoTokenizer.from_pretrained)
 
 
+def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
+    """Parse checkpoint-validation arguments."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
+    parser.add_argument("--engine", required=True, choices=QUANTIZATIONS_BY_ENGINE)
+    parser.add_argument("--format", dest="quantization_format", required=True)
+    return parser.parse_args(argument_values)
+
+
 def copy_source_assets(source_folder: Path, checkpoint_folder: Path) -> None:
     """Copy tokenizer, processor, template, and custom-code assets."""
     source_root = source_folder.resolve(strict=True)
@@ -73,15 +82,6 @@ def validate_checkpoint(checkpoint_folder: Path, engine: str, expected_format: s
         message = f"Checkpoint declares {detected_format!r}, expected {expected_format!r}"
         raise ValueError(message)
     return checkpoint_root
-
-
-def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse checkpoint-validation arguments."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
-    parser.add_argument("--engine", required=True, choices=QUANTIZATIONS_BY_ENGINE)
-    parser.add_argument("--format", dest="quantization_format", required=True)
-    return parser.parse_args(argument_values)
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:

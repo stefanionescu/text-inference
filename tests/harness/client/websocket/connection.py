@@ -47,6 +47,17 @@ def _normalize_path_scheme(url: str, default_path: str) -> tuple[str, str, str, 
     return scheme, netloc, normalized_path, parts.query, parts.fragment
 
 
+def _choose_receive_method(websocket: object) -> Callable[[], str | Awaitable[str]]:
+    """Support both `websockets` (recv) and Starlette/WebSocketTestClient (receive)."""
+    receiver = getattr(websocket, "receive", None)
+    if not callable(receiver):
+        receiver = getattr(websocket, "recv", None)
+    if not callable(receiver):
+        message = "websocket-like object must expose receive() or recv()"
+        raise TypeError(message)
+    return cast("Callable[[], str | Awaitable[str]]", receiver)
+
+
 def read_api_key(
     api_key_variable: str = "API_KEY",
     default_key: str | None = None,
@@ -99,17 +110,6 @@ async def send_end_frame(websocket: object) -> None:
         result = sender(json.dumps({"type": "end", "v": WEBSOCKET_PROTOCOL_VERSION}))
         if inspect.isawaitable(result):
             await result
-
-
-def _choose_receive_method(websocket: object) -> Callable[[], str | Awaitable[str]]:
-    """Support both `websockets` (recv) and Starlette/WebSocketTestClient (receive)."""
-    receiver = getattr(websocket, "receive", None)
-    if not callable(receiver):
-        receiver = getattr(websocket, "recv", None)
-    if not callable(receiver):
-        message = "websocket-like object must expose receive() or recv()"
-        raise TypeError(message)
-    return cast("Callable[[], str | Awaitable[str]]", receiver)
 
 
 async def receive_raw_frame(

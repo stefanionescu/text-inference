@@ -40,6 +40,62 @@ class TurnRequest:
     sampling_overrides: dict[str, float | int | bool] | None = None
 
 
+async def _send_initial_text(
+    websocket: WebSocket,
+    initial_text: str,
+    state: _StreamState,
+    *,
+    is_already_sent: bool,
+) -> None:
+    """Send initial text when it was not already emitted."""
+    if not initial_text or is_already_sent:
+        return
+    sent = await safe_send_flat(websocket, "token", text=initial_text)
+    if sent:
+        state.is_text_visible = True
+    else:
+        state.is_interrupted = True
+
+
+async def _forward_stream_chunks(
+    websocket: WebSocket,
+    stream: AsyncIterator[str],
+    state: _StreamState,
+) -> None:
+    """Forward generated stream chunks to the client."""
+    async for chunk in stream:
+        sent = await safe_send_flat(websocket, "token", text=chunk)
+        if not sent:
+            state.is_interrupted = True
+            break
+        state.completion_text += chunk
+        state.is_text_visible = True
+
+
+async def _send_completion_frames(websocket: WebSocket, state: _StreamState) -> None:
+    """Send final and done frames for a completed stream."""
+    sent_completion = await safe_send_flat(websocket, "final", status=WEBSOCKET_STATUS_OK, text=state.completion_text)
+    if not sent_completion:
+        state.is_interrupted = True
+        return
+    sent_done = await safe_send_flat(websocket, "done", status=WEBSOCKET_STATUS_OK)
+    if not sent_done:
+        state.is_interrupted = True
+
+
+async def _handle_empty_output(websocket: WebSocket) -> None:
+    """Report an empty model output to metrics and client."""
+    logger.warning("empty model output")
+    get_metrics().empty_model_output_total.add(1)
+    await safe_send_flat(
+        websocket,
+        "error",
+        status=500,
+        code="internal_error",
+        message="Model produced no output",
+    )
+
+
 async def run_turn_execution(
     websocket: WebSocket,
     request: TurnRequest,
@@ -108,62 +164,6 @@ class StreamResponseRequest:
     initial_text: str = ""
     is_initial_text_sent: bool = True
     history_user_utterance: str | None = None
-
-
-async def _send_initial_text(
-    websocket: WebSocket,
-    initial_text: str,
-    state: _StreamState,
-    *,
-    is_already_sent: bool,
-) -> None:
-    """Send initial text when it was not already emitted."""
-    if not initial_text or is_already_sent:
-        return
-    sent = await safe_send_flat(websocket, "token", text=initial_text)
-    if sent:
-        state.is_text_visible = True
-    else:
-        state.is_interrupted = True
-
-
-async def _forward_stream_chunks(
-    websocket: WebSocket,
-    stream: AsyncIterator[str],
-    state: _StreamState,
-) -> None:
-    """Forward generated stream chunks to the client."""
-    async for chunk in stream:
-        sent = await safe_send_flat(websocket, "token", text=chunk)
-        if not sent:
-            state.is_interrupted = True
-            break
-        state.completion_text += chunk
-        state.is_text_visible = True
-
-
-async def _send_completion_frames(websocket: WebSocket, state: _StreamState) -> None:
-    """Send final and done frames for a completed stream."""
-    sent_completion = await safe_send_flat(websocket, "final", status=WEBSOCKET_STATUS_OK, text=state.completion_text)
-    if not sent_completion:
-        state.is_interrupted = True
-        return
-    sent_done = await safe_send_flat(websocket, "done", status=WEBSOCKET_STATUS_OK)
-    if not sent_done:
-        state.is_interrupted = True
-
-
-async def _handle_empty_output(websocket: WebSocket) -> None:
-    """Report an empty model output to metrics and client."""
-    logger.warning("empty model output")
-    get_metrics().empty_model_output_total.add(1)
-    await safe_send_flat(
-        websocket,
-        "error",
-        status=500,
-        code="internal_error",
-        message="Model produced no output",
-    )
 
 
 async def stream_response(request: StreamResponseRequest) -> str:
