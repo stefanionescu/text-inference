@@ -1,11 +1,11 @@
-# TensorRT-LLM Docker Image
+# TensorRT-LLM Docker image
 
-The TensorRT-LLM image serves one immutable ModelOpt checkpoint in Hugging Face
-layout through the TensorRT-LLM `1.3.0rc20` public PyTorch backend. It does not
-use serialized TensorRT engine directories.
+The TensorRT-LLM image serves one immutable ModelOpt large language model (LLM)
+checkpoint in Hugging Face layout through the TensorRT-LLM `1.3.0rc20` public
+PyTorch backend. It does not use serialized TensorRT engine directories.
 
-The runtime is text-only, uses one GPU, and defaults `TRT_MAX_BATCH_SIZE` to
-`64`.
+The runtime is text-only, uses one graphics processing unit (GPU), and defaults
+`TRT_MAX_BATCH_SIZE` to `64`.
 
 Complete the common requirements in the
 [Docker image guide](../README.md) before building.
@@ -77,7 +77,7 @@ Runtime scheduling and memory remain configurable:
 - `GPU_MEMORY_FRACTION` sets the free-memory fraction available to the KV cache.
 - `KV_DTYPE` selects KV-cache storage.
 - The entrypoint's `--logs` option streams TensorRT and other dependency output;
-  otherwise only repository-owned logs are shown.
+  otherwise, the output contains only repository-owned logs.
 
 These settings do not change the quantized checkpoint.
 

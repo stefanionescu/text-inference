@@ -7,7 +7,7 @@ diagnostic work.
 
 Each server process has five fixed boundaries:
 
-- `--model` selects one deployed model.
+- `--model` selects one deployed large language model (LLM).
 - `--engine` selects one inference backend.
 - One tokenizer renders prompts and measures every token budget.
 - The authenticated `/ws` endpoint owns client sessions.
@@ -59,7 +59,8 @@ Shutdown aborts active requests before releasing engine resources and flushing
 telemetry.
 
 The process uses the `spawn` multiprocessing method before engine startup.
-This prevents child processes from inheriting an initialized CUDA context.
+This prevents child processes from inheriting an initialized Compute Unified
+Device Architecture (CUDA) context on the graphics processing unit (GPU).
 
 ### Runtime dependency ownership
 
@@ -112,8 +113,8 @@ Startup fails when:
 - `--engine` is not `trt` or `vllm`.
 - TensorRT dtype, KV dtype, or maximum batch settings are invalid.
 - The detected checkpoint format is incompatible with the selected engine.
-- Quantization was requested for an already-quantized source.
-- The model tokenizer files cannot be found.
+- You request quantization for an already-quantized source.
+- Tokenizer validation cannot find the model tokenizer files.
 
 ### GPU variables
 
@@ -209,11 +210,11 @@ Close codes:
 | ----------------------- | ------- | ------------------------------------------- |
 | `APPLICATION_LOG_LEVEL` | `INFO`  | Sets the root and application logger level. |
 
-The log format is fixed. Every record includes:
+The server uses one fixed log format. Every record includes:
 
-- Session identifier (`session_id`).
-- Request identifier (`request_id`).
-- Client identifier (`client_id`).
+- Session identifier in `session_id`.
+- Request identifier in `request_id`.
+- Client identifier in `client_id`.
 - Logger name.
 - Timestamp.
 - Message.
@@ -228,7 +229,7 @@ become WebSocket parameters.
 | vLLM         | `docker/vllm/build.sh` | `DOCKER_USERNAME`, `DOCKER_TOKEN`, `TAG`, `MODEL`, `MODEL_REVISION` |
 | TensorRT-LLM | `docker/trt/build.sh`  | `DOCKER_USERNAME`, `DOCKER_TOKEN`, `TAG`, `MODEL`, `MODEL_REVISION` |
 
-`HF_TOKEN` is passed as a BuildKit secret when the repository is gated.
+For a gated repository, set `HF_TOKEN`. The build passes it as a BuildKit secret.
 
 ## Host operations
 
@@ -242,13 +243,13 @@ The main script:
 
 - Validates authentication inputs, resolves the source revision, and inspects
   model metadata before cache deletion or dependency work.
-- Deploys unquantized or compatible prequantized sources unchanged when
-  `--quantization` is omitted.
-- Exports only an unquantized source when `--quantization` is supplied.
+- Deploys unquantized or compatible prequantized sources unchanged when the
+  command omits `--quantization`.
+- Exports only an unquantized source when the command includes `--quantization`.
 - Installs the dependencies for the selected engine.
 - Prepares or reuses a repository-provenanced local export when requested.
 - Starts the dual-listener server process in a detached session.
-- Records the process identifier in `server.pid`.
+- Records the process identifier (PID) in `server.pid`.
 - Appends server output to `server.log`.
 - Waits for loopback `/readyz` and runs the warmup client.
 - Tails the server log in the foreground.
@@ -333,7 +334,7 @@ An explicit dedicated-host reset also:
 - Removes temporary runtime state.
 - Removes server logs.
 
-Run the destructive reset only when the host is dedicated to this deployment:
+Run the destructive reset only on a host dedicated to this deployment:
 
 ```shell
 bash scripts/stop.sh --reset
@@ -362,7 +363,7 @@ foreground tail stays focused on warmup status.
 
 ### Hugging Face uploads
 
-Locally exported checkpoints can be pushed during host deployment:
+Host deployment can push locally exported checkpoints:
 
 ```shell
 export HF_TOKEN="<HF_WRITE_TOKEN>"
@@ -392,10 +393,10 @@ Rules:
 
 - `--push` uploads locally exported weights, tokenizer assets, provenance,
   and model-card metadata.
-- vLLM uploads are limited to locally produced `compressed-tensors` exports.
+- vLLM uploads accept only locally produced `compressed-tensors` exports.
 - TensorRT-LLM uploads support all three configured ModelOpt formats.
 - `HF_TOKEN` must have write access.
-- `HF_PUSH_REPO_ID` is required for quantized export pushes.
+- Quantized export pushes require `HF_PUSH_REPO_ID`.
 - `HF_PUSH_PRIVATE` defaults to `1`. Set it to `0` for a public repository.
 
 ## WebSocket API: `/ws`
@@ -534,8 +535,8 @@ Normal generation:
 ```
 
 The `final` text contains the accumulated visible response. The server commits
-visible response text to session history. This includes partial text when a
-send is interrupted after the client has received output.
+visible response text to session history. This includes partial text when an
+interruption stops a send after the client has received output.
 
 ### Cancel frame
 
@@ -610,8 +611,8 @@ Common codes:
 
 ### Node.js client
 
-This example assumes that the `ws` package is installed and `API_KEY` is
-set in the process environment:
+This example assumes that you installed the `ws` package and set `API_KEY` in
+the process environment:
 
 ```javascript
 import WebSocket from 'ws';
@@ -685,9 +686,9 @@ stores these session fields:
 - Imported conversation turns in `history`.
 - Optional sampling overrides.
 
-The prompt is rendered through the deployed model tokenizer template. A model
-without a usable chat template is rejected. The runtime does not synthesize a
-replacement template.
+The server renders the prompt through the deployed model tokenizer template.
+Prompt rendering fails for a model without a usable chat template. The runtime
+does not synthesize a replacement template.
 
 ### History import
 
@@ -707,11 +708,11 @@ Accepted roles:
 
 History handling:
 
-- Roles are normalized to lowercase.
-- Unknown fields are rejected.
-- Consecutive user entries can be merged.
-- Old complete turns are trimmed when token budgets are exceeded.
-- Completed generated turns are appended to session history.
+- The server normalizes roles to lowercase.
+- The server rejects unknown fields.
+- The server can merge consecutive user entries.
+- The server trims old complete turns when a session exceeds the token budgets.
+- The server appends completed generated turns to session history.
 
 ### Prompt fitting
 
@@ -729,7 +730,7 @@ current user text only when removing history does not make enough room.
 
 ### Sampling overrides
 
-Sampling can be passed in a nested object:
+Pass sampling values in a nested object:
 
 ```json
 {
@@ -745,7 +746,7 @@ Sampling can be passed in a nested object:
 }
 ```
 
-Or at top level:
+Pass them at the top level instead:
 
 ```json
 {
@@ -823,7 +824,7 @@ KV-cache memory and the sequence length of active requests.
 
 ### vLLM runtime
 
-vLLM is selected with `--engine vllm`. It provides
+Select vLLM with `--engine vllm`. vLLM provides
 dynamic serving with model-supported prefix caching and runtime cache reset
 support.
 
@@ -850,10 +851,10 @@ Hybrid models use vLLM's native cache policy.
 The server attempts a non-preemptive vLLM prefix-cache reset every ten minutes.
 It never resets while another client remains because of a disconnect. The last
 disconnect bypasses the timer and attempts the same non-preemptive reset
-immediately. A reset declined because active requests still own cache entries
-is retried after a fixed 30 seconds. The daemon is cancelled and awaited before
-engine shutdown. TensorRT-LLM does not use this coordinator because its runtime
-relies on block reuse.
+immediately. When the engine declines a reset because active requests still own
+cache entries, the server retries the reset after a fixed 30 seconds. The server
+cancels and awaits the daemon before engine shutdown. TensorRT-LLM does not use
+this coordinator because its runtime relies on block reuse.
 
 ## Quantization
 
@@ -867,14 +868,14 @@ is already quantized, deployment reports the detected format and instructs the
 operator to omit `--quantization`; re-quantization is not supported.
 
 For vLLM, prequantized checkpoints must declare a supported runtime format.
-Qwen 3.5 MoE GPTQ selects `moe_wna16` from model configuration. ModelOpt NVFP4
-selects `modelopt_fp4`.
+Qwen 3.5 MoE with Generative Pre-trained Transformer Quantization (GPTQ) selects
+`moe_wna16` from model configuration. ModelOpt NVFP4 selects `modelopt_fp4`.
 
 For TensorRT-LLM, the host pipeline reads the ModelOpt unified metadata. A
 prequantized checkpoint must declare `quant_method: modelopt` and a supported
-`quant_algo`. An unquantized source is exported locally only when an export is
-requested; otherwise it is served unchanged. Conflicting,
-unsupported, or malformed metadata stops deployment.
+`quant_algo`. The host pipeline exports an unquantized source locally only when
+you request an export; otherwise, TensorRT-LLM serves the source unchanged.
+Conflicting, unsupported, or malformed metadata stops deployment.
 
 Detection checks `config.json`, `quantization_config.json`,
 `quant_config.json`, and `awq_config.json`. Conflicting declarations across
@@ -891,7 +892,8 @@ those files stop deployment.
 
 The vLLM path supports:
 
-- Existing AWQ and GPTQ checkpoints that declare the requested format.
+- Existing Activation-aware Weight Quantization (AWQ) and GPTQ checkpoints that
+  declare the requested format.
 - Existing compressed-tensors and FP8 checkpoints.
 - ModelOpt `NVFP4` and `W4A16_NVFP4` checkpoints through `modelopt_fp4`.
 - Compressed-tensors NVFP4 checkpoints as `compressed-tensors` artifacts.
@@ -899,7 +901,7 @@ The vLLM path supports:
 - Fresh compressed-tensors W4A16 exports through LLM Compressor `0.12`.
 - Online vLLM FP8 for an unquantized source selected with `fp8`.
 
-On an A100 (`sm80`), vLLM can serve a compatible W8A8 INT8 or SmoothQuant
+On an `sm80` A100, vLLM can serve a compatible W8A8 INT8 or SmoothQuant
 checkpoint. The repository identifies that artifact as `compressed-tensors`,
 and `int8_sq` is not a vLLM runtime format.
 
@@ -995,8 +997,9 @@ records:
 - CUDA and Python versions.
 - Creation time.
 
-Tokenizer and custom-code assets are preserved from the immutable source and
-validated locally before the checkpoint is accepted or published.
+The export preserves tokenizer and custom-code assets from the immutable source.
+Local validation checks those assets before the repository accepts or publishes
+the checkpoint.
 
 Cache reuse requires the source identity and every output-affecting setting to
 match. `QUANT_FORCE_REBUILD=1` bypasses the match. `--push` can publish
@@ -1032,8 +1035,8 @@ docker run --gpus all --detach \
   <IMAGE> [--logs]
 ```
 
-Only the public WebSocket port is published. The fixed loopback probe port is
-not exposed to the host.
+Running the image publishes only the public WebSocket port. The fixed loopback
+probe port is not exposed to the host.
 
 `pyproject.toml` declares the engine extras, and `uv.lock` pins the resolved
 dependencies. Docker and host installation use those same lock inputs.
@@ -1122,7 +1125,7 @@ metrics objects but does not configure remote exporters.
 | `text_inference.empty_model_output_total`     | `{output}`     | Generations that produced no output. |
 | `text_inference.engine_abort_retryable_total` | `{abort}`      | Retryable engine abort calls.        |
 
-### UpDown counters
+### Up-down counters
 
 | Metric                              | Unit           | Description                    |
 | ----------------------------------- | -------------- | ------------------------------ |
@@ -1146,7 +1149,7 @@ GPU observations.
 `APPLICATION_LOG_LEVEL` controls the root and application logger levels. The default is
 `INFO`.
 
-The log format is fixed so every record carries the same context:
+The server uses one fixed log format, so every record carries the same context:
 
 ```text
 %(levelname)s %(asctime)s name=%(name)s session_id=%(session_id)s request_id=%(request_id)s client_id=%(client_id)s msg=%(message)s
@@ -1188,8 +1191,8 @@ curl --fail --max-time 2 http://127.0.0.1:8001/readyz
 ```
 
 `/healthz` reports that the process event loop is alive. `/readyz` returns 503
-until dependencies are initialized and the public WebSocket listener accepts
-connections, returns 200 while serving, and returns 503 before shutdown
+until the server initializes dependencies and the public WebSocket listener
+accepts connections, returns 200 while serving, and returns 503 before shutdown
 draining begins. Public port 8000 has no HTTP probe routes. The application
 does not expose FastAPI documentation, ReDoc, or OpenAPI routes.
 
@@ -1349,7 +1352,7 @@ mise run test:e2e:live -- --gender male --personality warm
 mise run test:e2e:live -- --timeout 120 "start with a greeting"
 ```
 
-The live profile registry is keyed by the exact `(gender, personality)` pair.
+The live profile registry uses the exact `(gender, personality)` pair as its key.
 Its commands are `/help`, `/history`, `/genders`, `/personalities`, `/stats`,
 and `/stop`. `/stats` takes no arguments and toggles metrics logging.
 
@@ -1381,9 +1384,8 @@ authentication throttle window to expire before retrying.
 
 ### `server_at_capacity`
 
-The server rejected the socket because
-`MAX_CONCURRENT_CONNECTIONS` has been reached. Increase the setting or retry
-with backoff.
+The server rejected the socket because the number of admitted connections
+reached `MAX_CONCURRENT_CONNECTIONS`. Increase the setting or retry with backoff.
 
 ### `rate_limited`
 
@@ -1411,8 +1413,8 @@ bash scripts/main.sh --engine vllm --model <AWQ_MODEL>
 bash scripts/main.sh --model <MODELOPT_FP8_MODEL>
 ```
 
-Use `--quantization FORMAT` only with an unquantized source. Re-quantization of
-an already-quantized source is rejected.
+Use `--quantization FORMAT` only with an unquantized source. Deployment rejects
+re-quantization of an already-quantized source.
 
 ### Calibration runs out of memory
 
@@ -1437,7 +1439,7 @@ Local model paths must include tokenizer assets such as:
 Deployment fails before serving when tokenizer validation cannot find usable
 files.
 
-### TensorRT checkpoint is invalid
+### The TensorRT checkpoint is invalid
 
 For a local TensorRT checkpoint:
 
@@ -1450,7 +1452,7 @@ weights. Its `config.json` must use the Model Optimizer unified
 `quantization_config` schema. Compiled TensorRT engine files are not runtime
 inputs for this backend.
 
-### CUDA 13.1 is unavailable
+### The required CUDA 13.1 support is unavailable
 
 Host TensorRT-LLM deployment expects CUDA 13.1 or later. The scripts validate
 the toolkit and driver capability.
@@ -1497,7 +1499,7 @@ bash scripts/readiness.sh
 
 Then verify:
 
-- `API_KEY` is set on the server and client.
+- Both the server and the client have a value for `API_KEY`.
 - The client sends `start` before `message`.
 - The prompt and history fit the configured token budgets.
 - The engine completed startup without an error in `server.log`.

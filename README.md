@@ -1,8 +1,8 @@
-# Text Inference Server
+# Text inference server
 
 This is an authenticated WebSocket server for streaming text
-generation on NVIDIA GPUs. Each deployment serves one model through either
-TensorRT-LLM or vLLM.
+generation on NVIDIA graphics processing unit (GPU) hardware. Each deployment
+serves one large language model (LLM) through either TensorRT-LLM or vLLM.
 
 The public API is text-only, and each engine currently runs on one GPU. A
 session can carry a profile prompt and imported conversation history. The
@@ -22,7 +22,7 @@ Operational controls cover separate concerns:
 - [Start the server](#start-the-server)
 - [Choose an engine and format](#choose-an-engine-and-format)
 - [Quantized checkpoints](#quantized-checkpoints)
-- [Use the WebSocket API](#use-the-websocket-api)
+- [Connect to the WebSocket API](#connect-to-the-websocket-api)
 - [Configure the runtime](#configure-the-runtime)
 - [Operate a host deployment](#operate-a-host-deployment)
 - [Build Docker images](#build-docker-images)
@@ -36,7 +36,8 @@ Operational controls cover separate concerns:
 Host deployment requires:
 
 - Linux with a supported NVIDIA GPU and driver.
-- CUDA 13.x support. The TensorRT-LLM host path requires CUDA 13.1 or later.
+- Compute Unified Device Architecture (CUDA) major version 13 support. The
+  TensorRT-LLM host path requires CUDA 13.1 or later.
 - Python 3.12 through the repository-managed environments.
 - A Hugging Face token that can read the selected model.
 - An allowlisted Hugging Face model or a local model directory.
@@ -65,8 +66,9 @@ export HF_TOKEN="<HF_TOKEN>"
 export MAX_CONCURRENT_CONNECTIONS=8
 ```
 
-Start TensorRT-LLM with a ready INT4-AWQ checkpoint. Quantization is detected
-from the checkpoint metadata, so no export option is needed:
+Start TensorRT-LLM with a ready INT4-AWQ checkpoint, which uses
+Activation-aware Weight Quantization (AWQ). The repository detects quantization
+from the checkpoint metadata, so you do not need an export option:
 
 ```shell
 bash scripts/main.sh \
@@ -89,10 +91,9 @@ startup. Pressing `Control+C` stops the log tail without stopping the server.
 
 ## Choose an engine and format
 
-`--model` is required for a fresh deployment. Omit `--quantization` to deploy
-the source unchanged, whether it is unquantized or already quantized. Add
-`--quantization FORMAT` only when an unquantized source must be exported into
-one of these formats:
+A fresh deployment requires `--model`. Omit `--quantization` to deploy an
+unquantized or already-quantized source unchanged. Add `--quantization FORMAT`
+only to export an unquantized source into one of these formats:
 
 | Engine       | Accepted formats                                    |
 | ------------ | --------------------------------------------------- |
@@ -111,8 +112,8 @@ Format support also depends on the model architecture and the selected
 quantizer. The model must appear in the allowlist for the chosen engine unless
 the host deployment uses a local directory. Requesting quantization for an
 already-quantized source fails instead of converting it. An existing format
-that the selected engine cannot serve also fails before caches or environments
-are changed.
+that the selected engine cannot serve also fails before deployment changes
+caches or environments.
 
 ## Quantized checkpoints
 
@@ -120,14 +121,14 @@ A checkpoint is the model directory loaded by an inference engine. It contains
 the model config, safetensors weights, tokenizer assets, and quantization
 metadata. It is not a running server or a serialized TensorRT engine.
 
-The repository detects quantization from that metadata. A prequantized
-checkpoint is served unchanged when its format is compatible with the selected
-engine.
+The repository detects quantization from that metadata. The selected engine
+serves a prequantized checkpoint unchanged when the checkpoint format is
+compatible with that engine.
 
 Host deployment can prepare an unquantized source in these cases:
 
 - vLLM can export a `compressed-tensors` W4A16 checkpoint with LLM Compressor.
-- vLLM can apply online FP8 quantization when `fp8` is selected.
+- vLLM can apply online FP8 quantization when you select `fp8`.
 - TensorRT-LLM can export `int4_awq`, `fp8`, or `nvfp4` checkpoints with
   NVIDIA Model Optimizer.
 
@@ -167,7 +168,7 @@ required by the public PyTorch backend.
 The advanced guide explains recipe selection, calibration behavior, cache
 identity, and publishing.
 
-## Use the WebSocket API
+## Connect to the WebSocket API
 
 Connect to `ws://<HOST>:8000/ws` with either authentication header:
 
@@ -233,9 +234,9 @@ Host deployment requires these values:
 | `HF_TOKEN`                   | Downloads source and checkpoint files from Hugging Face. |
 | `MAX_CONCURRENT_CONNECTIONS` | Limits admitted WebSocket connections.                   |
 
-The host command sets the model from `--model`. Runtime quantization is detected
-from the resolved checkpoint; the optional `--quantization` value is an export
-request, not persistent server configuration.
+The host command sets the model from `--model`. The repository detects runtime
+quantization from the resolved checkpoint; the optional `--quantization` value
+is an export request, not persistent server configuration.
 
 Common host runtime settings are:
 
@@ -423,8 +424,8 @@ causes:
   requested format.
 - A calibration out-of-memory error requires smaller calibration settings or
   a model that fits the available GPU.
-- A client connection failure usually means the API key, protocol order, or
-  connection limit is wrong.
+- A client connection failure points to a wrong API key, protocol order, or
+  connection limit.
 
 The advanced guide provides the corresponding checks and recovery commands.
 

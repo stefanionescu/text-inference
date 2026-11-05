@@ -9,6 +9,9 @@ print_width = 80
 quotes = "double"
 override = [{ paths = ["**/*.py"], indent_width = 4, print_width = 120 }]
 
+[spelling]
+allowed_words = { NVIDIA = "Real product and company names that the prose rules cannot spell out or lowercase.", TensorRT = "Real product and company names that the prose rules cannot spell out or lowercase.", LLM = "Real product and company names that the prose rules cannot spell out or lowercase.", vLLM = "Real product and company names that the prose rules cannot spell out or lowercase.", WebSocket = "Real product and company names that the prose rules cannot spell out or lowercase.", GPU = "Real product and company names that the prose rules cannot spell out or lowercase.", Hugging = "Real product and company names that the prose rules cannot spell out or lowercase.", Face = "Real product and company names that the prose rules cannot spell out or lowercase." }
+
 [python]
 docstring_convention = "google"
 

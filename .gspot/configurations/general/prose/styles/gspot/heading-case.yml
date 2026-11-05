@@ -24,19 +24,24 @@ exceptions:
   - Docker
   - ESM
   - EUR
+  - Face
   - GBP
   - GNU
+  - GPU
   - HTML
   - HTTP
   - HTTPS
+  - Hugging
   - ID
   - INI
   - JSON
   - JSX
+  - LLM
   - Linux
   - MIME
   - MIT
   - Markdown
+  - NVIDIA
   - Node
   - POSIX
   - Prettier
@@ -56,6 +61,7 @@ exceptions:
   - TODO
   - TOML
   - TSX
+  - TensorRT
   - Trivy
   - UI
   - URL
@@ -64,6 +70,7 @@ exceptions:
   - UTF
   - Vale
   - WASM
+  - WebSocket
   - Windows
   - XML
   - YAML
@@ -100,6 +107,7 @@ exceptions:
   - typos
   - uv
   - v8r
+  - vLLM
   - vale
   - vulture
   - xmllint

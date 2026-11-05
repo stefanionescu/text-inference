@@ -21,14 +21,17 @@ exceptions:
   - EUR
   - GBP
   - GNU
+  - GPU
   - HTML
   - HTTP
   - HTTPS
   - INI
   - JSON
   - JSX
+  - LLM
   - MIME
   - MIT
+  - NVIDIA
   - POSIX
   - README
   - RPC

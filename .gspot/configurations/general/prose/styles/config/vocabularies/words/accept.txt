@@ -5,9 +5,14 @@ CSRF
 DOM
 DTO
 Docker
+Face
+GPU
+Hugging
 JSON
+LLM
 Linux
 Markdown
+NVIDIA
 Node
 Prettier
 Python
@@ -16,8 +21,10 @@ Ruff
 Semgrep
 ShellCheck
 TOML
+TensorRT
 Trivy
 Vale
+WebSocket
 Windows
 YAML
 ajv
@@ -53,6 +60,7 @@ trivy
 typos
 uv
 v8r
+vLLM
 vale
 vulture
 xmllint
