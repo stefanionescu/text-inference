@@ -61,104 +61,12 @@ from config.runtime.websocket import (
     WEBSOCKET_WATCHDOG_TICK_SECONDS,
     HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
 )
-
-
-def _read_nullable_environment_text(
-    environment: EnvironmentValues,
-    name: str,
-    default: str | None,
-) -> str | None:
-    """Read a nullable stripped string setting from an environment mapping.
-
-    Args:
-        environment: Environment variables to read.
-        name: Name to use for the lookup.
-        default: Value to use when the setting is absent.
-
-    Returns:
-        A nullable stripped string setting from an environment mapping.
-
-    """
-    raw_value = environment.get(name)
-    if raw_value is None:
-        return default
-    normalized = str(raw_value).strip()
-    return normalized or None
-
-
-def _read_environment_integer(environment: EnvironmentValues, name: str, default: int) -> int:
-    """Read an integer setting from an environment mapping.
-
-    Args:
-        environment: Environment variables to read.
-        name: Name to use for the lookup.
-        default: Value to use when the setting is absent.
-
-    Returns:
-        An integer setting from an environment mapping.
-
-    Raises:
-        ValueError: `name` must be an integer, got `raw_value`.
-
-    """
-    raw_value = environment.get(name)
-    if raw_value is None or str(raw_value).strip() == "":
-        return default
-    try:
-        return int(str(raw_value).strip())
-    except (TypeError, ValueError) as exception:
-        message = f"{name} must be an integer, got {raw_value!r}"
-        raise ValueError(message) from exception
-
-
-def _read_environment_float(environment: EnvironmentValues, name: str, default: float) -> float:
-    """Read a float setting from an environment mapping.
-
-    Args:
-        environment: Environment variables to read.
-        name: Name to use for the lookup.
-        default: Value to use when the setting is absent.
-
-    Returns:
-        A float setting from an environment mapping.
-
-    Raises:
-        ValueError: `name` must be a float, got `raw_value`.
-
-    """
-    raw_value = environment.get(name)
-    if raw_value is None or str(raw_value).strip() == "":
-        return default
-    try:
-        return float(str(raw_value).strip())
-    except (TypeError, ValueError) as exception:
-        message = f"{name} must be a float, got {raw_value!r}"
-        raise ValueError(message) from exception
-
-
-def _read_environment_boolean(environment: EnvironmentValues, name: str) -> bool:
-    """Read an exact zero-or-one boolean setting.
-
-    Args:
-        environment: Environment variables to read.
-        name: Name to use for the lookup.
-
-    Returns:
-        An exact zero-or-one boolean setting.
-
-    Raises:
-        ValueError: `name` must be 0 or 1, got `raw_value`.
-
-    """
-    raw_value = environment.get(name)
-    if raw_value is None:
-        return False
-    if raw_value == "0":
-        return False
-    if raw_value == "1":
-        return True
-    message = f"{name} must be 0 or 1, got {raw_value!r}"
-    raise ValueError(message)
+from src.runtime.setting_values import (
+    parse_float_setting,
+    parse_boolean_setting,
+    parse_integer_setting,
+    parse_nullable_setting,
+)
 
 
 def _build_history_settings(limits: LimitSettings) -> HistorySettings:
@@ -201,7 +109,7 @@ def _build_session_settings(environment: EnvironmentValues, limits: LimitSetting
         maximum_prompt_tokens=maximum_prompt_tokens,
         maximum_user_utterance_tokens=maximum_user_utterance_tokens,
         stream_flush_milliseconds=stream_flush_milliseconds,
-        cache_reset_interval_seconds=_read_environment_float(
+        cache_reset_interval_seconds=parse_float_setting(
             environment,
             "CACHE_RESET_INTERVAL_SECONDS",
             CACHE_RESET_INTERVAL_SECONDS,
@@ -220,13 +128,13 @@ def _build_sampling_settings(environment: EnvironmentValues) -> SamplingSettings
 
     """
     return SamplingSettings(
-        temperature=_read_environment_float(environment, "TEMPERATURE", TEMPERATURE),
-        top_p=_read_environment_float(environment, "TOP_P", TOP_P),
-        top_k=_read_environment_integer(environment, "TOP_K", TOP_K),
-        min_p=_read_environment_float(environment, "MIN_P", MIN_P),
-        repetition_penalty=_read_environment_float(environment, "REPETITION_PENALTY", REPETITION_PENALTY),
-        presence_penalty=_read_environment_float(environment, "PRESENCE_PENALTY", PRESENCE_PENALTY),
-        frequency_penalty=_read_environment_float(environment, "FREQUENCY_PENALTY", FREQUENCY_PENALTY),
+        temperature=parse_float_setting(environment, "TEMPERATURE", TEMPERATURE),
+        top_p=parse_float_setting(environment, "TOP_P", TOP_P),
+        top_k=parse_integer_setting(environment, "TOP_K", TOP_K),
+        min_p=parse_float_setting(environment, "MIN_P", MIN_P),
+        repetition_penalty=parse_float_setting(environment, "REPETITION_PENALTY", REPETITION_PENALTY),
+        presence_penalty=parse_float_setting(environment, "PRESENCE_PENALTY", PRESENCE_PENALTY),
+        frequency_penalty=parse_float_setting(environment, "FREQUENCY_PENALTY", FREQUENCY_PENALTY),
         minimum_temperature=TEMPERATURE_MIN,
         maximum_temperature=TEMPERATURE_MAX,
         minimum_top_p=TOP_P_MIN,
@@ -259,43 +167,41 @@ def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSetti
     """
     return WebSocketSettings(
         maximum_connections=limits["MAX_CONCURRENT_CONNECTIONS"],
-        idle_timeout_seconds=_read_environment_float(
+        idle_timeout_seconds=parse_float_setting(
             environment,
             "WEBSOCKET_IDLE_TIMEOUT_SECONDS",
             WEBSOCKET_IDLE_TIMEOUT_SECONDS,
         ),
-        watchdog_tick_seconds=_read_environment_float(
+        watchdog_tick_seconds=parse_float_setting(
             environment,
             "WEBSOCKET_WATCHDOG_TICK_SECONDS",
             WEBSOCKET_WATCHDOG_TICK_SECONDS,
         ),
-        handshake_acquire_timeout_seconds=_read_environment_float(
+        handshake_acquire_timeout_seconds=parse_float_setting(
             environment,
             "WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS",
             HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
         ),
-        protocol_version=_read_environment_integer(
-            environment, "WEBSOCKET_PROTOCOL_VERSION", WEBSOCKET_PROTOCOL_VERSION
-        ),
-        maximum_message_bytes=_read_environment_integer(
+        protocol_version=parse_integer_setting(environment, "WEBSOCKET_PROTOCOL_VERSION", WEBSOCKET_PROTOCOL_VERSION),
+        maximum_message_bytes=parse_integer_setting(
             environment, "WEBSOCKET_MAX_MESSAGE_BYTES", WEBSOCKET_MAX_MESSAGE_BYTES
         ),
-        rate_limit_window_seconds=_read_environment_float(
+        rate_limit_window_seconds=parse_float_setting(
             environment,
             "WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS",
             WEBSOCKET_RATE_WINDOW_SECONDS,
         ),
-        maximum_messages_per_window=_read_environment_integer(
+        maximum_messages_per_window=parse_integer_setting(
             environment,
             "WEBSOCKET_MESSAGES_PER_WINDOW",
             WEBSOCKET_MESSAGES_PER_WINDOW,
         ),
-        maximum_cancels_per_window=_read_environment_integer(
+        maximum_cancels_per_window=parse_integer_setting(
             environment,
             "WEBSOCKET_CANCELS_PER_WINDOW",
             WEBSOCKET_CANCELS_PER_WINDOW,
         ),
-        authentication_failures_per_window=_read_environment_integer(
+        authentication_failures_per_window=parse_integer_setting(
             environment,
             "AUTHENTICATION_FAILURE_LIMIT",
             AUTHENTICATION_FAILURE_LIMIT,
@@ -325,16 +231,16 @@ def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSe
     engine_settings = EngineSettings(
         inference_engine=inference_engine,
         trt_precision=active_environment.get("TRT_DTYPE", TRT_DTYPE),
-        trt_maximum_batch_size=_read_environment_integer(
+        trt_maximum_batch_size=parse_integer_setting(
             active_environment,
             "TRT_MAX_BATCH_SIZE",
             TRT_MAX_BATCH_SIZE,
         ),
-        is_eager_execution_enforced=_read_environment_boolean(active_environment, "ENFORCE_EAGER"),
-        is_logging_enabled=_read_environment_boolean(active_environment, "LOGS_ENABLED"),
+        is_eager_execution_enforced=parse_boolean_setting(active_environment, "ENFORCE_EAGER"),
+        is_logging_enabled=parse_boolean_setting(active_environment, "LOGS_ENABLED"),
     )
     gpu_settings = GPUSettings(
-        gpu_memory_fraction=_read_environment_float(
+        gpu_memory_fraction=parse_float_setting(
             active_environment,
             "GPU_MEMORY_FRACTION",
             GPU_MEMORY_FRACTION,
@@ -343,7 +249,7 @@ def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSe
         gpu_compute_capability=active_environment.get("GPU_SM_ARCH", GPU_SM_ARCH),
     )
     timeout_settings = TimeoutSettings(
-        generation_timeout_seconds=_read_environment_float(
+        generation_timeout_seconds=parse_float_setting(
             active_environment,
             "GENERATION_TIMEOUT_SECONDS",
             GENERATION_TIMEOUT_SECONDS,
@@ -351,11 +257,11 @@ def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSe
     )
     return ApplicationSettings(
         authentication=AuthenticationSettings(
-            api_key=_read_nullable_environment_text(active_environment, "API_KEY", API_KEY),
+            api_key=parse_nullable_setting(active_environment, "API_KEY", API_KEY),
         ),
         model=ModelSettings(
-            source=_read_nullable_environment_text(active_environment, "MODEL", None),
-            runtime_quantization=_read_nullable_environment_text(active_environment, "RUNTIME_QUANTIZATION", None),
+            source=parse_nullable_setting(active_environment, "MODEL", None),
+            runtime_quantization=parse_nullable_setting(active_environment, "RUNTIME_QUANTIZATION", None),
         ),
         engine=engine_settings,
         gpu=gpu_settings,

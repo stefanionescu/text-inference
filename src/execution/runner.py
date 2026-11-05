@@ -22,7 +22,8 @@ from src.engines.protocol import SamplingParametersRequest
 from src.session.requests import is_request_cancelled
 from src.telemetry.instruments import get_metrics
 
-from .controller import StreamConfig, StreamController
+from .controller import StreamController
+from .stream_timing import StreamConfig
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator

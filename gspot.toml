@@ -74,7 +74,7 @@ can_import = ["config-runtime"]
 
 [[import_rule]]
 name = "runtime-records"
-paths = ["src/runtime/__init__.py", "src/runtime/config.py", "src/runtime/environment.py", "src/runtime/limits.py", "src/runtime/settings.py", "src/runtime/validation.py"]
+paths = ["src/runtime/__init__.py", "src/runtime/config.py", "src/runtime/environment.py", "src/runtime/limits.py", "src/runtime/setting_values.py", "src/runtime/settings.py", "src/runtime/validation.py"]
 can_import = ["config-limits", "config-security", "config-model", "config-runtime", "config-prompt", "tokens"]
 
 [[import_rule]]

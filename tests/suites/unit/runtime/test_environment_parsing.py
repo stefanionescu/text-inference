@@ -13,6 +13,19 @@ _DEFAULT_INTEGER = 7
 _DEFAULT_FLOAT = 1.5
 
 
+def _set_variable(monkeypatch: pytest.MonkeyPatch, raw_value: str | None) -> None:
+    """Set the test variable, or remove it when the case has no value.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+        raw_value: Text to store, or None to leave the variable unset.
+
+    """
+    monkeypatch.delenv(_VARIABLE, raising=False)
+    if raw_value is not None:
+        monkeypatch.setenv(_VARIABLE, raw_value)
+
+
 @pytest.mark.parametrize(
     ("raw_value", "expected"), [("42", 42), ("not-a-number", _DEFAULT_INTEGER), (None, _DEFAULT_INTEGER)]
 )
@@ -25,9 +38,7 @@ def test_integer_reader_uses_default(monkeypatch: pytest.MonkeyPatch, raw_value:
         expected: Value that the test expects.
 
     """
-    monkeypatch.delenv(_VARIABLE, raising=False)
-    if raw_value is not None:
-        monkeypatch.setenv(_VARIABLE, raw_value)
+    _set_variable(monkeypatch, raw_value)
     assert read_environment_integer(_VARIABLE, _DEFAULT_INTEGER) == expected
 
 
@@ -43,9 +54,7 @@ def test_float_reader_uses_default(monkeypatch: pytest.MonkeyPatch, raw_value: s
         expected: Value that the test expects.
 
     """
-    monkeypatch.delenv(_VARIABLE, raising=False)
-    if raw_value is not None:
-        monkeypatch.setenv(_VARIABLE, raw_value)
+    _set_variable(monkeypatch, raw_value)
     assert math.isclose(read_environment_float(_VARIABLE, _DEFAULT_FLOAT), expected)
 
 
@@ -68,7 +77,5 @@ def test_text_reader_ignores_empty(
         expected: Value that the test expects.
 
     """
-    monkeypatch.delenv(_VARIABLE, raising=False)
-    if raw_value is not None:
-        monkeypatch.setenv(_VARIABLE, raw_value)
+    _set_variable(monkeypatch, raw_value)
     assert read_environment_text(_VARIABLE, default_text) == expected
