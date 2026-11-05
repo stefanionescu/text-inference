@@ -6,9 +6,10 @@
         "quality"
     ],
     "engines": {
-        "node": ">=22.0.0 <23.0.0"
+        "node": ">=22.22.3 <23.0.0"
     },
     "devDependencies": {
+        "@gspothq/cli": "0.3.9",
         "jscpd": "5.0.9",
         "markdownlint-cli2": "0.22.1",
         "prettier": "3.8.4"
