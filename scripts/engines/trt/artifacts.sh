@@ -3,7 +3,7 @@
 # Resolve and validate TensorRT model checkpoint artifacts.
 # Runtime: Bash 3.2+, Linux.
 
-# trt_checkpoint_path - Print the repository-owned ModelOpt export path.
+# trt_checkpoint_path: Print the repository-owned ModelOpt export path.
 # Globals:
 #   TRT_CACHE_DIR
 # Arguments:
@@ -21,7 +21,7 @@ trt_checkpoint_path() {
     "${TRT_CACHE_DIR:?TRT_CACHE_DIR is required}/${source_model##*/}-${quantization_format}-ckpt"
 }
 
-# trt_validate_checkpoint - Validate one TensorRT Hugging Face checkpoint.
+# trt_validate_checkpoint: Validate one TensorRT Hugging Face checkpoint.
 # Globals:
 #   ROOT_DIR
 #   VENV_DIR

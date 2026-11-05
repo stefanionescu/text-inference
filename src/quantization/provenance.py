@@ -136,8 +136,7 @@ def write_provenance(
             )
             temporary.write("\n")
         destination = temporary_path.with_name(METADATA_FILENAME)
-        # reason: atomic rename stays in the operator-selected checkpoint directory.
-        # bearer:disable python_lang_path_traversal
+        # The atomic rename stays in the operator-selected checkpoint folder.
         temporary_path.replace(destination)
         temporary_path = None
     finally:

@@ -24,21 +24,21 @@ source "${STEP_DIR}/../lib/shared/deployment.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${STEP_DIR}/../lib/shared/log.sh"
 
-# _server_report_started - Print server ownership and health details.
+# _server_report_started: Print server ownership and health details.
 _server_report_started() {
   log_write "[server] Server started with PID ${SERVER_PID}"
   log_write "[server] Readiness: http://127.0.0.1:8001/readyz"
   log_write "[server] Logs: ${ROOT_DIR}/server.log"
 }
 
-# _server_run_warmup - Run warmup without turning probe failures into startup failure.
+# _server_run_warmup: Run warmup without turning probe failures into startup failure.
 _server_run_warmup() {
   if ! "${STEP_DIR}/../warmup.sh"; then
     log_write "[warmup] Warmup reported failures; inspect logs/warmup.log"
   fi
 }
 
-# main - Validate, start, persist, and warm the server.
+# main: Validate, start, persist, and warm the server.
 main() {
   deployment_validate_cuda "server"
   server_guard_start "${ROOT_DIR}"

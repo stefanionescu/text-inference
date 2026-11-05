@@ -3,12 +3,12 @@
 # Mark and report warmup-specific server log capture boundaries.
 # Runtime: Bash 3.2+, Linux.
 
-_WARMUP_CAPTURE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_CAPTURE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_WARMUP_CAPTURE_DIR}/../../shared/log.sh"
 
-# _warmup_capture_active - Report whether the recorded warmup process exists.
+# _warmup_capture_active: Report whether the recorded warmup process exists.
 # Globals:
 #   None.
 # Arguments:
@@ -27,7 +27,7 @@ _warmup_capture_active() {
   kill -0 "${pid}" 2>/dev/null
 }
 
-# warmup_capture_start - Detect warmup and start its detailed capture.
+# warmup_capture_start: Detect warmup and start its detailed capture.
 # Globals:
 #   None.
 # Arguments:
@@ -49,7 +49,7 @@ warmup_capture_start() {
     >>"${capture_file}"
 }
 
-# warmup_capture_finish - Mark and report completed warmup capture.
+# warmup_capture_finish: Mark and report completed warmup capture.
 # Globals:
 #   None.
 # Arguments:

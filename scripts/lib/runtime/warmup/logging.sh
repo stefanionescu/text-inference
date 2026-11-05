@@ -3,14 +3,14 @@
 # Format warmup log paths and report probe results.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_LOGGING_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_LOGGING_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_WARMUP_LOGGING_DIR}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_WARMUP_LOGGING_DIR}/../../shared/log.sh"
 
-# warmup_log_prefix - Print a filesystem-safe probe label.
+# warmup_log_prefix: Print a filesystem-safe probe label.
 # Globals:
 #   None.
 # Arguments:
@@ -30,7 +30,7 @@ warmup_log_prefix() {
   printf '%s\n' "${cleaned}"
 }
 
-# warmup_phase_result - Report one probe result to operator and server logs.
+# warmup_phase_result: Report one probe result to operator and server logs.
 # Globals:
 #   CFG_RUNTIME_SERVER_LOG_FILE
 #   ROOT_DIR

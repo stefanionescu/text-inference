@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the TensorRT checkpoint preparation workflow.
 
-_TRT_MAIN_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_MAIN_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/engines/trt/artifacts.sh
 source "${_TRT_MAIN_DIR}/artifacts.sh"
@@ -23,7 +23,7 @@ source "${_TRT_MAIN_DIR}/../checkpoint.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_MAIN_DIR}/../../lib/shared/log.sh"
 
-# _trt_publish_requested - Publish only a validated local export when requested.
+# _trt_publish_requested: Publish only a validated local export when requested.
 _trt_publish_requested() {
   if [[ ${PUSH_REQUESTED:?PUSH_REQUESTED is required} == "0" ]]; then
     return 0
@@ -35,7 +35,7 @@ _trt_publish_requested() {
   trt_publish_checkpoint "${EXPORT_PROVENANCE}" "${RUNTIME_QUANTIZATION-}"
 }
 
-# trt_prepare_checkpoint - Resolve, optionally export, validate, and publish.
+# trt_prepare_checkpoint: Resolve, optionally export, validate, and publish.
 # Globals:
 #   Deployment model, quantization, GPU, and publishing state.
 # Arguments:

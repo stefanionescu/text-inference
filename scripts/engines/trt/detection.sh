@@ -3,14 +3,14 @@
 # Detect TensorRT checkpoint and CUDA runtime capabilities.
 # Runtime: Bash 3.2+, Linux.
 
-_TRT_DETECTION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_DETECTION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
 source "${_TRT_DETECTION_DIR}/../../config/values/trt.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_DETECTION_DIR}/../../lib/shared/log.sh"
 
-# _trt_version_number - Convert a CUDA major.minor version for comparison.
+# _trt_version_number: Convert a CUDA major.minor version for comparison.
 _trt_version_number() {
   local version="$1"
 
@@ -21,7 +21,7 @@ _trt_version_number() {
   printf '%d%02d\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
 }
 
-# trt_cuda_version - Print the installed CUDA toolkit version.
+# trt_cuda_version: Print the installed CUDA toolkit version.
 # Globals:
 #   None.
 # Arguments:
@@ -41,7 +41,7 @@ trt_cuda_version() {
   printf '%s\n' "${BASH_REMATCH[1]}"
 }
 
-# trt_validate_cuda - Validate CUDA toolkit and driver minimum versions.
+# trt_validate_cuda: Validate CUDA toolkit and driver minimum versions.
 # Globals:
 #   CFG_TRT_MIN_CUDA_VERSION
 # Arguments:

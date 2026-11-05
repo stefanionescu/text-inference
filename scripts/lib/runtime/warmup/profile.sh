@@ -3,12 +3,12 @@
 # Resolve warmup profile variants from configuration or repository defaults.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_PROFILE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_PROFILE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
 source "${_WARMUP_PROFILE_DIR}/../../../config/values/deployment.sh"
 
-# _warmup_trim - Print a value without surrounding whitespace.
+# _warmup_trim: Print a value without surrounding whitespace.
 _warmup_trim() {
   local value="$1"
 
@@ -17,7 +17,7 @@ _warmup_trim() {
   printf '%s\n' "${value}"
 }
 
-# _warmup_add_profile - Append one normalized profile variant.
+# _warmup_add_profile: Append one normalized profile variant.
 _warmup_add_profile() {
   local gender
   local personality
@@ -28,7 +28,7 @@ _warmup_add_profile() {
   WARMUP_PROMPT_PAIRS+=("${gender}|${personality}")
 }
 
-# _warmup_parse_profiles - Parse comma-delimited profile configuration.
+# _warmup_parse_profiles: Parse comma-delimited profile configuration.
 _warmup_parse_profiles() {
   local specification="$1"
   local entry
@@ -46,7 +46,7 @@ _warmup_parse_profiles() {
   done
 }
 
-# warmup_detect_profiles - Populate profile variants from overrides or Python.
+# warmup_detect_profiles: Populate profile variants from overrides or Python.
 # Globals:
 #   GENDER
 #   PERSONALITY

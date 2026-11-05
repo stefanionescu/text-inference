@@ -4,14 +4,14 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns warmup process termination through its persisted PID.
 
-_WARMUP_PROCESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_PROCESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_WARMUP_PROCESS_DIR}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_WARMUP_PROCESS_DIR}/../../shared/log.sh"
 
-# warmup_stop_existing - Stop the warmup process recorded by the repository.
+# warmup_stop_existing: Stop the warmup process recorded by the repository.
 # Globals:
 #   CFG_RUNTIME_WARMUP_LOCK_FILE
 # Arguments:

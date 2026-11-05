@@ -10,12 +10,13 @@ source "${SCRIPT_DIR}/logs.sh"
 # shellcheck source=scripts/config/defaults.sh
 source "/app/scripts/config/defaults.sh"
 
-maximum_wait_seconds="${WARMUP_MAX_WAIT_SECONDS-}"
-cfg_set_default maximum_wait_seconds "300"
-wait_interval_seconds="${WARMUP_WAIT_INTERVAL_SECONDS-}"
-cfg_set_default wait_interval_seconds "5"
-
+# wait_for_readiness: Poll the readiness script until it passes or the wait runs out.
+# Arguments:
+#   $1: Longest wait in seconds.
+#   $2: Seconds between attempts.
 wait_for_readiness() {
+  local maximum_wait_seconds="$1"
+  local wait_interval_seconds="$2"
   local elapsed_seconds=0
 
   log_write "[warmup] Waiting for server readiness"
@@ -31,4 +32,14 @@ wait_for_readiness() {
   return 1
 }
 
-wait_for_readiness
+# main: Read the wait settings, then wait for the server.
+main() {
+  local maximum_wait_seconds="${WARMUP_MAX_WAIT_SECONDS-}"
+  local wait_interval_seconds="${WARMUP_WAIT_INTERVAL_SECONDS-}"
+
+  cfg_set_default maximum_wait_seconds "300"
+  cfg_set_default wait_interval_seconds "5"
+  wait_for_readiness "${maximum_wait_seconds}" "${wait_interval_seconds}"
+}
+
+main "$@"

@@ -3,7 +3,7 @@
 # Resolve immutable model identity and quantization before deployment mutation.
 # Runtime: Bash 3.2+, Linux.
 
-_INSPECTION_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_INSPECTION_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_INSPECTION_SHARED_DIR}/../../config/defaults.sh"
@@ -14,7 +14,7 @@ source "${_INSPECTION_SHARED_DIR}/../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_INSPECTION_SHARED_DIR}/log.sh"
 
-# _inspection_run - Run the standard-library-only metadata inspector.
+# _inspection_run: Run the standard-library-only metadata inspector.
 _inspection_run() {
   local root_dir="$1"
   local model="$2"
@@ -33,7 +33,7 @@ _inspection_run() {
     >"${output_file}" 2>"${diagnostics_file}"
 }
 
-# _inspection_read_fields - Read the exact inspector TSV protocol.
+# _inspection_read_fields: Read the exact inspector TSV protocol.
 _inspection_read_fields() {
   local output_file="$1"
   local key
@@ -54,7 +54,7 @@ _inspection_read_fields() {
   done <"${output_file}"
 }
 
-# _inspection_report - Export and report a complete inspection result.
+# _inspection_report: Export and report a complete inspection result.
 _inspection_report() {
   if [[ -z ${SOURCE_MODEL-} || -z ${SOURCE_REVISION-} || -z ${CHECKPOINT_ACTION-} ]]; then
     log_write "[inspect] Model inspection returned incomplete identity"
@@ -71,7 +71,7 @@ _inspection_report() {
   fi
 }
 
-# deployment_inspect_model - Resolve model identity and quantization before mutation.
+# deployment_inspect_model: Resolve model identity and quantization before mutation.
 # Globals:
 #   HF_TOKEN, MODEL_REVISION, TMPDIR.
 # Arguments:
@@ -95,10 +95,9 @@ deployment_inspect_model() {
   }
   [[ -n ${temporary_dir} ]] || temporary_dir="/tmp"
   output_file="$(mktemp "${temporary_dir}/yap-inspection.XXXXXX")" || return 1
-  diagnostics_file="$(mktemp "${temporary_dir}/yap-inspection-log.XXXXXX")" || {
-    rm -f -- "${output_file}"
-    return 1
-  }
+  trap 'rm -f -- "${output_file}"; trap - RETURN' RETURN
+  diagnostics_file="$(mktemp "${temporary_dir}/yap-inspection-log.XXXXXX")" || return 1
+  trap 'rm -f -- "${output_file}" "${diagnostics_file}"; trap - RETURN' RETURN
   _inspection_run \
     "${root_dir}" "$2" "$3" "$4" "${output_file}" "${diagnostics_file}" || status=1
   while IFS= read -r line || [[ -n ${line} ]]; do
@@ -110,7 +109,6 @@ deployment_inspect_model() {
   if ((status == 0)); then
     _inspection_read_fields "${output_file}" || status=1
   fi
-  rm -f -- "${output_file}" "${diagnostics_file}" || status=1
   if ((status != 0)); then
     log_write "[inspect] Model inspection failed; detailed diagnostics: ${server_log}"
     return 1

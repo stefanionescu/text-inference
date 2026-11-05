@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns reset capture across repository log deletion.
 
-_RESTART_RESET_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RESTART_RESET_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_RESTART_RESET_DIR}/../../config/values/runtime.sh"
@@ -13,7 +13,7 @@ source "${_RESTART_RESET_DIR}/../runtime/cleanup/reset.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RESTART_RESET_DIR}/../shared/log.sh"
 
-# restart_capture_reset - Run the host reset while retaining raw diagnostics.
+# restart_capture_reset: Run the host reset while retaining raw diagnostics.
 # Globals:
 #   LOGS_ENABLED, TMPDIR.
 # Arguments:
@@ -32,11 +32,9 @@ restart_capture_reset() {
 
   [[ -n ${temporary_root} ]] || temporary_root="/tmp"
   capture_file="$(mktemp "${temporary_root}/yap-reset.XXXXXX")" || return 1
+  trap 'rm -f -- "${capture_file}"; trap - RETURN' RETURN
   runtime_reset_host "${root_dir}" >"${capture_file}" 2>&1 || status=$?
-  if ! mv -- "${capture_file}" "${server_log}"; then
-    rm -f -- "${capture_file}"
-    return 1
-  fi
+  mv -- "${capture_file}" "${server_log}" || return 1
   while IFS= read -r line || [[ -n ${line} ]]; do
     if [[ ${LOGS_ENABLED:?LOGS_ENABLED is required} == "1" ]] ||
       log_is_repository_line "${line}"; then

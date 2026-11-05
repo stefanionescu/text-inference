@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-# prepare_shared_build_context - Create one engine image build context.
+# prepare_shared_build_context: Create one engine image build context.
+# Globals:
+#   DOCKERFILE
+#   ROOT_DIR
+#   TMP_BUILD_DIR
+#   BUILD_CONTEXT
+# Arguments:
+#   $1: Folder of the engine stack.
+#   $2: Prefix of the temporary build folder.
 prepare_shared_build_context() {
   local stack_dir="$1"
   local tmp_prefix="$2"

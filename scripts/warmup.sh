@@ -22,7 +22,7 @@ source "${SCRIPT_DIR}/lib/env/warmup.sh"
 # shellcheck source=scripts/lib/runtime/warmup/main.sh
 source "${SCRIPT_DIR}/lib/runtime/warmup/main.sh"
 
-# _warmup_usage - Print the warmup command contract.
+# _warmup_usage: Print the warmup command contract.
 _warmup_usage() {
   printf '%s\n' \
     "Usage:" \
@@ -33,7 +33,7 @@ _warmup_usage() {
     "  -h, --help  Show this help."
 }
 
-# main - Initialize and execute the warmup suite.
+# main: Initialize and execute the warmup suite.
 main() {
   local argument
   local is_help_requested=0

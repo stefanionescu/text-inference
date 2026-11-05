@@ -22,7 +22,7 @@ source "${SCRIPT_DIR}/lib/shared/deployment.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${SCRIPT_DIR}/lib/shared/log.sh"
 
-# _restart_usage - Print restart command help and terminate.
+# _restart_usage: Print restart command help and terminate.
 _restart_usage() {
   local status="$1"
   local line
@@ -33,7 +33,7 @@ _restart_usage() {
   exit "${status}"
 }
 
-# _restart_export_model_args - Export parsed model selection arguments.
+# _restart_export_model_args: Export parsed model selection arguments.
 _restart_export_model_args() {
   INFERENCE_ENGINE="$1"
   MODEL_ARGUMENT="$2"
@@ -42,7 +42,7 @@ _restart_export_model_args() {
   export INFERENCE_ENGINE MODEL_ARGUMENT MODEL_ARGUMENT_PROVIDED QUANTIZATION_ARGUMENT
 }
 
-# _restart_export_action_args - Export parsed restart action arguments.
+# _restart_export_action_args: Export parsed restart action arguments.
 _restart_export_action_args() {
   REINSTALL_REQUESTED="$1"
   RESET_HOST="$2"
@@ -51,7 +51,34 @@ _restart_export_action_args() {
   export LOGS_ENABLED PUSH_REQUESTED REINSTALL_REQUESTED RESET_HOST
 }
 
-# _restart_parse_args - Parse the public restart command contract.
+# _restart_read_value_flag: Store one flag's value in the variables of _restart_parse_args.
+_restart_read_value_flag() {
+  case "$1" in
+    --engine) engine="$2" ;;
+    --model)
+      model="$2"
+      is_model_provided=1
+      ;;
+    --quantization)
+      [[ -n $2 ]] || return 2
+      quantization="$2"
+      ;;
+    *) return 2 ;;
+  esac
+}
+
+# _restart_read_action_flag: Record one switch in the variables of _restart_parse_args.
+_restart_read_action_flag() {
+  case "$1" in
+    --reinstall) is_reinstallation_requested=1 ;;
+    --reset) is_host_reset_requested=1 ;;
+    --push) is_push_requested=1 ;;
+    --logs) is_logging_enabled=1 ;;
+    *) return 2 ;;
+  esac
+}
+
+# _restart_parse_args: Parse the public restart command contract.
 _restart_parse_args() {
   local engine="" model="" quantization="" is_model_provided="0"
   local is_reinstallation_requested="0" is_host_reset_requested="0" is_push_requested="0" is_logging_enabled="0"
@@ -60,28 +87,11 @@ _restart_parse_args() {
     case "$1" in
       --engine | --model | --quantization)
         (($# >= 2)) || return 2
-        case "$1" in
-          --engine) engine="$2" ;;
-          --model)
-            model="$2"
-            is_model_provided=1
-            ;;
-          --quantization)
-            [[ -n $2 ]] || return 2
-            quantization="$2"
-            ;;
-          *) return 2 ;;
-        esac
+        _restart_read_value_flag "$1" "$2" || return 2
         shift 2
         ;;
       --reinstall | --reset | --push | --logs)
-        case "$1" in
-          --reinstall) is_reinstallation_requested=1 ;;
-          --reset) is_host_reset_requested=1 ;;
-          --push) is_push_requested=1 ;;
-          --logs) is_logging_enabled=1 ;;
-          *) return 2 ;;
-        esac
+        _restart_read_action_flag "$1" || return 2
         shift
         ;;
       --help | -h) _restart_usage 0 ;;
@@ -96,7 +106,7 @@ _restart_parse_args() {
     "${is_push_requested}" "${is_logging_enabled}"
 }
 
-# main - Validate restart inputs and execute the restart workflow.
+# main: Validate restart inputs and execute the restart workflow.
 main() {
   _restart_parse_args "$@" || _restart_usage 2
   deployment_require_environment

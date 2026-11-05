@@ -2,7 +2,7 @@
 #
 # Resolve persisted or newly requested restart model configuration.
 # Runtime: Bash 3.2+, Linux.
-_RESTART_MODEL_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RESTART_MODEL_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 # shellcheck source=scripts/config/defaults.sh
 source "${_RESTART_MODEL_DIR}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/deployment.sh
@@ -22,7 +22,7 @@ source "${_RESTART_MODEL_DIR}/../shared/inspection.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RESTART_MODEL_DIR}/../shared/log.sh"
 
-# _restart_read_persisted - Read the complete persisted deployment identity.
+# _restart_read_persisted: Read the complete persisted deployment identity.
 _restart_read_persisted() {
   local root_dir="$1"
 
@@ -40,7 +40,7 @@ _restart_read_persisted() {
   }
 }
 
-# _restart_select_requested - Inspect a newly supplied model configuration.
+# _restart_select_requested: Inspect a newly supplied model configuration.
 _restart_select_requested() {
   local root_dir="$1"
   local requested_engine="$2"
@@ -59,7 +59,7 @@ _restart_select_requested() {
   EXPORT_PROVENANCE=""
 }
 
-# _restart_select_persisted - Reuse or re-inspect persisted model state.
+# _restart_select_persisted: Reuse or re-inspect persisted model state.
 _restart_select_persisted() {
   local root_dir="$1"
   local requested_engine="$2"
@@ -78,7 +78,7 @@ _restart_select_persisted() {
   fi
 }
 
-# restart_select_model - Resolve and inspect new or transition-sensitive inputs.
+# restart_select_model: Resolve and inspect new or transition-sensitive inputs.
 # Globals:
 #   Restart model arguments and persisted deployment fields.
 # Arguments:
@@ -104,7 +104,7 @@ restart_select_model() {
   export SOURCE_MODEL SOURCE_REVISION
 }
 
-# restart_prepare_checkpoint - Prepare a checkpoint or publish a validated reuse.
+# restart_prepare_checkpoint: Prepare a checkpoint or publish a validated reuse.
 # Globals:
 #   Active engine, checkpoint, quantization, provenance, and publishing state.
 # Arguments:

@@ -3,7 +3,7 @@
 # Validate shared host deployment inputs and publishing policy.
 # Runtime: Bash 3.2+, Linux.
 
-_DEPLOYMENT_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_DEPLOYMENT_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
 source "${_DEPLOYMENT_SHARED_DIR}/../../config/values/deployment.sh"
@@ -16,7 +16,7 @@ source "${_DEPLOYMENT_SHARED_DIR}/../../engines/trt/detection.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_DEPLOYMENT_SHARED_DIR}/log.sh"
 
-# deployment_require_environment - Validate required deployment environment values.
+# deployment_require_environment: Validate required deployment environment values.
 # Globals:
 #   HF_TOKEN
 #   MAX_CONCURRENT_CONNECTIONS
@@ -43,7 +43,7 @@ deployment_require_environment() {
   export HF_TOKEN MAX_CONCURRENT_CONNECTIONS API_KEY
 }
 
-# deployment_validate_model - Validate the configured model and quantization.
+# deployment_validate_model: Validate the configured model and quantization.
 # Globals:
 #   ROOT_DIR
 #   VENV_DIR
@@ -67,7 +67,7 @@ deployment_validate_model() {
   fi
 }
 
-# deployment_validate_cuda - Validate CUDA for the selected engine.
+# deployment_validate_cuda: Validate CUDA for the selected engine.
 # Globals:
 #   CFG_ENGINE_TRT
 #   CFG_ENGINE_VLLM

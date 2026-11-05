@@ -3,7 +3,7 @@
 # Validate Hugging Face export publishing inputs.
 # Runtime: Bash 3.2+, Linux.
 
-_PUBLISHING_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_PUBLISHING_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_PUBLISHING_SHARED_DIR}/../../config/defaults.sh"
@@ -12,7 +12,7 @@ source "${_PUBLISHING_SHARED_DIR}/../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_PUBLISHING_SHARED_DIR}/log.sh"
 
-# publishing_validate - Validate upload credentials and destination policy.
+# publishing_validate: Validate upload credentials and destination policy.
 # Globals:
 #   HF_PUSH_PRIVATE, HF_PUSH_REPO_ID, PUSH_REQUESTED.
 # Arguments:

@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the bounded network readiness probe for server startup.
 
-_SERVER_READINESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_SERVER_READINESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_SERVER_READINESS_DIR}/../../../config/defaults.sh"
@@ -13,7 +13,7 @@ source "${_SERVER_READINESS_DIR}/../../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_SERVER_READINESS_DIR}/../../shared/log.sh"
 
-# server_wait_ready - Wait for the local readiness endpoint.
+# server_wait_ready: Wait for the local readiness endpoint.
 # Globals:
 #   SERVER_PID
 #   WARMUP_PROBE_SCRIPT

@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the external Model Optimizer git checkout.
 
-_TRT_MODELOPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_MODELOPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
 source "${_TRT_MODELOPT_DIR}/../../config/values/trt.sh"
@@ -13,7 +13,7 @@ source "${_TRT_MODELOPT_DIR}/../../lib/runtime/cleanup/paths.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_MODELOPT_DIR}/../../lib/shared/log.sh"
 
-# trt_prepare_modelopt - Clone and verify the pinned Model Optimizer revision.
+# trt_prepare_modelopt: Clone and verify the pinned Model Optimizer revision.
 # Globals:
 #   CFG_MODELOPT_COMMIT
 #   CFG_MODELOPT_REPO_URL

@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns opt-in destructive reset of inference host resources.
 
-_RUNTIME_RESET_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_RESET_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 # shellcheck source=scripts/lib/runtime/cleanup/artifacts.sh
 source "${_RUNTIME_RESET_DIR}/artifacts.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/host.sh
@@ -15,7 +15,7 @@ source "${_RUNTIME_RESET_DIR}/main.sh"
 source "${_RUNTIME_RESET_DIR}/python.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RUNTIME_RESET_DIR}/../../shared/log.sh"
-# _runtime_reset_kill_pattern - Signal all helpers matching one reset pattern.
+# _runtime_reset_kill_pattern: Signal all helpers matching one reset pattern.
 _runtime_reset_kill_pattern() {
   local signal_name="$1"
   local pattern="$2"
@@ -32,7 +32,7 @@ _runtime_reset_kill_pattern() {
   log_write "[reset] pkill failed for pattern '${pattern}' with status ${status}"
   return "${status}"
 }
-# _runtime_reset_engine_helpers - Terminate broad inference helper matches.
+# _runtime_reset_engine_helpers: Terminate broad inference helper matches.
 _runtime_reset_engine_helpers() {
   local pattern
   local status=0
@@ -52,7 +52,7 @@ _runtime_reset_engine_helpers() {
   return "${status}"
 }
 
-# _runtime_reset_gpu_pids - Terminate every detected GPU compute PID.
+# _runtime_reset_gpu_pids: Terminate every detected GPU compute PID.
 # Globals:
 #   None.
 # Arguments:
@@ -82,7 +82,7 @@ _runtime_reset_gpu_pids() {
   return "${status}"
 }
 
-# _runtime_reset_gpu - Terminate GPU users and reset the hardware.
+# _runtime_reset_gpu: Terminate GPU users and reset the hardware.
 _runtime_reset_gpu() {
   local output
   local pid
@@ -109,7 +109,7 @@ _runtime_reset_gpu() {
   return "${status}"
 }
 
-# runtime_reset_host - Perform every explicit reset operation and report failures.
+# runtime_reset_host: Perform every explicit reset operation and report failures.
 # Globals:
 #   None.
 # Arguments:

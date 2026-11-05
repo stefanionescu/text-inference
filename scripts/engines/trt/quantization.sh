@@ -3,7 +3,7 @@
 # Export TensorRT checkpoints with NVIDIA Model Optimizer.
 # Runtime: Bash 3.2+, Linux.
 
-_TRT_QUANTIZATION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_QUANTIZATION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
 source "${_TRT_QUANTIZATION_DIR}/../../config/values/trt.sh"
@@ -18,7 +18,7 @@ source "${_TRT_QUANTIZATION_DIR}/../../lib/runtime/cleanup/paths.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_QUANTIZATION_DIR}/../../lib/shared/log.sh"
 
-# _trt_kv_format - Print the KV-cache format for one quantization format.
+# _trt_kv_format: Print the KV-cache format for one quantization format.
 _trt_kv_format() {
   case "$1" in
     int4_awq) printf 'none\n' ;;
@@ -28,7 +28,7 @@ _trt_kv_format() {
   esac
 }
 
-# _trt_run_quantizer - Run ModelOpt with quiet or raw dependency output.
+# _trt_run_quantizer: Run ModelOpt with quiet or raw dependency output.
 # Globals:
 #   LOGS_ENABLED and fixed TensorRT dependency logging values.
 # Arguments:
@@ -51,7 +51,7 @@ _trt_run_quantizer() {
     "${quantizer_python}" "$@"
 }
 
-# trt_export_checkpoint - Reuse or create one ModelOpt checkpoint.
+# trt_export_checkpoint: Reuse or create one ModelOpt checkpoint.
 # Globals:
 #   ModelOpt calibration, repository, and virtual environment variables.
 # Arguments:

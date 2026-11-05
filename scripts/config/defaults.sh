@@ -3,11 +3,9 @@
 # Define configuration assignment functions for sourced scripts.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-# shellcheck disable=SC2034 # lint:justify -- reason: sourced configuration exports variables consumed by parent scripts -- ticket: N/A
-[[ -n ${_CFG_DEFAULTS_READY:-} ]] && return 0
-readonly _CFG_DEFAULTS_READY=1
+# shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 
-# cfg_set_default - Assign a default when a variable is unset or empty.
+# cfg_set_default: Assign a default when a variable is unset or empty.
 # Globals:
 #   Variable named by the first argument.
 # Arguments:
@@ -28,7 +26,7 @@ cfg_set_default() {
   printf -v "${name}" '%s' "${default_value}"
 }
 
-# cfg_assign_value - Assign a configured value or its declared default.
+# cfg_assign_value: Assign a configured value or its declared default.
 # Globals:
 #   Variable named by the second argument.
 # Arguments:
@@ -52,7 +50,7 @@ cfg_assign_value() {
   printf -v "${output_name}" '%s' "${default_value}"
 }
 
-# cfg_export_default - Export a default when a variable is unset or empty.
+# cfg_export_default: Export a default when a variable is unset or empty.
 # Globals:
 #   Variable named by the first argument.
 # Arguments:

@@ -63,7 +63,7 @@ WEBSOCKET_TYPE_PONG = "pong"
 WEBSOCKET_TYPE_END = "end"
 WEBSOCKET_TYPE_ERROR = "error"
 # reason: This protocol message type label is not a credential.
-WEBSOCKET_TYPE_TOKEN = "token"  # nosec B105
+WEBSOCKET_TYPE_TOKEN = "token"
 WEBSOCKET_TYPE_COMPLETION = "final"
 WEBSOCKET_TYPE_DONE = "done"
 WEBSOCKET_TYPE_CANCELLED = "cancelled"

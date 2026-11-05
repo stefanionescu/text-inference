@@ -4,12 +4,12 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns explicit reset cleanup outside repository ownership.
 
-_RUNTIME_RESET_HOST_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_RESET_HOST_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RUNTIME_RESET_HOST_DIR}/../../shared/log.sh"
 
-# _runtime_reset_remove_path - Remove one validated non-root host path.
+# _runtime_reset_remove_path: Remove one validated non-root host path.
 # Globals:
 #   HOME.
 # Arguments:
@@ -47,7 +47,7 @@ _runtime_reset_remove_path() {
   fi
 }
 
-# _runtime_reset_cache_root - Remove known caches below one cache root.
+# _runtime_reset_cache_root: Remove known caches below one cache root.
 _runtime_reset_cache_root() {
   local cache_root="$1"
   local name
@@ -63,7 +63,7 @@ _runtime_reset_cache_root() {
   return "${status}"
 }
 
-# _runtime_reset_configured_caches - Remove configured and user data caches.
+# _runtime_reset_configured_caches: Remove configured and user data caches.
 _runtime_reset_configured_caches() {
   local target_path
   local status=0
@@ -83,7 +83,7 @@ _runtime_reset_configured_caches() {
   return "${status}"
 }
 
-# _runtime_reset_temporary_paths - Remove known inference files from temporary roots.
+# _runtime_reset_temporary_paths: Remove known inference files from temporary roots.
 # Globals:
 #   None.
 # Arguments:
@@ -110,7 +110,7 @@ _runtime_reset_temporary_paths() {
   return "${status}"
 }
 
-# runtime_reset_host_caches - Clear all reset-owned host cache locations.
+# runtime_reset_host_caches: Clear all reset-owned host cache locations.
 # Globals:
 #   HOME, XDG_CACHE_HOME.
 # Arguments:

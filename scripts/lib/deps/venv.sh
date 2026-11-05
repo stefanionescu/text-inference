@@ -4,14 +4,14 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns host Python package installation and venv creation.
 
-_VENV_DEPS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_VENV_DEPS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
 source "${_VENV_DEPS_DIR}/../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_VENV_DEPS_DIR}/../shared/log.sh"
 
-# _venv_python_version - Print one interpreter's major and minor version.
+# _venv_python_version: Print one interpreter's major and minor version.
 _venv_python_version() {
   local python_bin="$1"
   local version_output
@@ -23,7 +23,7 @@ _venv_python_version() {
   printf '%s\n' "${version}"
 }
 
-# _venv_install_python - Install the configured Python interpreter with apt.
+# _venv_install_python: Install the configured Python interpreter with apt.
 # Globals:
 #   CFG_PYTHON_VERSION
 #   EUID
@@ -51,7 +51,7 @@ _venv_install_python() {
     "${package_name}-venv"
 }
 
-# venv_prepare - Create or validate a managed Python environment.
+# venv_prepare: Create or validate a managed Python environment.
 # Globals:
 #   CFG_PYTHON_VERSION
 # Arguments:

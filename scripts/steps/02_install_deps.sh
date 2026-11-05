@@ -26,7 +26,7 @@ source "${STEP_DIR}/../engines/trt/detection.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${STEP_DIR}/../lib/shared/log.sh"
 
-# _install_engine_dependencies - Install the selected engine dependency set.
+# _install_engine_dependencies: Install the selected engine dependency set.
 _install_engine_dependencies() {
   case "${INFERENCE_ENGINE:?INFERENCE_ENGINE is required}" in
     trt)
@@ -43,7 +43,7 @@ _install_engine_dependencies() {
   esac
 }
 
-# main - Install certificates and locked Python dependencies.
+# main: Install certificates and locked Python dependencies.
 main() {
   [[ -x ${VENV_DIR:?VENV_DIR is required}/bin/python ]] || return 1
   [[ -n ${TORCH_CUDA_ARCH_LIST-} ]] || return 1

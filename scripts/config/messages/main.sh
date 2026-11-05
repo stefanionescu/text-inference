@@ -3,11 +3,9 @@
 # Define deployment command messages and usage text.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-# shellcheck disable=SC2034,SC2016 # lint:justify -- reason: sourced configuration exports variables consumed by parent scripts; message config intentionally stores literal shell snippets for user output -- ticket: N/A
-[[ -n ${_CFG_MSG_MAIN_READY:-} ]] && return 0
-readonly _CFG_MSG_MAIN_READY=1
+# shellcheck disable=SC2034,SC2016 # reason: sourced configuration exports variables consumed by parent scripts; message config intentionally stores literal shell snippets for user output
 
-readonly -a CFG_MAIN_USAGE_LINES=(
+CFG_MAIN_USAGE_LINES=(
   "Usage:"
   '  $0 [--engine trt|vllm] --model MODEL [--quantization FORMAT] [--push] [--logs]'
   ""
@@ -49,4 +47,4 @@ readonly -a CFG_MAIN_USAGE_LINES=(
   "  --logs              Stream third-party runtime and quantization logs"
 )
 
-readonly CFG_MAIN_MSG_INVALID_ARGS="[main] Not enough arguments"
+CFG_MAIN_MSG_INVALID_ARGS="[main] Not enough arguments"

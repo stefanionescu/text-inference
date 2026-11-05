@@ -3,11 +3,9 @@
 # Define restart command messages and usage text.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-# shellcheck disable=SC2034 # lint:justify -- reason: sourced configuration exports user-facing message values -- ticket: N/A
-[[ -n ${_CFG_MSG_RESTART_READY:-} ]] && return 0
-readonly _CFG_MSG_RESTART_READY=1
+# shellcheck disable=SC2034 # reason: sourced configuration exports user-facing message values
 
-readonly -a CFG_RESTART_USAGE_LINES=(
+CFG_RESTART_USAGE_LINES=(
   "Usage:"
   "  scripts/restart.sh [--engine trt|vllm] [--model MODEL [--quantization FORMAT]]"
   "                     [--reinstall] [--reset] [--push] [--logs]"

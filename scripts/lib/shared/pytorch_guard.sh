@@ -4,12 +4,12 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the managed Python CUDA package compatibility probe.
 
-_PYTORCH_GUARD_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_PYTORCH_GUARD_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_PYTORCH_GUARD_DIR}/log.sh"
 
-# pytorch_guard_check - Detect mismatched Torch packages.
+# pytorch_guard_check: Detect mismatched Torch packages.
 # Globals:
 #   ROOT_DIR
 #   VENV_DIR

@@ -98,7 +98,7 @@ class LiveClient:
             await send_end_frame(self.websocket)
         except asyncio.CancelledError:
             raise
-        except Exception as exception:  # noqa: BLE001 -- reason: live harness boundary converts client failures to results.
+        except Exception as exception:  # noqa: BLE001 # reason: live harness boundary converts client failures to results.
             logger.warning("Failed to send client end frame: %s", exception)
         with contextlib.suppress(Exception):
             await self.websocket.close(code=1000)

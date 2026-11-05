@@ -3,11 +3,11 @@ set -euo pipefail
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC2034  # sourced helper scripts rely on ROOT_DIR # lint:justify -- reason: sourced configuration exports variables consumed by parent scripts -- ticket: N/A
+# shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 SHARED_DIR="${SCRIPT_DIR}/../shared"
 
-# usage - Print vLLM Docker build help.
+# usage: Print vLLM Docker build help.
 usage() {
   cat <<'EOF'
 Usage: docker/vllm/build.sh
@@ -29,7 +29,7 @@ EOF
   exit 0
 }
 
-# shellcheck disable=SC2034  # Used by sourced scripts # lint:justify -- reason: sourced configuration exports variables consumed by parent scripts -- ticket: N/A
+# shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 DOCKERFILE="${SCRIPT_DIR}/Dockerfile"
 
 # Modules - shared Docker utilities
@@ -39,11 +39,16 @@ source "${SHARED_DIR}/scripts/logs.sh"
 source "${SHARED_DIR}/scripts/build/driver.sh"
 
 # No command-line flags supported except --help
-if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
-  usage
-fi
-if (($# != 0)); then
-  log_write "[build] ✗ vLLM build does not accept positional arguments"
-  exit 1
-fi
-run_stack_build "${SCRIPT_DIR}" "text-inference-vllm" "vllm"
+# main: Reject unexpected arguments, then build the vLLM image.
+main() {
+  if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
+    usage
+  fi
+  if (($# != 0)); then
+    log_write "[build] ✗ vLLM build does not accept positional arguments"
+    exit 1
+  fi
+  run_stack_build "${SCRIPT_DIR}" "text-inference-vllm" "vllm"
+}
+
+main "$@"

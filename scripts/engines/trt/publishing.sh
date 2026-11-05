@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the TensorRT Hugging Face upload integration.
 
-# trt_publish_checkpoint - Upload one local ModelOpt checkpoint.
+# trt_publish_checkpoint: Upload one local ModelOpt checkpoint.
 # Globals:
 #   HF_PUSH_PRIVATE
 #   HF_PUSH_REPO_ID

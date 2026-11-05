@@ -20,7 +20,7 @@ source "${SCRIPTS_DIR}/lib/restart/workflow.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${SCRIPTS_DIR}/lib/shared/log.sh"
 
-# _restart_report_exit - Report the captured diagnostics for a failed workflow.
+# _restart_report_exit: Report the captured diagnostics for a failed workflow.
 _restart_report_exit() {
   local status=$?
 
@@ -31,7 +31,7 @@ _restart_report_exit() {
   exit "${status}"
 }
 
-# main - Run the inspected restart workflow inside the shared capture.
+# main: Run the inspected restart workflow inside the shared capture.
 main() {
   (($# == 0)) || return 2
 

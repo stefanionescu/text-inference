@@ -66,7 +66,7 @@ class _LLMCompressorRuntime:
     ) -> tuple[Mapping[str, object], Mapping[str, object]]:
         """Read model and decoder configuration from a local snapshot."""
         # reason: The snapshot path is verified and loading is restricted to local files.
-        configuration = AutoConfig.from_pretrained(  # nosec B615
+        configuration = AutoConfig.from_pretrained(
             source_path,
             trust_remote_code=True,
             local_files_only=True,
@@ -86,7 +86,7 @@ class _LLMCompressorRuntime:
         """Create a compressed-tensors checkpoint with LLM Compressor."""
         with load_context(AutoModelForCausalLM):
             # reason: The snapshot path is verified and loading is restricted to local files.
-            model = AutoModelForCausalLM.from_pretrained(  # nosec B615
+            model = AutoModelForCausalLM.from_pretrained(
                 source.path,
                 dtype=torch.bfloat16,
                 trust_remote_code=True,

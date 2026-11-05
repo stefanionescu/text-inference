@@ -5,7 +5,7 @@
 # shellcheck source=scripts/lib/shared/log.sh
 source "/app/scripts/lib/shared/log.sh"
 
-# container_show_usage - Print the fixed Docker runtime interface.
+# container_show_usage: Print the fixed Docker runtime interface.
 # Globals:
 #   None.
 # Arguments:
@@ -23,6 +23,7 @@ WebSocket service on port 8000, and keeps readiness on loopback port 8001.
 EOF
 }
 
+# _container_follow_log: Print the server log through a private FIFO until the server stops.
 _container_follow_log() {
   local log_file="$1"
   local server_pid="$2"
@@ -33,11 +34,9 @@ _container_follow_log() {
   local line
 
   pipe_dir="$(mktemp -d /tmp/yap-log.XXXXXX)" || return 1
+  trap 'rm -rf -- "${pipe_dir}"; trap - RETURN' RETURN
   pipe_path="${pipe_dir}/stream"
-  mkfifo "${pipe_path}" || {
-    rmdir "${pipe_dir}"
-    return 1
-  }
+  mkfifo "${pipe_path}" || return 1
   tail --pid="${server_pid}" -n +1 -F "${log_file}" >"${pipe_path}" &
   tail_pid=$!
   while IFS= read -r line || [[ -n ${line} ]]; do
@@ -47,12 +46,13 @@ _container_follow_log() {
     fi
   done <"${pipe_path}"
   wait "${tail_pid}" || tail_status=$?
-  rm -f -- "${pipe_path}" || return 1
-  rmdir "${pipe_dir}" || return 1
   return "${tail_status}"
 }
 
-# start_warmup_server - Start one dual-listener engine server and warmup probe.
+# start_warmup_server: Start one dual-listener engine server and warmup probe.
+# Arguments:
+#   $1: Engine name.
+#   $2: Python module that runs the server.
 start_warmup_server() {
   local engine="$1"
   local server_module="$2"

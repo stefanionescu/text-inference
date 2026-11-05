@@ -33,6 +33,7 @@ export LOGS_ENABLED
 
 # shellcheck source=docker/vllm/scripts/gpu.sh
 source "${SCRIPT_DIR}/gpu.sh"
+vllm_configure_gpu
 : "${API_KEY:?API_KEY is required}"
 RUNTIME_QUANTIZATION="$("${VENV_DIR:?VENV_DIR is required}/bin/python" \
   -m src.quantization.detection "${MODEL:?MODEL is required}")"

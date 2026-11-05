@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns detached process creation for host deployment workflows.
 
-_RUNTIME_BACKGROUND_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_BACKGROUND_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
 source "${_RUNTIME_BACKGROUND_DIR}/../../config/values/deployment.sh"
@@ -17,7 +17,7 @@ source "${_RUNTIME_BACKGROUND_DIR}/logs.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RUNTIME_BACKGROUND_DIR}/../shared/log.sh"
 
-# _runtime_background_log - Prepare and print the runtime log path.
+# _runtime_background_log: Prepare and print the runtime log path.
 # Globals:
 #   CFG_MAX_SERVER_LOG_BYTES
 #   CFG_RUNTIME_RUN_DIR
@@ -46,7 +46,7 @@ _runtime_background_log() {
   printf '%s\n' "${server_log}"
 }
 
-# runtime_start_background - Start a detached command and follow its log.
+# runtime_start_background: Start a detached command and follow its log.
 # Globals:
 #   CFG_RUNTIME_DEPLOYMENT_PID_FILE
 # Arguments:

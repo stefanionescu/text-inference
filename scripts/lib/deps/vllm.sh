@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the vLLM and compressor dependency installation workflow.
 
-_VLLM_DEPS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_VLLM_DEPS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/deps/uv/environment.sh
 source "${_VLLM_DEPS_DIR}/uv/environment.sh"
@@ -13,7 +13,7 @@ source "${_VLLM_DEPS_DIR}/venv.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_VLLM_DEPS_DIR}/../shared/log.sh"
 
-# vllm_install_dependencies - Install runtime and compressor dependencies.
+# vllm_install_dependencies: Install runtime and compressor dependencies.
 # Globals:
 #   QUANT_VENV_DIR
 #   VENV_DIR

@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns TensorRT and Model Optimizer dependency synchronization.
 
-_TRT_INSTALL_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_INSTALL_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
 source "${_TRT_INSTALL_DIR}/../../../config/values/trt.sh"
@@ -15,7 +15,7 @@ source "${_TRT_INSTALL_DIR}/../venv.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_INSTALL_DIR}/../../shared/log.sh"
 
-# trt_install_dependencies - Install runtime and Model Optimizer dependencies.
+# trt_install_dependencies: Install runtime and Model Optimizer dependencies.
 # Globals:
 #   QUANT_VENV_DIR
 #   ROOT_DIR

@@ -3,7 +3,7 @@
 # Initialize validated warmup runtime values.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_WARMUP_ENV_DIR}/../../config/defaults.sh"
@@ -14,7 +14,7 @@ source "${_WARMUP_ENV_DIR}/../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_WARMUP_ENV_DIR}/../shared/log.sh"
 
-# _warmup_positive_integer - Validate and export one positive integer.
+# _warmup_positive_integer: Validate and export one positive integer.
 _warmup_positive_integer() {
   local variable_name="$1"
   local default_value="$2"
@@ -31,7 +31,7 @@ _warmup_positive_integer() {
   export "${variable_name?}"
 }
 
-# warmup_initialize_environment - Export warmup paths, timeouts, and retries.
+# warmup_initialize_environment: Export warmup paths, timeouts, and retries.
 # Globals:
 #   WARMUP_PROBE_SCRIPT
 #   WARMUP_HEALTH_POLL_INTERVAL_SECONDS

@@ -3,7 +3,7 @@
 # Apply locked uv environments to managed Python interpreters.
 # Runtime: Bash 3.2+, Linux.
 
-_UV_ENVIRONMENT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_UV_ENVIRONMENT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/deps/uv/command.sh
 source "${_UV_ENVIRONMENT_DIR}/command.sh"
@@ -12,7 +12,7 @@ source "${_UV_ENVIRONMENT_DIR}/../../../config/defaults.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_UV_ENVIRONMENT_DIR}/../../shared/log.sh"
 
-# uv_export_environment - Export deterministic uv install settings.
+# uv_export_environment: Export deterministic uv install settings.
 # Globals:
 #   FLASHINFER_ENABLE_AOT
 #   UV_LINK_MODE
@@ -31,7 +31,7 @@ uv_export_environment() {
   cfg_export_default FLASHINFER_ENABLE_AOT "1"
 }
 
-# uv_apply_lock - Apply locked extras to one virtual environment.
+# uv_apply_lock: Apply locked extras to one virtual environment.
 # Globals:
 #   ROOT_DIR
 # Arguments:
@@ -61,7 +61,7 @@ uv_apply_lock() {
   )
 }
 
-# uv_install_packages - Install special packages into the runtime environment.
+# uv_install_packages: Install special packages into the runtime environment.
 # Globals:
 #   VENV_DIR
 # Arguments:

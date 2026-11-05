@@ -3,7 +3,7 @@
 # Initialize and validate TensorRT host environment values.
 # Runtime: Bash 3.2+, Linux.
 
-_TRT_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_TRT_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_TRT_ENV_DIR}/../../config/defaults.sh"
@@ -14,7 +14,7 @@ source "${_TRT_ENV_DIR}/../../config/values/trt.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_TRT_ENV_DIR}/../shared/log.sh"
 
-# trt_initialize_environment - Export TensorRT and Model Optimizer paths.
+# trt_initialize_environment: Export TensorRT and Model Optimizer paths.
 # Globals:
 #   MODELOPT_REPO_DIR
 #   MPI_VERSION_PIN
@@ -44,7 +44,7 @@ trt_initialize_environment() {
     "${CFG_TRT_DEFAULT_SEQUENTIAL_DEVICE_MAP}"
 }
 
-# trt_validate_calibration - Validate Model Optimizer calibration settings.
+# trt_validate_calibration: Validate Model Optimizer calibration settings.
 # Globals:
 #   TRT_AWQ_BLOCK_SIZE
 #   TRT_CALIBRATION_MEMORY_FRACTION
@@ -80,7 +80,7 @@ trt_validate_calibration() {
   fi
 }
 
-# trt_validate_format - Validate one Model Optimizer format for the GPU.
+# trt_validate_format: Validate one Model Optimizer format for the GPU.
 # Globals:
 #   CFG_TRT_FP8_SM_ARCHS
 #   CFG_TRT_NVFP4_SM_ARCHS

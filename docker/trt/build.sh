@@ -2,11 +2,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC2034 # lint:justify -- reason: sourced build helpers consume ROOT_DIR -- ticket: N/A
+# shellcheck disable=SC2034 # reason: sourced build helpers consume ROOT_DIR
 ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 SHARED_DIR="${SCRIPT_DIR}/../shared"
 
-# usage - Print TensorRT Docker build help.
+# usage: Print TensorRT Docker build help.
 usage() {
   cat <<'EOF'
 Usage: docker/trt/build.sh
@@ -28,18 +28,23 @@ EOF
   exit 0
 }
 
-# shellcheck disable=SC2034 # lint:justify -- reason: sourced build helpers consume DOCKERFILE -- ticket: N/A
+# shellcheck disable=SC2034 # reason: sourced build helpers consume DOCKERFILE
 DOCKERFILE="${SCRIPT_DIR}/Dockerfile"
 # shellcheck source=docker/shared/scripts/logs.sh
 source "${SHARED_DIR}/scripts/logs.sh"
 # shellcheck source=docker/shared/scripts/build/driver.sh
 source "${SHARED_DIR}/scripts/build/driver.sh"
 
-if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
-  usage
-fi
-if (($# != 0)); then
-  log_write "[build] ✗ TensorRT build does not accept positional arguments"
-  exit 1
-fi
-run_stack_build "${SCRIPT_DIR}" "text-inference-trt" "trt"
+# main: Reject unexpected arguments, then build the TensorRT image.
+main() {
+  if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
+    usage
+  fi
+  if (($# != 0)); then
+    log_write "[build] ✗ TensorRT build does not accept positional arguments"
+    exit 1
+  fi
+  run_stack_build "${SCRIPT_DIR}" "text-inference-trt" "trt"
+}
+
+main "$@"

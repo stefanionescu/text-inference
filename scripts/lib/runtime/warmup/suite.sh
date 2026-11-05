@@ -3,12 +3,12 @@
 # Execute warmup and benchmark integration clients for each profile.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_SUITE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_WARMUP_SUITE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/runtime/warmup/logging.sh
 source "${_WARMUP_SUITE_DIR}/logging.sh"
 
-# _warmup_run_retries - Run one Python integration client with bounded retries.
+# _warmup_run_retries: Run one Python integration client with bounded retries.
 _warmup_run_retries() {
   local label="$1"
   local prefix="$2"
@@ -32,7 +32,23 @@ _warmup_run_retries() {
   return 1
 }
 
-# _warmup_run_profile - Run warmup and benchmark clients for one profile.
+# _warmup_run_bench: Run the benchmark client for one profile with bounded retries.
+_warmup_run_bench() {
+  local label="$1"
+  local maximum_connections="$2"
+  local python_bin="$3"
+  local retries="$4"
+  local prefix
+  shift 4
+
+  prefix="$(warmup_log_prefix "bench_${maximum_connections}x_${label}")" || return 1
+  _warmup_run_retries \
+    "warmup: bench ${maximum_connections}x ${label}" "${prefix}" \
+    "${python_bin}" "${retries}" -m tests.suites.e2e.test_bench \
+    --requests "${maximum_connections}" --concurrency "${maximum_connections}" "$@"
+}
+
+# _warmup_run_profile: Run warmup and benchmark clients for one profile.
 _warmup_run_profile() {
   local profile="$1"
   local maximum_connections="$2"
@@ -55,17 +71,13 @@ _warmup_run_profile() {
     "warmup: ${label}" "${prefix}" "${python_bin}" "${retries}" \
     -m tests.suites.e2e.test_warmup "${profile_arguments[@]:1}" || status=1
   sleep "${WARMUP_RUN_DELAY_SECONDS:?WARMUP_RUN_DELAY_SECONDS is required}"
-  prefix="$(warmup_log_prefix "bench_${maximum_connections}x_${label}")" || return 1
-  _warmup_run_retries \
-    "warmup: bench ${maximum_connections}x ${label}" "${prefix}" \
-    "${python_bin}" "${retries}" -m tests.suites.e2e.test_bench \
-    --requests "${maximum_connections}" --concurrency "${maximum_connections}" \
+  _warmup_run_bench "${label}" "${maximum_connections}" "${python_bin}" "${retries}" \
     "${profile_arguments[@]:1}" || status=1
   sleep "${WARMUP_RUN_DELAY_SECONDS}"
   return "${status}"
 }
 
-# warmup_run_suite - Run all profile warmup and benchmark probes.
+# warmup_run_suite: Run all profile warmup and benchmark probes.
 # Globals:
 #   WARMUP_PROMPT_PAIRS
 #   WARMUP_RETRIES

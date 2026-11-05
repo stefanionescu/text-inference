@@ -4,25 +4,57 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the tail process and warmup-specific operator log stream.
 
-_RUNTIME_LOGS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_LOGS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 # shellcheck source=scripts/lib/runtime/warmup/capture.sh
 source "${_RUNTIME_LOGS_DIR}/warmup/capture.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RUNTIME_LOGS_DIR}/../shared/log.sh"
-# _runtime_log_stream_start - Start tail through a private FIFO.
+# _runtime_log_stream_start: Start tail through a private FIFO.
 _runtime_log_stream_start() {
   local log_file="$1"
   local temporary_root="${TMPDIR-}"
 
   [[ -n ${temporary_root} ]] || temporary_root="/tmp"
   _RUNTIME_LOG_STREAM_DIR="$(mktemp -d "${temporary_root}/yap-log.XXXXXX")" || return 1
+  trap 'rm -rf -- "${_RUNTIME_LOG_STREAM_DIR}"' EXIT
   _RUNTIME_LOG_STREAM_FIFO="${_RUNTIME_LOG_STREAM_DIR}/stream"
   mkfifo "${_RUNTIME_LOG_STREAM_FIFO}" || return 1
   tail -n +1 -F "${log_file}" >"${_RUNTIME_LOG_STREAM_FIFO}" &
   _RUNTIME_LOG_STREAM_PID=$!
 }
 
-# _runtime_log_stream_stop - Stop tail and remove its private FIFO.
+# _runtime_log_route_captured: Route one line while warmup output is being captured.
+# Globals:
+#   is_filter_active: Cleared in runtime_follow_log when warmup ends.
+#   LOGS_ENABLED
+# Arguments:
+#   $1: Log line.
+#   $2: Warmup capture file.
+# Outputs:
+#   Writes warmup lines, and other lines when logs are on, to standard output.
+# Returns:
+#   0 after routing the line, non-zero when the capture file cannot be written.
+_runtime_log_route_captured() {
+  local line="$1"
+  local capture_file="$2"
+
+  if [[ ${line} == *"[warmup]"* ]]; then
+    printf '%s\n' "${line}"
+    if [[ ${line} == *"[warmup] Warmup complete"* ||
+      ${line} == *"[warmup] Warmup finished with failures"* ||
+      ${line} == *"[warmup] Warmup reported failures"* ]]; then
+      warmup_capture_finish "${capture_file}" || return 1
+      is_filter_active=0
+    fi
+  else
+    printf '%s\n' "${line}" >>"${capture_file}" || return 1
+    if [[ ${LOGS_ENABLED:?LOGS_ENABLED is required} == "1" ]]; then
+      printf '%s\n' "${line}"
+    fi
+  fi
+}
+
+# _runtime_log_stream_stop: Stop tail and remove its private FIFO.
 # Globals:
 #   _RUNTIME_LOG_STREAM_DIR
 #   _RUNTIME_LOG_STREAM_FIFO
@@ -53,7 +85,7 @@ _runtime_log_stream_stop() {
   return "${status}"
 }
 
-# runtime_follow_log - Follow deployment output with warmup-aware filtering.
+# runtime_follow_log: Follow deployment output with warmup-aware filtering.
 # Globals:
 #   _RUNTIME_LOG_SIGNAL_STATUS
 # Arguments:
@@ -88,20 +120,7 @@ runtime_follow_log() {
       fi
       continue
     fi
-    if [[ ${line} == *"[warmup]"* ]]; then
-      printf '%s\n' "${line}"
-      if [[ ${line} == *"[warmup] Warmup complete"* ||
-        ${line} == *"[warmup] Warmup finished with failures"* ||
-        ${line} == *"[warmup] Warmup reported failures"* ]]; then
-        warmup_capture_finish "${capture_file}" || return 1
-        is_filter_active=0
-      fi
-    else
-      printf '%s\n' "${line}" >>"${capture_file}" || return 1
-      if [[ ${LOGS_ENABLED} == "1" ]]; then
-        printf '%s\n' "${line}"
-      fi
-    fi
+    _runtime_log_route_captured "${line}" "${capture_file}" || return 1
   done <"${_RUNTIME_LOG_STREAM_FIFO}"
   _runtime_log_stream_stop || return 1
   trap - EXIT INT TERM

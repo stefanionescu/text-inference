@@ -4,12 +4,12 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns generated Python cache discovery and removal.
 
-_RUNTIME_CLEANUP_PYTHON_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_CLEANUP_PYTHON_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
 source "${_RUNTIME_CLEANUP_PYTHON_DIR}/paths.sh"
 
-# runtime_cleanup_python_artifacts - Remove discovered Python cache directories.
+# runtime_cleanup_python_artifacts: Remove discovered Python cache directories.
 # Globals:
 #   None.
 # Arguments:
@@ -25,19 +25,16 @@ runtime_cleanup_python_artifacts() {
   local removal_status=0
 
   manifest="$(mktemp "${root_dir}/.cleanup-paths.XXXXXX")" || return 1
-  if ! find "${root_dir}" \
+  trap 'rm -f -- "${manifest}"; trap - RETURN' RETURN
+  find "${root_dir}" \
     -type d \
     \( -name "__pycache__" -o -name ".pytest_cache" \) \
-    -print0 >"${manifest}"; then
-    rm -f -- "${manifest}"
-    return 1
-  fi
+    -print0 >"${manifest}" || return 1
   while IFS= LC_ALL=C read -r -d '' cache_dir; do
     if ! runtime_remove_owned_path "${root_dir}" "${cache_dir}"; then
       removal_status=1
       break
     fi
   done <"${manifest}"
-  rm -f -- "${manifest}"
   return "${removal_status}"
 }

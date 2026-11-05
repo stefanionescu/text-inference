@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns restart-time virtual environment replacement and repair.
 
-_RESTART_DEPENDENCIES_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RESTART_DEPENDENCIES_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/deps/venv.sh
 source "${_RESTART_DEPENDENCIES_DIR}/../deps/venv.sh"
@@ -15,7 +15,7 @@ source "${_RESTART_DEPENDENCIES_DIR}/../shared/log.sh"
 # shellcheck source=scripts/lib/shared/pytorch_guard.sh
 source "${_RESTART_DEPENDENCIES_DIR}/../shared/pytorch_guard.sh"
 
-# _restart_rebuild_dependencies - Replace both managed environments.
+# _restart_rebuild_dependencies: Replace both managed environments.
 _restart_rebuild_dependencies() {
   local scripts_dir="$1"
 
@@ -28,7 +28,7 @@ _restart_rebuild_dependencies() {
   bash "${scripts_dir}/steps/02_install_deps.sh"
 }
 
-# _restart_torch_status - Return the managed environment compatibility status.
+# _restart_torch_status: Return the managed environment compatibility status.
 _restart_torch_status() {
   if [[ ! -x ${VENV_DIR:?VENV_DIR is required}/bin/python ]]; then
     return 0
@@ -36,7 +36,19 @@ _restart_torch_status() {
   pytorch_guard_check "[restart]"
 }
 
-# restart_prepare_dependencies - Rebuild dependencies when requested or required.
+# _restart_apply_transition: Request a rebuild for the transitions that need one.
+_restart_apply_transition() {
+  case "$1" in
+    engine | reset)
+      REINSTALL_REQUESTED=1
+      export REINSTALL_REQUESTED
+      ;;
+    fresh | model | same) ;;
+    *) return 2 ;;
+  esac
+}
+
+# restart_prepare_dependencies: Rebuild dependencies when requested or required.
 # Globals:
 #   REINSTALL_REQUESTED, ROOT_DIR, QUANT_VENV_DIR, VENV_DIR.
 # Arguments:
@@ -50,14 +62,7 @@ restart_prepare_dependencies() {
   local transition="$2"
   local torch_status=0
 
-  case "${transition}" in
-    engine | reset)
-      REINSTALL_REQUESTED=1
-      export REINSTALL_REQUESTED
-      ;;
-    fresh | model | same) ;;
-    *) return 2 ;;
-  esac
+  _restart_apply_transition "${transition}" || return 2
   _restart_torch_status || torch_status=$?
   if ((torch_status == 42)); then
     log_write "[restart] Torch mismatch requires a clean dependency rebuild"

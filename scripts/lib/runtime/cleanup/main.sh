@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns termination of repository-recorded process groups.
 
-_RUNTIME_CLEANUP_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_CLEANUP_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_RUNTIME_CLEANUP_DIR}/../../../config/values/runtime.sh"
@@ -13,7 +13,7 @@ source "${_RUNTIME_CLEANUP_DIR}/../process.sh"
 # shellcheck source=scripts/lib/shared/log.sh
 source "${_RUNTIME_CLEANUP_DIR}/../../shared/log.sh"
 
-# _runtime_cleanup_wait - Wait briefly for an owned process to stop.
+# _runtime_cleanup_wait: Wait briefly for an owned process to stop.
 # Globals:
 #   None.
 # Arguments:
@@ -35,7 +35,7 @@ _runtime_cleanup_wait() {
   return 1
 }
 
-# _runtime_cleanup_process - Stop the process group recorded in one PID file.
+# _runtime_cleanup_process: Stop the process group recorded in one PID file.
 # Globals:
 #   None.
 # Arguments:
@@ -70,7 +70,7 @@ _runtime_cleanup_process() {
   rm -f -- "${pid_file}"
 }
 
-# runtime_stop_owned_process - Stop one selected repository process group.
+# runtime_stop_owned_process: Stop one selected repository process group.
 # Globals:
 #   CFG_RUNTIME_DEPLOYMENT_PID_FILE, CFG_RUNTIME_SERVER_PID_FILE.
 # Arguments:
@@ -92,7 +92,7 @@ runtime_stop_owned_process() {
   _runtime_cleanup_process "${pid_file}"
 }
 
-# runtime_stop_owned_processes - Stop all repository-recorded process groups.
+# runtime_stop_owned_processes: Stop all repository-recorded process groups.
 # Globals:
 #   None.
 # Arguments:

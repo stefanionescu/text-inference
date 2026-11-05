@@ -3,14 +3,14 @@
 # Initialize repository-owned runtime directories.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_RUNTIME_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 1
+_RUNTIME_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
 source "${_RUNTIME_ENV_DIR}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_RUNTIME_ENV_DIR}/../../config/values/runtime.sh"
 
-# runtime_initialize_paths - Create and export runtime directories.
+# runtime_initialize_paths: Create and export runtime directories.
 # Globals:
 #   LOG_DIR
 #   RUN_DIR

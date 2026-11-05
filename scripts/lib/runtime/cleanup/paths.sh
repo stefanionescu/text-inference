@@ -4,7 +4,7 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns recursive deletion for repository-managed files.
 
-# runtime_remove_owned_path - Remove one path below a verified repository root.
+# runtime_remove_owned_path: Remove one path below a verified repository root.
 # Globals:
 #   None.
 # Arguments:

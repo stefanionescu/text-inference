@@ -33,6 +33,7 @@ export LOGS_ENABLED
 
 # shellcheck source=docker/trt/scripts/env.sh
 source "${SCRIPT_DIR}/env.sh"
+trt_export_defaults
 # shellcheck source=scripts/lib/shared/gpu/environment.sh
 source "/app/scripts/lib/shared/gpu/environment.sh"
 # shellcheck source=scripts/lib/env/trt.sh

@@ -218,3 +218,30 @@ can_import = ["config-model", "config-runtime", "config-tests", "errors", "token
 name = "tests-package"
 paths = ["tests/**"]
 can_import = []
+
+[[ignore]]
+check = "bash/shellcheck"
+rule = "SC2310"
+reason = "Scripts call functions in if and || conditions on purpose and handle each failure explicitly; the previous shellcheckrc turned this off too."
+
+[[ignore]]
+check = "bash/safety"
+rule = "recursive-remove"
+paths = ["scripts/lib/runtime/cleanup/{host,paths}.sh"]
+reason = "The reset and cleanup commands delete caches on purpose, and each path is checked against its owner root first."
+
+[[ignore]]
+check = "bash/safety"
+rule = "broad-kill"
+paths = ["scripts/lib/runtime/cleanup/reset.sh"]
+reason = "The host reset stops helper processes by pattern because it runs after their PID records may be gone."
+
+[[ignore]]
+check = "python/pip-installs"
+paths = ["docker/vllm/Dockerfile"]
+reason = "flashinfer ships from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
+
+[[ignore]]
+check = "python/pip-installs"
+paths = ["scripts/lib/deps/uv/environment.sh"]
+reason = "This helper installs flashinfer from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
