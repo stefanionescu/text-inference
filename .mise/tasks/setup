@@ -6,4 +6,4 @@ cd "${REPO_ROOT}"
 
 mise install
 mise run deps
-git config core.hooksPath .githooks
+bunx --no-install gspot install

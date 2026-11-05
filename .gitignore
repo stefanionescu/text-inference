@@ -15,21 +15,11 @@ __pycache__/
 .cache/
 .pytest_cache
 .ruff_cache
-.import_linter_cache
 .mypi_cache
 .mypy_cache
 node_modules/
 pytest.xml
-.scannerwork/
-.sonarqube/
-.jscpd-report/
 reports/
-gitleaks-report.json
-bearer-results.sarif
-bearer-report.json
-bandit-report.json
-semgrep-results.json
-osv-results.json
 
 # Logs and output files
 logs/

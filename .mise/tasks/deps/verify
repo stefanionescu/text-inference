@@ -9,4 +9,3 @@ uv lock --check
 # lint:justify -- reason: UV_PYTHON is provided by mise from mise.toml.
 uv sync --python "${UV_PYTHON}" --all-groups --frozen
 CI=1 bun install --frozen-lockfile --dry-run
-uv run python -m quality.repository.dependencies
