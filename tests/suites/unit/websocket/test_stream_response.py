@@ -28,14 +28,27 @@ class _DisconnectSecondSendWS:
     _send_count: int = 0
 
     async def send_text(self, _text: str) -> None:
-        """Test send text."""
+        """Test send text.
+
+        Args:
+            _text: Unused text that the caller's signature requires.
+
+        Raises:
+            WebSocketDisconnect: The operation fails with this error.
+
+        """
         self._send_count += 1
         if self._send_count >= SECOND_SEND:
             raise WebSocketDisconnect
 
 
 def _start_session() -> tuple[SessionRuntime, SessionState]:
-    """Return a runtime with limits out of the way and the initialized state of a new connection."""
+    """Return a runtime with limits out of the way and the initialized state of a new connection.
+
+    Returns:
+        A runtime with limits out of the way and the initialized state of a new connection.
+
+    """
     session_runtime = build_session_runtime(build_local_tokenizer())
     return session_runtime, build_session_state(session_runtime)
 
@@ -49,7 +62,20 @@ def _run_stream(
     user_utterance: str = USER_TEXT,
     history_user_utterance: str = USER_TEXT,
 ) -> str:
-    """Stream one response to a recording socket unless the test supplies its own."""
+    """Stream one response to a recording socket unless the test supplies its own.
+
+    Args:
+        session_runtime: Session runtime.
+        state: State of the session or test run.
+        stream: Stream to read from.
+        websocket: WebSocket connection of the client.
+        user_utterance: User utterance.
+        history_user_utterance: History user utterance.
+
+    Returns:
+        The resulting text.
+
+    """
     return asyncio.run(
         stream_response(
             StreamResponseRequest(

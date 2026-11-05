@@ -17,7 +17,16 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class PromptLimit:
-    """Prompt validation policy for a single text field."""
+    """Prompt validation policy for a single text field.
+
+    Attributes:
+        field_label: Field label.
+        invalid_error_code: Code of the invalid error.
+        too_long_error_code: Code of the too long error.
+        maximum_tokens: Largest allowed tokens.
+        count_tokens: Function that counts the tokens of a text.
+
+    """
 
     field_label: str
     invalid_error_code: str
@@ -27,7 +36,15 @@ class PromptLimit:
 
 
 def normalize_gender(value: str | None) -> str | None:
-    """Normalize gender input to standardized values ('female'|'male')."""
+    """Normalize gender input to standardized values ('female'|'male').
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        The updated text.
+
+    """
     if value is None:
         return None
     normalized_value = value.strip().lower()
@@ -35,7 +52,15 @@ def normalize_gender(value: str | None) -> str | None:
 
 
 def normalize_personality(value: str | None) -> str | None:
-    """Normalize personality: letters-only, length-limited, lowercased."""
+    """Normalize personality: letters-only, length-limited, lowercased.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        The updated text.
+
+    """
     if value is None:
         return None
     normalized_value = value.strip()
@@ -50,7 +75,18 @@ def normalize_personality(value: str | None) -> str | None:
 
 
 def validate_required_gender(raw_gender: str | None) -> str:
-    """Validate and normalize the required gender field."""
+    """Validate and normalize the required gender field.
+
+    Args:
+        raw_gender: Unvalidated gender as received.
+
+    Returns:
+        The resulting text.
+
+    Raises:
+        ValidationError: Missing_gender.
+
+    """
     if raw_gender is None or not raw_gender.strip():
         message = "missing_gender"
         raise ValidationError(
@@ -68,7 +104,18 @@ def validate_required_gender(raw_gender: str | None) -> str:
 
 
 def validate_required_personality(raw_personality: str | None) -> str:
-    """Validate and normalize the required personality field."""
+    """Validate and normalize the required personality field.
+
+    Args:
+        raw_personality: Unvalidated personality as received.
+
+    Returns:
+        The resulting text.
+
+    Raises:
+        ValidationError: Missing_personality.
+
+    """
     if raw_personality is None or not raw_personality.strip():
         message = "missing_personality"
         raise ValidationError(
@@ -91,14 +138,39 @@ def require_prompt(
     error_code: str,
     message: str,
 ) -> str:
-    """Return a present prompt or raise a validation error."""
+    """Return a present prompt or raise a validation error.
+
+    Args:
+        raw_prompt: Unvalidated prompt as received.
+        error_code: Code of the error.
+        message: Message to send, check, or report.
+
+    Returns:
+        A present prompt or raise a validation error.
+
+    Raises:
+        ValidationError: The operation fails with this error.
+
+    """
     if not raw_prompt:
         raise ValidationError(error_code, message)
     return raw_prompt
 
 
 def sanitize_prompt_limit(raw_prompt: str, limit: PromptLimit) -> str:
-    """Sanitize a prompt and enforce its token limit."""
+    """Sanitize a prompt and enforce its token limit.
+
+    Args:
+        raw_prompt: Unvalidated prompt as received.
+        limit: Largest number to allow.
+
+    Returns:
+        The updated text.
+
+    Raises:
+        ValidationError: The operation fails with this error.
+
+    """
     try:
         prompt = sanitize_prompt(raw_prompt)
     except ValueError as exception:

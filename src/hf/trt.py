@@ -37,7 +37,17 @@ _COMMAND_DESCRIPTION = "Push a TensorRT-LLM ModelOpt checkpoint"
 
 
 def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: str | None) -> str:
-    """Build the detailed checkpoint-only TensorRT model card."""
+    """Build the detailed checkpoint-only TensorRT model card.
+
+    Args:
+        metadata: Metadata fields to read.
+        repo_id: ID of the repo.
+        hf_token: Hugging Face token.
+
+    Returns:
+        The detailed checkpoint-only TensorRT model card.
+
+    """
     card_fields = build_provenance_fields(metadata, repo_id, hf_token=hf_token)
     quantization = read_metadata_section(metadata, "quantization")
     calibration = read_metadata_section(metadata, "calibration")
@@ -84,7 +94,15 @@ def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: 
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Generate a model card and upload one ModelOpt checkpoint."""
+    """Generate a model card and upload one ModelOpt checkpoint.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        A model card and upload one ModelOpt checkpoint.
+
+    """
     arguments = parse_upload_arguments(argument_values, _COMMAND_DESCRIPTION, is_format_required=True)
     checkpoint_folder = require_checkpoint_folder(arguments.checkpoint_folder)
     validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)

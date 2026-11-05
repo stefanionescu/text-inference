@@ -35,7 +35,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass(slots=True)
 class _OpenTelemetryState:
-    """Process-wide OpenTelemetry provider state."""
+    """Process-wide OpenTelemetry provider state.
+
+    Attributes:
+        tracer_provider: Tracer provider.
+        meter_provider: Meter provider.
+
+    """
 
     tracer_provider: TracerProvider | None = None
     meter_provider: MeterProvider | None = None
@@ -45,7 +51,12 @@ _OPEN_TELEMETRY_STATE = _OpenTelemetryState()
 
 
 def _build_resource() -> Resource:
-    """Build OpenTelemetry resource attributes for this process."""
+    """Build OpenTelemetry resource attributes for this process.
+
+    Returns:
+        OpenTelemetry resource attributes for this process.
+
+    """
     attributes: dict[str, str] = {
         "service.name": read_environment_text("OTEL_RESOURCE_NAME", OTEL_RESOURCE_NAME),
         "deployment.environment": read_environment_text("AXIOM_ENVIRONMENT", AXIOM_ENVIRONMENT),

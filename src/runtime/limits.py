@@ -10,7 +10,21 @@ if TYPE_CHECKING:
 
 
 class LimitSettings(TypedDict):
-    """Resolved limit settings with concrete types."""
+    """Resolved limit settings with concrete types.
+
+    Attributes:
+        PROMPT_MAX_TOKENS: Token count of the prompt max.
+        HISTORY_MAX_TOKENS: Token count of the history max.
+        USER_UTTERANCE_MAX_TOKENS: Token count of the user utterance max.
+        HISTORY_RETENTION_PERCENTAGE: History retention percentage.
+        CONTEXT_BUFFER: Context buffer.
+        MAXIMUM_CONTEXT_LENGTH: Largest allowed context length.
+        TRIMMED_HISTORY_LENGTH: Trimmed history length.
+        STREAM_FLUSH_MILLISECONDS: Stream flush in milliseconds.
+        MAXIMUM_OUTPUT_TOKENS: Largest allowed output tokens.
+        MAX_CONCURRENT_CONNECTIONS: Largest allowed concurrent connections.
+
+    """
 
     PROMPT_MAX_TOKENS: int
     HISTORY_MAX_TOKENS: int
@@ -30,13 +44,31 @@ def _read_environment_value(
     *,
     environment: Mapping[str, str] | None,
 ) -> str:
-    """Resolve one value from an environment mapping or process environment."""
+    """Resolve one value from an environment mapping or process environment.
+
+    Args:
+        key: Lookup key.
+        default: Value to use when the setting is absent.
+        environment: Environment variables to read.
+
+    Returns:
+        One value from an environment mapping or process environment.
+
+    """
     raw_value = os.getenv(key) if environment is None else environment.get(key)
     return default if raw_value is None else raw_value
 
 
 def read_limit_settings(*, environment: Mapping[str, str] | None = None) -> LimitSettings:
-    """Read token and connection limits from environment values."""
+    """Read token and connection limits from environment values.
+
+    Args:
+        environment: Environment variables to read.
+
+    Returns:
+        Token and connection limits from environment values.
+
+    """
     maximum_prompt_tokens = int(
         _read_environment_value("PROMPT_MAX_TOKENS", "1500", environment=environment),
     )

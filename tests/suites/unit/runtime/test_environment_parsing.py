@@ -17,7 +17,14 @@ _DEFAULT_FLOAT = 1.5
     ("raw_value", "expected"), [("42", 42), ("not-a-number", _DEFAULT_INTEGER), (None, _DEFAULT_INTEGER)]
 )
 def test_integer_reader_uses_default(monkeypatch: pytest.MonkeyPatch, raw_value: str | None, expected: int) -> None:
-    """An absent or malformed integer gives the default instead of an exception."""
+    """An absent or malformed integer gives the default instead of an exception.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+        raw_value: Unvalidated value as received.
+        expected: Value that the test expects.
+
+    """
     monkeypatch.delenv(_VARIABLE, raising=False)
     if raw_value is not None:
         monkeypatch.setenv(_VARIABLE, raw_value)
@@ -28,7 +35,14 @@ def test_integer_reader_uses_default(monkeypatch: pytest.MonkeyPatch, raw_value:
     ("raw_value", "expected"), [("2.5", 2.5), ("not-a-number", _DEFAULT_FLOAT), (None, _DEFAULT_FLOAT)]
 )
 def test_float_reader_uses_default(monkeypatch: pytest.MonkeyPatch, raw_value: str | None, expected: float) -> None:
-    """An absent or malformed float gives the default instead of an exception."""
+    """An absent or malformed float gives the default instead of an exception.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+        raw_value: Unvalidated value as received.
+        expected: Value that the test expects.
+
+    """
     monkeypatch.delenv(_VARIABLE, raising=False)
     if raw_value is not None:
         monkeypatch.setenv(_VARIABLE, raw_value)
@@ -45,7 +59,15 @@ def test_text_reader_ignores_empty(
     default_text: str | None,
     expected: str,
 ) -> None:
-    """An empty value counts as unset, and the result is always a string."""
+    """An empty value counts as unset, and the result is always a string.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+        raw_value: Unvalidated value as received.
+        default_text: Text of the default.
+        expected: Value that the test expects.
+
+    """
     monkeypatch.delenv(_VARIABLE, raising=False)
     if raw_value is not None:
         monkeypatch.setenv(_VARIABLE, raw_value)

@@ -27,7 +27,15 @@ def test_either_tokenizer_file_passes(
     has_json: bool,
     has_config: bool,
 ) -> None:
-    """One tokenizer file is enough, and the result says which ones exist."""
+    """One tokenizer file is enough, and the result says which ones exist.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+        filenames: Names of the files.
+        has_json: Whether a JSON exists.
+        has_config: Whether a config exists.
+
+    """
     for filename in filenames:
         (tmp_path / filename).write_text("{}", encoding="utf-8")
     result = validate_tokenizer_exists(str(tmp_path))
@@ -38,7 +46,12 @@ def test_either_tokenizer_file_passes(
 
 
 def test_empty_folder_explains_fix(tmp_path: Path) -> None:
-    """A folder without tokenizer files names both files that it looked for."""
+    """A folder without tokenizer files names both files that it looked for.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     result = validate_tokenizer_exists(str(tmp_path))
     assert not result.is_valid
     assert result.error_message is not None
@@ -47,7 +60,12 @@ def test_empty_folder_explains_fix(tmp_path: Path) -> None:
 
 
 def test_missing_folder_is_invalid(tmp_path: Path) -> None:
-    """A path that does not exist fails the check instead of raising."""
+    """A path that does not exist fails the check instead of raising.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     result = validate_tokenizer_exists(str(tmp_path / "absent"))
     assert not result.is_valid
     assert result.error_message is not None
@@ -61,7 +79,12 @@ def test_empty_model_path_refused() -> None:
 
 
 def test_file_path_is_refused(tmp_path: Path) -> None:
-    """A path to a file is not a model folder."""
+    """A path to a file is not a model folder.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     model_file = tmp_path / "model.bin"
     model_file.write_text("weights", encoding="utf-8")
     with pytest.raises(NotADirectoryError, match="must be a directory"):

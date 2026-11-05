@@ -15,7 +15,12 @@ class RateLimitError(ServerError):
 
     @override
     def format_for_user(self) -> str:
-        """Format the rate limit failure for terminal output."""
+        """Format the rate limit failure for terminal output.
+
+        Returns:
+            The rate limit failure for terminal output.
+
+        """
         if self.friendly_message:
             return self.friendly_message
         retry_delay_seconds = self.retry_after_seconds

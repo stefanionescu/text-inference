@@ -28,7 +28,18 @@ logger = logging.getLogger("live")
 
 @dataclass(frozen=True)
 class LiveRunRequest:
-    """Inputs for an interactive live session."""
+    """Inputs for an interactive live session.
+
+    Attributes:
+        server_url: Server URL.
+        api_key: Key of the API.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        timeout_seconds: Timeout in seconds.
+        sampling: Sampling overrides of the request.
+        message: Message to send, check, or report.
+
+    """
 
     server_url: str
     api_key: str | None
@@ -41,7 +52,17 @@ class LiveRunRequest:
 
 @dataclass(frozen=True)
 class LiveConnection:
-    """Resolved WebSocket inputs for a live session."""
+    """Resolved WebSocket inputs for a live session.
+
+    Attributes:
+        server_url: Server URL.
+        authentication_headers: Authentication headers.
+        session: Session to use.
+        timeout_seconds: Timeout in seconds.
+        registry: Registry of prompt profiles.
+        initial_message: Initial message.
+
+    """
 
     server_url: str
     authentication_headers: dict[str, str]
@@ -59,7 +80,19 @@ def _prepare_session(
     message: list[str] | None,
     sampling: dict[str, float | int | bool] | None,
 ) -> tuple[LiveSession, PromptProfile, str]:
-    """Resolve the selected prompt profile and initial message."""
+    """Resolve the selected prompt profile and initial message.
+
+    Args:
+        registry: Registry of prompt profiles.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        message: Message to send, check, or report.
+        sampling: Sampling overrides of the request.
+
+    Returns:
+        The selected prompt profile and initial message.
+
+    """
     profile = registry.require_profile(gender, personality)
     initial_message = " ".join(message).strip() if message else "Hey!"
     session = LiveSession(
@@ -71,7 +104,13 @@ def _prepare_session(
 
 
 def _print_banner(server_url: str, profile: PromptProfile) -> None:
-    """Print the selected connection and prompt profile."""
+    """Print the selected connection and prompt profile.
+
+    Args:
+        server_url: Server URL.
+        profile: Prompt profile to use.
+
+    """
     write_line(f"\n{section_header('LIVE SESSION')}")
     write_line(dim(f"  server: {server_url}"))
     write_line(dim(f"  profile: {profile.gender}/{profile.personality}"))
@@ -79,7 +118,12 @@ def _print_banner(server_url: str, profile: PromptProfile) -> None:
 
 
 async def _run_session(connection: LiveConnection) -> None:
-    """Connect and run the interactive input loop."""
+    """Connect and run the interactive input loop.
+
+    Args:
+        connection: Open connection to the server.
+
+    """
     async with open_websocket(
         lambda: connect_websocket(
             connection.server_url,
@@ -98,7 +142,12 @@ async def _run_session(connection: LiveConnection) -> None:
 
 
 def _log_websocket_close(exception: Exception) -> None:
-    """Report an expected idle close or another remote close."""
+    """Report an expected idle close or another remote close.
+
+    Args:
+        exception: Exception to inspect.
+
+    """
     close_code = getattr(exception, "code", None)
     close_reason = getattr(exception, "reason", None)
     if close_code == WEBSOCKET_IDLE_CLOSE_CODE or (close_reason and "idle" in str(close_reason).lower()):
@@ -108,7 +157,15 @@ def _log_websocket_close(exception: Exception) -> None:
 
 
 def _raise_for_server_error(exception: ServerError) -> None:
-    """Translate terminal server errors into live-client exits."""
+    """Translate terminal server errors into live-client exits.
+
+    Args:
+        exception: Exception to inspect.
+
+    Raises:
+        SystemExit: The command stops because of an error.
+
+    """
     if exception.error_code == "authentication_failed":
         logger.error("Authentication failed. Check --api-key or API_KEY.")
         raise SystemExit(1) from exception
@@ -120,7 +177,15 @@ def _raise_for_server_error(exception: ServerError) -> None:
 
 
 async def run_live_session(request: LiveRunRequest) -> None:
-    """Run the interactive live session."""
+    """Run the interactive live session.
+
+    Args:
+        request: Request to run.
+
+    Raises:
+        SystemExit: The command stops because of an error.
+
+    """
     registry = PromptProfileRegistry()
     try:
         session, profile, initial_message = _prepare_session(

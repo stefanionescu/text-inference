@@ -29,7 +29,18 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class TurnRequest:
-    """Validated plan for executing one start/message turn."""
+    """Validated plan for executing one start/message turn.
+
+    Attributes:
+        state: State of the session or test run.
+        request_id: ID of the request.
+        static_prefix: Static prefix.
+        runtime_text: Text of the runtime.
+        history_messages: History messages.
+        user_utterance: User utterance.
+        sampling_overrides: Sampling overrides.
+
+    """
 
     state: SessionState
     request_id: str
@@ -47,7 +58,15 @@ async def _send_initial_text(
     *,
     is_already_sent: bool,
 ) -> None:
-    """Send initial text when it was not already emitted."""
+    """Send initial text when it was not already emitted.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        initial_text: Text of the initial.
+        state: State of the session or test run.
+        is_already_sent: Whether already is sent.
+
+    """
     if not initial_text or is_already_sent:
         return
     sent = await safe_send_flat(websocket, "token", text=initial_text)
@@ -62,7 +81,14 @@ async def _forward_stream_chunks(
     stream: AsyncIterator[str],
     state: _StreamState,
 ) -> None:
-    """Forward generated stream chunks to the client."""
+    """Forward generated stream chunks to the client.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        stream: Stream to read from.
+        state: State of the session or test run.
+
+    """
     async for chunk in stream:
         sent = await safe_send_flat(websocket, "token", text=chunk)
         if not sent:
@@ -73,7 +99,13 @@ async def _forward_stream_chunks(
 
 
 async def _send_completion_frames(websocket: WebSocket, state: _StreamState) -> None:
-    """Send final and done frames for a completed stream."""
+    """Send final and done frames for a completed stream.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+
+    """
     sent_completion = await safe_send_flat(websocket, "final", status=WEBSOCKET_STATUS_OK, text=state.completion_text)
     if not sent_completion:
         state.is_interrupted = True
@@ -84,7 +116,12 @@ async def _send_completion_frames(websocket: WebSocket, state: _StreamState) -> 
 
 
 async def _handle_empty_output(websocket: WebSocket) -> None:
-    """Report an empty model output to metrics and client."""
+    """Report an empty model output to metrics and client.
+
+    Args:
+        websocket: WebSocket connection of the client.
+
+    """
     logger.warning("empty model output")
     get_metrics().empty_model_output_total.add(1)
     await safe_send_flat(
@@ -101,7 +138,14 @@ async def run_turn_execution(
     request: TurnRequest,
     runtime_dependencies: RuntimeDependencies,
 ) -> None:
-    """Fit the prompt, stream generation, and commit the visible response."""
+    """Fit the prompt, stream generation, and commit the visible response.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        request: Request to run.
+        runtime_dependencies: Runtime dependencies.
+
+    """
     settings = runtime_dependencies.settings
     try:
         prompt_fit = fit_prompt_to_budget(
@@ -145,7 +189,14 @@ async def run_turn_execution(
 
 @dataclass
 class _StreamState:
-    """Internal state for stream_response."""
+    """Internal state for stream_response.
+
+    Attributes:
+        completion_text: Text of the completion.
+        is_text_visible: Whether text is visible.
+        is_interrupted: Whether it is interrupted.
+
+    """
 
     completion_text: str
     is_text_visible: bool
@@ -154,7 +205,19 @@ class _StreamState:
 
 @dataclass(frozen=True)
 class StreamResponseRequest:
-    """Inputs for streaming one model response to a websocket."""
+    """Inputs for streaming one model response to a websocket.
+
+    Attributes:
+        websocket: WebSocket connection of the client.
+        stream: Stream to read from.
+        connection_state: State of the connection.
+        user_utterance: User utterance.
+        session_runtime: Session runtime.
+        initial_text: Text of the initial.
+        is_initial_text_sent: Whether initial text is sent.
+        history_user_utterance: History user utterance.
+
+    """
 
     websocket: WebSocket
     stream: AsyncIterator[str]
@@ -167,7 +230,15 @@ class StreamResponseRequest:
 
 
 async def stream_response(request: StreamResponseRequest) -> str:
-    """Stream chunks, emit final/done messages, and record history."""
+    """Stream chunks, emit final/done messages, and record history.
+
+    Args:
+        request: Request to run.
+
+    Returns:
+        The resulting text.
+
+    """
     history_user = (
         request.history_user_utterance if request.history_user_utterance is not None else request.user_utterance
     )

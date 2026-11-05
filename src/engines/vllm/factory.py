@@ -20,7 +20,15 @@ if TYPE_CHECKING:
 
 
 async def create_vllm_engine(settings: ApplicationSettings) -> VLLMEngine:
-    """Create the vLLM 0.25.1 asynchronous engine."""
+    """Create the vLLM 0.25.1 asynchronous engine.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The vLLM 0.25.1 asynchronous engine.
+
+    """
     model = require_local_model_directory(cast("str", settings.model.source))
     quantization_format = settings.model.runtime_quantization
     model_config = await asyncio.to_thread(

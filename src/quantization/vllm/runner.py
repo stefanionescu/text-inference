@@ -49,14 +49,30 @@ class CompressorRuntime(Protocol):
 
     @property
     def version(self) -> str:
-        """Return the LLM Compressor package version."""
+        """Return the LLM Compressor package version.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
     def read_model_configuration(
         self,
         source_path: Path,
     ) -> tuple[Mapping[str, object], Mapping[str, object]]:
-        """Read model and decoder configuration from a local snapshot."""
+        """Read model and decoder configuration from a local snapshot.
+
+        Args:
+            source_path: Path of the source.
+
+        Returns:
+            Model and decoder configuration from a local snapshot.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(source_path)
 
     def quantize(
@@ -67,16 +83,51 @@ class CompressorRuntime(Protocol):
         settings: QuantizationSettings,
         /,
     ) -> None:
-        """Create a compressed-tensors checkpoint."""
+        """Create a compressed-tensors checkpoint.
+
+        Args:
+            source: Source checkpoint to read.
+            checkpoint_folder: Folder of the checkpoint.
+            policy: Quantization policy to apply.
+            settings: Application settings.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(source, checkpoint_folder, policy, settings)
 
     def environment_metadata(self, environment: Mapping[str, str]) -> Mapping[str, object]:
-        """Return execution metadata that does not constrain cache reuse."""
+        """Return execution metadata that does not constrain cache reuse.
+
+        Args:
+            environment: Environment variables to read.
+
+        Returns:
+            Execution metadata that does not constrain cache reuse.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(environment)
 
 
 def _read_positive_integer(environment: Mapping[str, str], key: str, default: int) -> int:
-    """Read one positive environment integer."""
+    """Read one positive environment integer.
+
+    Args:
+        environment: Environment variables to read.
+        key: Lookup key.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        One positive environment integer.
+
+    Raises:
+        ValueError: `key` must be a positive integer.
+
+    """
     value = int(environment.get(key, str(default)))
     if value < 1:
         message = f"{key} must be a positive integer"
@@ -85,7 +136,19 @@ def _read_positive_integer(environment: Mapping[str, str], key: str, default: in
 
 
 def _read_binary_flag(environment: Mapping[str, str], key: str) -> bool:
-    """Read one binary environment flag."""
+    """Read one binary environment flag.
+
+    Args:
+        environment: Environment variables to read.
+        key: Lookup key.
+
+    Returns:
+        One binary environment flag.
+
+    Raises:
+        ValueError: `key` must be 0 or 1.
+
+    """
     value = environment.get(key, "0")
     if value not in BINARY_FLAG_VALUES:
         message = f"{key} must be 0 or 1"
@@ -95,7 +158,18 @@ def _read_binary_flag(environment: Mapping[str, str], key: str) -> bool:
 
 @dataclass(frozen=True, slots=True)
 class QuantizationSettings:
-    """Validated vLLM quantization settings."""
+    """Validated vLLM quantization settings.
+
+    Attributes:
+        dataset: Name of the calibration dataset.
+        samples: Latency samples.
+        sequence_length: Sequence length.
+        batch_size: Batch size.
+        pipeline: Name of the calibration pipeline.
+        source_revision: Revision of the source.
+        is_rebuild_forced: Whether rebuild is forced.
+
+    """
 
     dataset: str
     samples: int
@@ -107,7 +181,18 @@ class QuantizationSettings:
 
     @classmethod
     def read_environment(cls, environment: Mapping[str, str]) -> QuantizationSettings:
-        """Build settings from the host environment."""
+        """Build settings from the host environment.
+
+        Args:
+            environment: Environment variables to read.
+
+        Returns:
+            Settings from the host environment.
+
+        Raises:
+            ValueError: Calibration dataset and model revision must not be empty.
+
+        """
         dataset = environment.get("VLLM_CALIBRATION_DATASET", DEFAULT_CALIBRATION_DATASET).strip()
         revision = environment.get("SOURCE_REVISION", DEFAULT_MODEL_REVISION).strip()
         pipeline = environment.get("VLLM_CALIBRATION_PIPELINE", DEFAULT_CALIBRATION_PIPELINE).strip()
@@ -137,7 +222,15 @@ class QuantizationSettings:
 
 
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the quantizer command contract."""
+    """Parse the quantizer command contract.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The quantizer command contract.
+
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--out", dest="checkpoint_folder", required=True)
@@ -150,7 +243,18 @@ def _build_request(
     settings: QuantizationSettings,
     compressor_version: str,
 ) -> QuantizationRequest:
-    """Build the complete cache-identity request."""
+    """Build the complete cache-identity request.
+
+    Args:
+        source: Source checkpoint to read.
+        policy: Quantization policy to apply.
+        settings: Application settings.
+        compressor_version: Version of the compressor.
+
+    Returns:
+        The complete cache-identity request.
+
+    """
     return QuantizationRequest(
         engine=VLLM_ENGINE,
         quantization_format=COMPRESSED_TENSORS_FORMAT,
@@ -172,7 +276,16 @@ def _build_request(
 
 
 def _is_cache_usable(checkpoint_folder: Path, request: QuantizationRequest) -> bool:
-    """Return whether a matching cache remains a valid checkpoint."""
+    """Return whether a matching cache remains a valid checkpoint.
+
+    Args:
+        checkpoint_folder: Folder of the checkpoint.
+        request: Request to run.
+
+    Returns:
+        Whether a matching cache remains a valid checkpoint.
+
+    """
     if not cache_matches(checkpoint_folder, request):
         return False
     try:
@@ -188,7 +301,20 @@ def run_quantization(
     environment: Mapping[str, str],
     compressor: CompressorRuntime,
 ) -> int:
-    """Quantize one model through a supplied compressor integration."""
+    """Quantize one model through a supplied compressor integration.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+        environment: Environment variables to read.
+        compressor: LLM Compressor entry points to call.
+
+    Returns:
+        The resulting number.
+
+    Raises:
+        ValueError: LLM Compressor requires an unquantized source checkpoint.
+
+    """
     arguments = _parse_arguments(argument_values)
     settings = QuantizationSettings.read_environment(environment)
     checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()

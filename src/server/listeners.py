@@ -39,18 +39,34 @@ class _PublicServer(uvicorn.Server):
     """Expose exact public socket acceptance and draining transitions."""
 
     def __init__(self, config: uvicorn.Config, readiness_state: ReadinessState) -> None:
-        """Initialize a public server tied to shared readiness state."""
+        """Initialize a public server tied to shared readiness state.
+
+        Args:
+            config: Settings for this run.
+            readiness_state: State of the readiness.
+
+        """
         super().__init__(config)
         self._readiness_state = readiness_state
 
     async def startup(self, sockets: list[socket.socket] | None = None) -> None:
-        """Mark readiness only after the public socket starts accepting."""
+        """Mark readiness only after the public socket starts accepting.
+
+        Args:
+            sockets: Sockets.
+
+        """
         await super().startup(sockets=sockets)
         if self.started and not self._readiness_state.is_draining:
             self._readiness_state.is_public_accepting = True
 
     async def shutdown(self, sockets: list[socket.socket] | None = None) -> None:
-        """Withdraw readiness before the public listener begins draining."""
+        """Withdraw readiness before the public listener begins draining.
+
+        Args:
+            sockets: Sockets.
+
+        """
         self._readiness_state.start_draining()
         await super().shutdown(sockets=sockets)
 
@@ -63,7 +79,19 @@ def _build_server_config(
     is_logging_enabled: bool,
     lifespan: str,
 ) -> uvicorn.Config:
-    """Build one fixed single-worker server configuration."""
+    """Build one fixed single-worker server configuration.
+
+    Args:
+        application: FastAPI application to serve or test.
+        host: Host name or address.
+        port: Network port.
+        is_logging_enabled: Whether logging is enabled.
+        lifespan: Uvicorn lifespan mode.
+
+    Returns:
+        One fixed single-worker server configuration.
+
+    """
     return uvicorn.Config(
         application,
         host=host,
@@ -82,7 +110,15 @@ async def serve_applications(
     *,
     is_logging_enabled: bool,
 ) -> None:
-    """Serve both listeners until either server stops."""
+    """Serve both listeners until either server stops.
+
+    Args:
+        public_application: Public application.
+        readiness_application: Readiness application.
+        readiness_state: State of the readiness.
+        is_logging_enabled: Whether logging is enabled.
+
+    """
     public_server = _PublicServer(
         _build_server_config(
             public_application,
@@ -122,7 +158,15 @@ def run_applications(
     *,
     settings: ApplicationSettings,
 ) -> None:
-    """Run both listeners in the process event loop."""
+    """Run both listeners in the process event loop.
+
+    Args:
+        public_application: Public application.
+        readiness_application: Readiness application.
+        readiness_state: State of the readiness.
+        settings: Application settings.
+
+    """
     asyncio.run(
         serve_applications(
             public_application,

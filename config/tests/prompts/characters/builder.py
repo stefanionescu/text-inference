@@ -57,7 +57,20 @@ _PERSONALITY_MODULES: dict[str, ModuleType] = {
 
 @dataclass(frozen=True, slots=True)
 class _PersonalityBlocks:
-    """Prompt sections for one personality variant."""
+    """Prompt sections for one personality variant.
+
+    Attributes:
+        voiceprint: Prompt section about voice.
+        sexual_tone: Prompt section about tone.
+        traits: Prompt section about traits.
+        messages: Messages of the conversation.
+        helpfulness: Prompt section about helpfulness.
+        quirks: Prompt section about quirks.
+        likes: Prompt section about likes.
+        features: Feature setting of the export.
+        boundaries: Boundary setting of the calibration.
+
+    """
 
     voiceprint: str
     sexual_tone: str
@@ -71,7 +84,19 @@ class _PersonalityBlocks:
 
 
 def _text_block(module: ModuleType, name: str) -> str:
-    """Return a named text block from a personality module."""
+    """Return a named text block from a personality module.
+
+    Args:
+        module: Python module to read.
+        name: Name to use for the lookup.
+
+    Returns:
+        A named text block from a personality module.
+
+    Raises:
+        TypeError: `__name__`.`name` must be a string.
+
+    """
     value = getattr(module, name)
     if not isinstance(value, str):
         message = f"{module.__name__}.{name} must be a string"
@@ -85,7 +110,17 @@ def _personality_blocks(
     *,
     voiceprint_prefix: str | None = None,
 ) -> _PersonalityBlocks:
-    """Return all prompt sections for a personality module."""
+    """Return all prompt sections for a personality module.
+
+    Args:
+        module: Python module to read.
+        prefix: Text that comes first.
+        voiceprint_prefix: Voiceprint prefix.
+
+    Returns:
+        All prompt sections for a personality module.
+
+    """
     voiceprint = voiceprint_prefix or prefix
     return _PersonalityBlocks(
         voiceprint=_text_block(module, f"{voiceprint}_VOICEPRINT_BLOCK"),
@@ -101,7 +136,17 @@ def _personality_blocks(
 
 
 def _character_prompt(character_block: str, blocks: _PersonalityBlocks, dislikes_text: str) -> str:
-    """Build a full character prompt from shared and personality blocks."""
+    """Build a full character prompt from shared and personality blocks.
+
+    Args:
+        character_block: Character block.
+        blocks: Prompt sections for one personality.
+        dislikes_text: Text of the dislikes.
+
+    Returns:
+        A full character prompt from shared and personality blocks.
+
+    """
     return f"""{MESSAGE_LENGTH_BLOCK}
 {REALITY_CONSTRAINTS_BLOCK}
 {KNOWLEDGE_BLOCK}
@@ -129,7 +174,17 @@ User's Local Time and Date:
 
 
 def build_character_prompts(character: str, identity_block: str, *, epersona_voiceprint: str) -> dict[str, str]:
-    """Return one character's full prompt for every personality, keyed by the personality's block prefix."""
+    """Return one character's full prompt for every personality, keyed by the personality's block prefix.
+
+    Args:
+        character: Character.
+        identity_block: Identity block.
+        epersona_voiceprint: Epersona voiceprint.
+
+    Returns:
+        One character's full prompt for every personality, keyed by the personality's block prefix.
+
+    """
     voiceprint_prefixes = {"EPERSONA": epersona_voiceprint}
     return {
         prefix: _character_prompt(

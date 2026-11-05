@@ -18,7 +18,17 @@ SamplingCaster = type[float | int]
 
 @dataclass(frozen=True)
 class SamplingFieldSpec:
-    """Validation metadata for a numeric sampling field."""
+    """Validation metadata for a numeric sampling field.
+
+    Attributes:
+        name: Name to use for the lookup.
+        caster: Function that converts the raw sampling value.
+        minimum: Smallest accepted value.
+        maximum: Largest accepted value.
+        invalid_code: Code of the invalid.
+        range_code: Code of the range.
+
+    """
 
     name: str
     caster: SamplingCaster
@@ -30,7 +40,17 @@ class SamplingFieldSpec:
 
 @dataclass(frozen=True)
 class DynamicSamplingField:
-    """Sampling field metadata resolved from runtime settings."""
+    """Sampling field metadata resolved from runtime settings.
+
+    Attributes:
+        name: Name to use for the lookup.
+        caster: Function that converts the raw sampling value.
+        minimum_attribute: Smallest allowed attribute.
+        maximum_attribute: Largest allowed attribute.
+        invalid_code: Code of the invalid.
+        range_code: Code of the range.
+
+    """
 
     name: str
     caster: SamplingCaster
@@ -103,14 +123,35 @@ DYNAMIC_SAMPLING_FIELDS: tuple[DynamicSamplingField, ...] = (
 
 
 def _parse_sampling_value(value: object, caster: SamplingCaster) -> NumericSamplingValue:
-    """Coerce a raw value to the target sampling type."""
+    """Coerce a raw value to the target sampling type.
+
+    Args:
+        value: Value to check or convert.
+        caster: Function that converts the raw sampling value.
+
+    Returns:
+        The numeric sampling value.
+
+    """
     if caster is int:
         return _parse_int(value)
     return _parse_float(value)
 
 
 def _parse_float(value: object) -> float:
-    """Coerce a value to float, rejecting bools and invalid types."""
+    """Coerce a value to float, rejecting bools and invalid types.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        The resulting number.
+
+    Raises:
+        TypeError: Bool not allowed.
+        ValueError: Empty string.
+
+    """
     if isinstance(value, bool):
         message = "bool not allowed"
         raise TypeError(message)
@@ -127,7 +168,19 @@ def _parse_float(value: object) -> float:
 
 
 def _parse_int(value: object) -> int:
-    """Coerce a value to int, rejecting bools and non-integer floats."""
+    """Coerce a value to int, rejecting bools and non-integer floats.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        The resulting number.
+
+    Raises:
+        TypeError: Bool not allowed.
+        ValueError: Non-integer float.
+
+    """
     if isinstance(value, bool):
         message = "bool not allowed"
         raise TypeError(message)
@@ -149,7 +202,18 @@ def _parse_int(value: object) -> int:
 
 
 def _get_sampling_block(message: Mapping[str, object]) -> Mapping[str, object]:
-    """Return nested sampling overrides from a message."""
+    """Return nested sampling overrides from a message.
+
+    Args:
+        message: Message to send, check, or report.
+
+    Returns:
+        Nested sampling overrides from a message.
+
+    Raises:
+        ValidationError: Invalid_sampling_payload.
+
+    """
     sampling_block = message.get("sampling")
     if sampling_block is None:
         return {}
@@ -164,7 +228,17 @@ def _read_field_value(
     message: Mapping[str, object],
     sampling_block: Mapping[str, object],
 ) -> object | None:
-    """Read a sampling field from nested or top-level payload."""
+    """Read a sampling field from nested or top-level payload.
+
+    Args:
+        field: Name of the field.
+        message: Message to send, check, or report.
+        sampling_block: Sampling block.
+
+    Returns:
+        A sampling field from nested or top-level payload.
+
+    """
     raw_value = sampling_block.get(field)
     if raw_value is None:
         raw_value = message.get(field)
@@ -175,7 +249,19 @@ def _validate_numeric_field(
     raw_value: object,
     field: SamplingFieldSpec,
 ) -> NumericSamplingValue:
-    """Validate and coerce one numeric sampling field."""
+    """Validate and coerce one numeric sampling field.
+
+    Args:
+        raw_value: Unvalidated value as received.
+        field: Name of the field.
+
+    Returns:
+        The numeric sampling value.
+
+    Raises:
+        ValidationError: The operation fails with this error.
+
+    """
     try:
         normalized = _parse_sampling_value(raw_value, field.caster)
     except (TypeError, ValueError):
@@ -195,7 +281,17 @@ def _extract_numeric_overrides(
     *,
     sampling_settings: SamplingSettings,
 ) -> dict[str, NumericSamplingValue]:
-    """Extract numeric sampling overrides from a message."""
+    """Extract numeric sampling overrides from a message.
+
+    Args:
+        message: Message to send, check, or report.
+        sampling_block: Sampling block.
+        sampling_settings: Settings for sampling.
+
+    Returns:
+        Numeric sampling overrides from a message.
+
+    """
     overrides: dict[str, NumericSamplingValue] = {}
     resolved_fields = tuple(
         SamplingFieldSpec(
@@ -223,7 +319,19 @@ def _extract_sanitize_override(
     message: Mapping[str, object],
     sampling_block: Mapping[str, object],
 ) -> bool | None:
-    """Extract the optional sanitize_output override."""
+    """Extract the optional sanitize_output override.
+
+    Args:
+        message: Message to send, check, or report.
+        sampling_block: Sampling block.
+
+    Returns:
+        The optional sanitize_output override.
+
+    Raises:
+        ValidationError: Invalid_sanitize_output.
+
+    """
     sanitize_raw = _read_field_value("sanitize_output", message, sampling_block)
     if sanitize_raw is None:
         return None
@@ -249,9 +357,6 @@ def extract_sampling_overrides(
 
     Returns:
         Dict of validated sampling overrides.
-
-    Raises:
-        ValidationError: If any parameter fails type or range validation.
 
     """
     sampling_block = _get_sampling_block(message)

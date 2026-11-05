@@ -55,7 +55,15 @@ _REGEX_FLAGS = {
 
 
 def _compile_flags(flag_names: tuple[str, ...]) -> re.RegexFlag:
-    """Return combined regex flags from static flag names."""
+    """Return combined regex flags from static flag names.
+
+    Args:
+        flag_names: Flag names.
+
+    Returns:
+        Combined regex flags from static flag names.
+
+    """
     flags = re.NOFLAG
     for flag_name in flag_names:
         flags |= _REGEX_FLAGS[flag_name]
@@ -63,7 +71,16 @@ def _compile_flags(flag_names: tuple[str, ...]) -> re.RegexFlag:
 
 
 def _compile(pattern_text: str, flag_names: tuple[str, ...] = ()) -> re.Pattern[str]:
-    """Compile a configured regex pattern."""
+    """Compile a configured regex pattern.
+
+    Args:
+        pattern_text: Text of the pattern.
+        flag_names: Flag names.
+
+    Returns:
+        The re.
+
+    """
     return re.compile(pattern_text, _compile_flags(flag_names))
 
 
@@ -101,7 +118,15 @@ EMAIL_PATTERN = _compile(EMAIL_PATTERN_TEXT, EMAIL_PATTERN_FLAGS)
 
 
 def _strip_escaped_quotes(text: str) -> str:
-    r"""Remove escaped quote sequences like \" or \\\" entirely."""
+    r"""Remove escaped quote sequences like \" or \\\" entirely.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     if not text:
         return ""
     return ESCAPED_QUOTE_PATTERN.sub("", text)

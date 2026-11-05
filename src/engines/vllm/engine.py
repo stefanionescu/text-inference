@@ -16,9 +16,9 @@ import logging
 from src.engines.protocol import EngineOutput, CompletionText
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence, AsyncIterator
+    from collections.abc import Callable, Sequence, AsyncIterator, AsyncGenerator
 
-    from src.engines.protocol import EngineOutputStream, SamplingParametersRequest
+    from src.engines.protocol import SamplingParametersRequest
 
     type SamplingParametersFactory = Callable[..., object]
 
@@ -30,7 +30,12 @@ class _VLLMCompletion(CompletionText, Protocol):
 
     @property
     def token_ids(self) -> Sequence[int]:
-        """Cumulative completion token identifiers."""
+        """Cumulative completion token identifiers.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
 
@@ -39,12 +44,22 @@ class _VLLMOutput(Protocol):
 
     @property
     def outputs(self) -> Sequence[_VLLMCompletion]:
-        """Completion outputs in this result."""
+        """Completion outputs in this result.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
     @property
     def finished(self) -> bool:
-        """Whether generation is complete."""
+        """Whether generation is complete.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
 
@@ -58,15 +73,41 @@ class _VLLMRuntime(Protocol):
         sampling_params: object,
         request_id: str,
     ) -> AsyncIterator[_VLLMOutput]:
-        """Start one asynchronous generation stream."""
+        """Start one asynchronous generation stream.
+
+        Args:
+            prompt: Prompt text.
+            sampling_params: Sampling params.
+            request_id: ID of the request.
+
+        Returns:
+            The async iterator.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(prompt, sampling_params, request_id)
 
     async def abort(self, request_id: str) -> None:
-        """Abort one generation request."""
+        """Abort one generation request.
+
+        Args:
+            request_id: ID of the request.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(request_id)
 
     def shutdown(self) -> None:
-        """Release runtime workers."""
+        """Release runtime workers.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
     async def reset_prefix_cache(
@@ -75,7 +116,19 @@ class _VLLMRuntime(Protocol):
         reset_running_requests: bool = False,
         reset_connector: bool = False,
     ) -> bool:
-        """Reset the prefix cache."""
+        """Reset the prefix cache.
+
+        Args:
+            reset_running_requests: Reset running requests.
+            reset_connector: Reset connector.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(reset_running_requests, reset_connector)
 
 
@@ -83,7 +136,7 @@ class VLLMEngine:
     """vLLM-based inference engine with cache management.
 
     Attributes:
-        _engine: The underlying vLLM AsyncLLM instance.
+        can_reset_cache: Whether it can reset cache.
 
     """
 
@@ -94,12 +147,26 @@ class VLLMEngine:
         llm_engine: _VLLMRuntime,
         sampling_parameters_factory: SamplingParametersFactory,
     ) -> None:
-        """Initialize the vLLM engine adapter."""
+        """Initialize the vLLM engine adapter.
+
+        Args:
+            llm_engine: vLLM runtime engine.
+            sampling_parameters_factory: Sampling parameters factory.
+
+        """
         self._engine = llm_engine
         self._sampling_parameters_factory = sampling_parameters_factory
 
     def create_sampling_parameters(self, request: SamplingParametersRequest) -> object:
-        """Create vLLM 0.25 sampling parameters."""
+        """Create vLLM 0.25 sampling parameters.
+
+        Args:
+            request: Request to run.
+
+        Returns:
+            VLLM 0.25 sampling parameters.
+
+        """
         return self._sampling_parameters_factory(
             temperature=request.temperature,
             top_p=request.top_p,
@@ -113,7 +180,12 @@ class VLLMEngine:
             logit_bias=request.logit_bias,
         )
 
-    async def generate_stream(self, prompt: str, sampling_parameters: object, request_id: str) -> EngineOutputStream:
+    async def generate_stream(
+        self,
+        prompt: str,
+        sampling_parameters: object,
+        request_id: str,
+    ) -> AsyncGenerator[EngineOutput, None]:
         """Stream generation using vLLM's generate API.
 
         Args:
@@ -121,8 +193,11 @@ class VLLMEngine:
             sampling_parameters: vLLM SamplingParams instance.
             request_id: Unique identifier for tracking/abortion.
 
+        Returns:
+            Generation using vLLM's generate API.
+
         Yields:
-            EngineOutput with cumulative text and completion status.
+            Generation using vLLM's generate API.
 
         """
         engine = self._engine
@@ -140,7 +215,12 @@ class VLLMEngine:
             )
 
     async def abort(self, request_id: str) -> None:
-        """Abort a vLLM generation request."""
+        """Abort a vLLM generation request.
+
+        Args:
+            request_id: ID of the request.
+
+        """
         await self._engine.abort(request_id)
 
     async def shutdown(self) -> None:
@@ -149,7 +229,15 @@ class VLLMEngine:
         logger.info("vLLM: engine shutdown complete")
 
     async def reset_caches(self, reason: str) -> bool:
-        """Attempt a prefix reset without preempting active requests."""
+        """Attempt a prefix reset without preempting active requests.
+
+        Args:
+            reason: Reason text to report.
+
+        Returns:
+            Whether the check passes.
+
+        """
         logger.info("resetting vLLM cache (reason=%s)", reason)
         return await self._engine.reset_prefix_cache(
             reset_running_requests=False,

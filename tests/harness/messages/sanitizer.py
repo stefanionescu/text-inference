@@ -11,7 +11,15 @@ CASE_ITEM_WIDTH = 2
 
 
 def _read_cases() -> list[tuple[str, list[int]]]:
-    """Load streaming sanitizer cases from JSON fixture examples."""
+    """Load streaming sanitizer cases from JSON fixture examples.
+
+    Returns:
+        Streaming sanitizer cases from JSON fixture examples.
+
+    Raises:
+        TypeError: Streaming sanitizer fixture must be a list.
+
+    """
     raw: object = json.loads(_EXAMPLE_PATH.read_text(encoding="utf-8"))
     if not isinstance(raw, list):
         message = "streaming sanitizer fixture must be a list"

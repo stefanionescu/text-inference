@@ -6,12 +6,26 @@ from typing import TYPE_CHECKING, Protocol
 from dataclasses import dataclass
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator, AsyncGenerator
+    from collections.abc import AsyncIterator
 
 
 @dataclass(frozen=True)
 class SamplingParametersRequest:
-    """Parameters needed to create engine-specific sampling settings."""
+    """Parameters needed to create engine-specific sampling settings.
+
+    Attributes:
+        temperature: Sampling temperature.
+        top_p: Top-P sampling value.
+        top_k: Top-K sampling value.
+        min_p: Minimum-probability sampling value.
+        repetition_penalty: Repetition penalty.
+        presence_penalty: Presence penalty.
+        frequency_penalty: Frequency penalty.
+        maximum_tokens: Largest allowed tokens.
+        stop: Stop strings of the generation.
+        logit_bias: Logit bias.
+
+    """
 
     temperature: float = 1.0
     top_p: float = 1.0
@@ -27,14 +41,18 @@ class SamplingParametersRequest:
 
 @dataclass(slots=True)
 class EngineOutput:
-    """Unified output format for streaming generation."""
+    """Unified output format for streaming generation.
+
+    Attributes:
+        text: Text to process.
+        token_ids: Token identifiers.
+        is_finished: Whether it is finished.
+
+    """
 
     text: str
     token_ids: list[int] | None = None
     is_finished: bool = False
-
-
-type EngineOutputStream = AsyncGenerator[EngineOutput, None]
 
 
 class CompletionText(Protocol):
@@ -42,17 +60,38 @@ class CompletionText(Protocol):
 
     @property
     def text(self) -> str:
-        """Cumulative completion text."""
+        """Cumulative completion text.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
 
 class Engine(Protocol):
-    """Inference behavior required by the application runtime."""
+    """Inference behavior required by the application runtime.
+
+    Attributes:
+        can_reset_cache: Whether it can reset cache.
+
+    """
 
     can_reset_cache: bool
 
     def create_sampling_parameters(self, request: SamplingParametersRequest) -> object:
-        """Create sampling parameters for this exact backend version."""
+        """Create sampling parameters for this exact backend version.
+
+        Args:
+            request: Request to run.
+
+        Returns:
+            Sampling parameters for this exact backend version.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(request)
 
     def generate_stream(
@@ -68,8 +107,11 @@ class Engine(Protocol):
             sampling_parameters: Engine-specific sampling parameters.
             request_id: Unique identifier for this request.
 
-        Yields:
+        Returns:
             EngineOutput instances with cumulative text and optional token IDs.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
 
         """
         raise NotImplementedError(prompt, sampling_parameters, request_id)
@@ -80,16 +122,35 @@ class Engine(Protocol):
         Args:
             request_id: The request ID to abort.
 
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
         """
         raise NotImplementedError(request_id)
 
     async def shutdown(self) -> None:
-        """Shutdown the engine and release resources."""
+        """Shutdown the engine and release resources.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
     async def reset_caches(self, reason: str) -> bool:
-        """Reset engine caches when the backend supports it."""
+        """Reset engine caches when the backend supports it.
+
+        Args:
+            reason: Reason text to report.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(reason)
 
 
-__all__ = ["CompletionText", "Engine", "EngineOutput", "EngineOutputStream", "SamplingParametersRequest"]
+__all__ = ["CompletionText", "Engine", "EngineOutput", "SamplingParametersRequest"]

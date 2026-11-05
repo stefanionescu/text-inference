@@ -26,7 +26,13 @@ logger = getLogger(__name__)
 
 @dataclass(slots=True)
 class _SentryState:
-    """Process-wide Sentry lifecycle and rate-limit state."""
+    """Process-wide Sentry lifecycle and rate-limit state.
+
+    Attributes:
+        is_initialized: Whether it is initialized.
+        error_timestamps: Error timestamps.
+
+    """
 
     is_initialized: bool = False
     error_timestamps: dict[str, float] = field(default_factory=dict)
@@ -79,7 +85,16 @@ def capture_error(
     client_id: str | None = None,
     extra: dict[str, object] | None = None,
 ) -> None:
-    """Report an error to Sentry with rate-limiting per error class."""
+    """Report an error to Sentry with rate-limiting per error class.
+
+    Args:
+        error: Error text or error object to report.
+        session_id: ID of the session.
+        request_id: ID of the request.
+        client_id: ID of the client.
+        extra: Extra fields to include.
+
+    """
     if not _SENTRY_STATE.is_initialized:
         return
 
@@ -112,7 +127,15 @@ def add_breadcrumb(
     level: str = "metadata",
     payload: dict[str, object] | None = None,
 ) -> None:
-    """Add a Sentry breadcrumb. No-op when Sentry is disabled."""
+    """Add a Sentry breadcrumb. No-op when Sentry is disabled.
+
+    Args:
+        message: Message to send, check, or report.
+        category: Category label of the record.
+        level: Logging level name.
+        payload: Decoded message fields.
+
+    """
     if not _SENTRY_STATE.is_initialized:
         return
     sentry_sdk.add_breadcrumb(message=message, category=category, level=level, payload=payload or {})

@@ -19,7 +19,15 @@ ONLINE_ACTION = "online"
 
 @dataclass(frozen=True, slots=True)
 class QuantizationPlan:
-    """Resolved checkpoint action and eventual runtime format."""
+    """Resolved checkpoint action and eventual runtime format.
+
+    Attributes:
+        action: Action that the record names.
+        source_format: Format of the source.
+        requested_format: Format of the requested.
+        runtime_format: Format of the runtime.
+
+    """
 
     action: str
     source_format: str | None
@@ -28,7 +36,16 @@ class QuantizationPlan:
 
 
 def _validate_requested_format(engine: str, requested_format: str | None) -> None:
-    """Require a requested export format supported by the selected engine."""
+    """Require a requested export format supported by the selected engine.
+
+    Args:
+        engine: Inference engine that serves the request.
+        requested_format: Format of the requested.
+
+    Raises:
+        ValueError: Quantization format `requested_format` is incompatible with `engine`; expected `allowed`.
+
+    """
     if requested_format is None:
         return
     if requested_format not in QUANTIZATIONS_BY_ENGINE[engine]:
@@ -38,7 +55,16 @@ def _validate_requested_format(engine: str, requested_format: str | None) -> Non
 
 
 def _validate_existing_format(engine: str, source_format: str | None) -> None:
-    """Require an existing format compatible with the selected engine."""
+    """Require an existing format compatible with the selected engine.
+
+    Args:
+        engine: Inference engine that serves the request.
+        source_format: Format of the source.
+
+    Raises:
+        ValueError: Checkpoint format `source_format` is incompatible with the `engine` engine.
+
+    """
     if source_format is None or source_format in QUANTIZATIONS_BY_ENGINE[engine]:
         return
     message = f"Checkpoint format {source_format!r} is incompatible with the {engine} engine"
@@ -46,7 +72,15 @@ def _validate_existing_format(engine: str, source_format: str | None) -> None:
 
 
 def validate_engine(engine: str) -> None:
-    """Require one supported inference engine."""
+    """Require one supported inference engine.
+
+    Args:
+        engine: Inference engine that serves the request.
+
+    Raises:
+        ValueError: Inference engine must be one of `tuple`, got `engine`.
+
+    """
     if engine not in QUANTIZATIONS_BY_ENGINE:
         message = f"Inference engine must be one of {tuple(QUANTIZATIONS_BY_ENGINE)}, got {engine!r}"
         raise ValueError(message)
@@ -57,7 +91,21 @@ def build_quantization_plan(
     source_format: str | None,
     requested_format: str | None,
 ) -> QuantizationPlan:
-    """Resolve the complete source/requested-format matrix."""
+    """Resolve the complete source/requested-format matrix.
+
+    Args:
+        engine: Inference engine that serves the request.
+        source_format: Format of the source.
+        requested_format: Format of the requested.
+
+    Returns:
+        The complete source/requested-format matrix.
+
+    Raises:
+        ValueError: Checkpoint already declares `source_format`. Omit `--quantization` to deploy it unchanged;
+            re-quantization is not supported.
+
+    """
     validate_engine(engine)
     _validate_requested_format(engine, requested_format)
     if source_format is not None and requested_format is not None:

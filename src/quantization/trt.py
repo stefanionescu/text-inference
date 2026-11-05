@@ -24,7 +24,18 @@ _CACHE_REUSE = "reuse"
 
 
 def _parse_binary_flag(value: str) -> bool:
-    """Parse one binary command value."""
+    """Parse one binary command value.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        One binary command value.
+
+    Raises:
+        argparse.ArgumentTypeError: Binary values must be 0 or 1.
+
+    """
     if value not in BINARY_FLAG_VALUES:
         message = "Binary values must be 0 or 1"
         raise argparse.ArgumentTypeError(message)
@@ -32,7 +43,12 @@ def _parse_binary_flag(value: str) -> bool:
 
 
 def _add_request_arguments(parser: argparse.ArgumentParser) -> None:
-    """Add shared ModelOpt artifact arguments."""
+    """Add shared ModelOpt artifact arguments.
+
+    Args:
+        parser: Argument parser to extend.
+
+    """
     parser.add_argument("--source-model", required=True)
     parser.add_argument("--source-dir", dest="source_folder", required=True)
     parser.add_argument("--source-revision", required=True)
@@ -54,7 +70,15 @@ def _add_request_arguments(parser: argparse.ArgumentParser) -> None:
 
 
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse TRT artifact commands."""
+    """Parse TRT artifact commands.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        TRT artifact commands.
+
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -71,7 +95,15 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
 
 
 def _build_request(arguments: argparse.Namespace) -> QuantizationRequest:
-    """Build the exact ModelOpt cache request."""
+    """Build the exact ModelOpt cache request.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    Returns:
+        The exact ModelOpt cache request.
+
+    """
     modelopt_repository = Path(arguments.modelopt_repository).resolve(strict=True)
     revision = read_repository_revision(modelopt_repository)
     source = derive_source_identity(
@@ -107,7 +139,15 @@ def _build_request(arguments: argparse.Namespace) -> QuantizationRequest:
 
 
 def _choose_cache_action(arguments: argparse.Namespace) -> str:
-    """Return whether a matching TRT checkpoint can be reused."""
+    """Return whether a matching TRT checkpoint can be reused.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    Returns:
+        Whether a matching TRT checkpoint can be reused.
+
+    """
     if arguments.is_rebuild_forced:
         return _CACHE_REBUILD
     checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()
@@ -122,7 +162,12 @@ def _choose_cache_action(arguments: argparse.Namespace) -> str:
 
 
 def _finalize_checkpoint(arguments: argparse.Namespace) -> None:
-    """Preserve assets, validate the export, and write provenance."""
+    """Preserve assets, validate the export, and write provenance.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    """
     checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()
     copy_source_assets(Path(arguments.source_folder), checkpoint_folder)
     validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)
@@ -140,7 +185,15 @@ def _finalize_checkpoint(arguments: argparse.Namespace) -> None:
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Run one TRT cache or finalization command."""
+    """Run one TRT cache or finalization command.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The resulting number.
+
+    """
     arguments = _parse_arguments(argument_values)
     if arguments.command == "cache":
         sys.stdout.write(f"{_choose_cache_action(arguments)}\n")

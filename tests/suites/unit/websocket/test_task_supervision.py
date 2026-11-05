@@ -29,7 +29,18 @@ async def _spawn_task(
     request_id: str,
     operation: Callable[[], Awaitable[None]],
 ) -> asyncio.Task[None] | None:
-    """Compose protocol reporting with session-owned task tracking."""
+    """Compose protocol reporting with session-owned task tracking.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+        request_id: ID of the request.
+        operation: Function to run.
+
+    Returns:
+        Protocol reporting with session-owned task tracking.
+
+    """
     return await spawn_session_task(
         state,
         request_id=request_id,
@@ -38,7 +49,16 @@ async def _spawn_task(
 
 
 async def _run_tracked_task(request_id: str, operation: Callable[[], Awaitable[None]]) -> RecordingWebSocket:
-    """Await a supervised task, check it released its tracking slots, and return the socket it wrote to."""
+    """Await a supervised task, check it released its tracking slots, and return the socket it wrote to.
+
+    Args:
+        request_id: ID of the request.
+        operation: Function to run.
+
+    Returns:
+        The socket it wrote to.
+
+    """
     websocket = RecordingWebSocket()
     state = SessionState(meta={})
 

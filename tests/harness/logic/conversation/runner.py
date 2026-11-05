@@ -59,7 +59,18 @@ MAXIMUM_MESSAGES_PER_WINDOW = read_environment_integer("WEBSOCKET_MESSAGES_PER_W
 
 @dataclass(frozen=True, slots=True)
 class ConversationRunRequest:
-    """Inputs for the conversation e2e helper."""
+    """Inputs for the conversation e2e helper.
+
+    Attributes:
+        server_url: Server URL.
+        api_key: Key of the API.
+        prompts: Prompt texts.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        timeout_seconds: Timeout in seconds.
+        sampling: Sampling overrides of the request.
+
+    """
 
     server_url: str
     api_key: str | None
@@ -141,7 +152,15 @@ async def _finish_conversation(websocket: WebSocketClientProtocol, context: _Con
 
 
 async def run_conversation(request: ConversationRunRequest) -> None:
-    """Execute a multi-turn conversation test."""
+    """Execute a multi-turn conversation test.
+
+    Args:
+        request: Request to run.
+
+    Raises:
+        ValueError: Conversation prompt list is empty; nothing to send.
+
+    """
     if not request.prompts:
         message = "Conversation prompt list is empty; nothing to send."
         raise ValueError(message)

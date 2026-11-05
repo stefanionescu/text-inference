@@ -35,7 +35,17 @@ if TYPE_CHECKING:
 
 
 def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: str | None) -> str:
-    """Build the detailed compressed-tensors model card."""
+    """Build the detailed compressed-tensors model card.
+
+    Args:
+        metadata: Metadata fields to read.
+        repo_id: ID of the repo.
+        hf_token: Hugging Face token.
+
+    Returns:
+        The detailed compressed-tensors model card.
+
+    """
     card_fields = build_provenance_fields(metadata, repo_id, hf_token=hf_token)
     recipe = read_metadata_section(metadata, "quantization")
     calibration = read_metadata_section(metadata, "calibration")
@@ -75,7 +85,15 @@ def build_model_card(metadata: Mapping[str, object], repo_id: str, *, hf_token: 
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Upload the configured checkpoint."""
+    """Upload the configured checkpoint.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The resulting number.
+
+    """
     arguments = parse_upload_arguments(argument_values, __doc__, is_format_required=False)
     checkpoint_folder = require_checkpoint_folder(arguments.checkpoint_folder)
     validate_checkpoint(checkpoint_folder, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)

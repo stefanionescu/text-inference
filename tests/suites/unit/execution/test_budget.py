@@ -33,7 +33,20 @@ def _fit_prompt(
     static_prefix: str = "",
     maximum_user_tokens: int | None = None,
 ) -> PromptFitResult:
-    """Fit a prompt with no runtime text and, unless a test passes them, no history or static prefix."""
+    """Fit a prompt with no runtime text and, unless a test passes them, no history or static prefix.
+
+    Args:
+        tokenizer: Tokenizer to use.
+        user_utterance: User utterance.
+        maximum_prompt_tokens: Largest allowed prompt tokens.
+        history_messages: History messages.
+        static_prefix: Static prefix.
+        maximum_user_tokens: Largest allowed user tokens.
+
+    Returns:
+        A prompt with no runtime text and, unless a test passes them, no history or static prefix.
+
+    """
     return fit_prompt_to_budget(
         PromptBudgetRequest(
             static_prefix=static_prefix,

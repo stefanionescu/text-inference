@@ -16,7 +16,12 @@ PACKAGE_MINIMUM_ARGUMENTS = 2
 
 
 def main() -> int:
-    """CLI entry point for shell script integration."""
+    """CLI entry point for shell script integration.
+
+    Returns:
+        The resulting number.
+
+    """
     if len(sys.argv) < PACKAGE_MINIMUM_ARGUMENTS:
         return 1
 

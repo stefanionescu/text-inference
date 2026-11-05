@@ -43,6 +43,12 @@ def add_connection_arguments(
     - ``--api-key`` defaults to the ``API_KEY`` environment value when included.
     - ``--timeout`` bounds one complete transaction.
     - ``--sanitize`` opts into server output sanitization.
+
+    Args:
+        parser: Argument parser to extend.
+        server_help: Help text of the server option.
+        is_api_key_included: Whether API key is included.
+
     """
     default_server = os.getenv("SERVER_URL", DEFAULT_SERVER_URL)
     parser.add_argument(
@@ -70,7 +76,12 @@ def add_connection_arguments(
 
 
 def add_sampling_arguments(parser: ArgumentParser) -> None:
-    """Register standard sampling override options shared across test clients."""
+    """Register standard sampling override options shared across test clients.
+
+    Args:
+        parser: Argument parser to extend.
+
+    """
     parser.add_argument(
         "--temperature",
         type=float,
@@ -109,7 +120,15 @@ def add_sampling_arguments(parser: ArgumentParser) -> None:
 
 
 def build_sampling_payload(arguments: Mapping[str, Any] | Namespace) -> dict[str, float | int | bool]:
-    """Extract CLI sampling overrides into the payload format expected by the server."""
+    """Extract CLI sampling overrides into the payload format expected by the server.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    Returns:
+        CLI sampling overrides into the payload format expected by the server.
+
+    """
     if not isinstance(arguments, Mapping):
         arguments = vars(arguments)
     payload: dict[str, float | int | bool] = {}
@@ -123,7 +142,15 @@ def build_sampling_payload(arguments: Mapping[str, Any] | Namespace) -> dict[str
 
 
 def build_client_parser(description: str) -> ArgumentParser:
-    """Create a parser that already holds the connection and sampling flags, with abbreviations off."""
+    """Create a parser that already holds the connection and sampling flags, with abbreviations off.
+
+    Args:
+        description: Description.
+
+    Returns:
+        A parser that already holds the connection and sampling flags, with abbreviations off.
+
+    """
     parser = argparse.ArgumentParser(description=description, allow_abbrev=False)
     add_connection_arguments(
         parser,
@@ -134,7 +161,12 @@ def build_client_parser(description: str) -> ArgumentParser:
 
 
 def add_profile_arguments(parser: ArgumentParser) -> None:
-    """Register gender and personality flags that default to the GENDER and PERSONALITY environment values."""
+    """Register gender and personality flags that default to the GENDER and PERSONALITY environment values.
+
+    Args:
+        parser: Argument parser to extend.
+
+    """
     parser.add_argument(
         "--gender",
         dest="gender",
@@ -151,14 +183,27 @@ def add_profile_arguments(parser: ArgumentParser) -> None:
 
 
 def parse_client_arguments(parser: ArgumentParser) -> Namespace:
-    """Parse the command line and attach the sampling overrides a client sends to the server."""
+    """Parse the command line and attach the sampling overrides a client sends to the server.
+
+    Args:
+        parser: Argument parser to extend.
+
+    Returns:
+        The server.
+
+    """
     arguments = parser.parse_args()
     arguments.sampling = build_sampling_payload(arguments)
     return arguments
 
 
 def run_client(session: Coroutine[Any, Any, object]) -> None:
-    """Run a client session to its end; a server error exits with status 1 and Ctrl-C exits quietly."""
+    """Run a client session to its end; a server error exits with status 1 and Ctrl-C exits quietly.
+
+    Args:
+        session: Session to use.
+
+    """
     try:
         asyncio.run(session)
     except ServerError:

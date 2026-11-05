@@ -11,7 +11,15 @@ if TYPE_CHECKING:
 
 
 def copy_messages(messages: Sequence[HistoryMessage]) -> list[HistoryMessage]:
-    """Return normalized copies of non-empty messages."""
+    """Return normalized copies of non-empty messages.
+
+    Args:
+        messages: Messages of the conversation.
+
+    Returns:
+        Normalized copies of non-empty messages.
+
+    """
     copied: list[HistoryMessage] = []
     for message in messages:
         content = (message.content or "").strip()
@@ -27,6 +35,13 @@ def group_turns(messages: Sequence[HistoryMessage]) -> list[list[HistoryMessage]
     A turn starts with a user message and keeps any following assistant
     messages until the next user. Leading assistant-only messages are grouped
     together so trimming can still drop them as a unit.
+
+    Args:
+        messages: Messages of the conversation.
+
+    Returns:
+        Messages into trim-safe turns.
+
     """
     turns: list[list[HistoryMessage]] = []
     current_turn: list[HistoryMessage] | None = None
@@ -57,7 +72,15 @@ def group_turns(messages: Sequence[HistoryMessage]) -> list[list[HistoryMessage]
 
 
 def flatten_turns(turns: Sequence[Sequence[HistoryMessage]]) -> list[HistoryMessage]:
-    """Flatten grouped turns back into normalized messages."""
+    """Flatten grouped turns back into normalized messages.
+
+    Args:
+        turns: Conversation turns.
+
+    Returns:
+        Grouped turns back into normalized messages.
+
+    """
     return copy_messages([message for turn in turns for message in turn])
 
 

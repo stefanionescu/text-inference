@@ -12,7 +12,13 @@ class SlidingWindowPacer:
     """Asynchronous pacer that enforces a rolling window cap."""
 
     def __init__(self, limit: int, window_seconds: float) -> None:
-        """Initialize the pacer with a maximum event count and window."""
+        """Initialize the pacer with a maximum event count and window.
+
+        Args:
+            limit: Largest number to allow.
+            window_seconds: Window in seconds.
+
+        """
         self.limit = max(0, int(limit))
         self.window_seconds = max(0.0, float(window_seconds))
         self._events: deque[float] = collections.deque()

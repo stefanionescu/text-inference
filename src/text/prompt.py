@@ -27,6 +27,13 @@ def sanitize_prompt(raw: object | None, *, max_chars: int | None = None) -> str:
         raw: Input prompt value.
         max_chars: Optional post-sanitization character limit.
 
+    Returns:
+        The updated text.
+
+    Raises:
+        TypeError: Prompt must be a string.
+        ValueError: Prompt is required.
+
     """
     if raw is None:
         message = "prompt is required"

@@ -28,7 +28,13 @@ class SessionRuntime:
         tokenizer: ThreadSafeTokenizer,
         settings: ApplicationSettings,
     ) -> None:
-        """Initialize the session services with resolved startup settings."""
+        """Initialize the session services with resolved startup settings.
+
+        Args:
+            tokenizer: Tokenizer to use.
+            settings: Application settings.
+
+        """
         self.tokenizer = tokenizer
         self.history_config = settings.history
         self.session_settings = settings.session
@@ -44,7 +50,15 @@ class SessionRuntime:
     # ============================================================================
 
     def initialize_session(self, state: SessionState) -> dict[str, Any]:
-        """Populate a fresh session state with default metadata."""
+        """Populate a fresh session state with default metadata.
+
+        Args:
+            state: State of the session or test run.
+
+        Returns:
+            The resulting mapping.
+
+        """
         if state.history_messages is None:
             state.history_messages = []
         timestamp = format_session_timestamp()
@@ -71,7 +85,20 @@ class SessionRuntime:
         static_prefix: str,
         runtime_text: str = "",
     ) -> list[HistoryMessage]:
-        """Exact-fit seeded history at start time and reject impossible latest turns."""
+        """Exact-fit seeded history at start time and reject impossible latest turns.
+
+        Args:
+            state: State of the session or test run.
+            static_prefix: Static prefix.
+            runtime_text: Text of the runtime.
+
+        Returns:
+            The resulting items.
+
+        Raises:
+            ValueError: Seed history exceeds exact context budget at session start.
+
+        """
         original_history = self.history.get_messages(state)
         if not original_history:
             return []

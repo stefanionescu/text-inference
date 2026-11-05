@@ -29,6 +29,13 @@ async def send_error(
 
     If status is not provided, it is looked up from ERROR_CODE_TO_STATUS
     using the code. Falls back to 500 if not found.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        status: Status code to report.
+        code: Error or close code.
+        message: Message to send, check, or report.
+
     """
     resolved_status = status if status is not None else ERROR_CODE_TO_STATUS.get(code, WEBSOCKET_STATUS_INTERNAL)
     await safe_send_flat(websocket, "error", status=resolved_status, code=code, message=message)
@@ -41,7 +48,15 @@ async def reject_connection(
     message: str,
     close_code: int,
 ) -> None:
-    """Accept connection briefly to send an error, then close immediately."""
+    """Accept connection briefly to send an error, then close immediately.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        code: Error or close code.
+        message: Message to send, check, or report.
+        close_code: Code of the close.
+
+    """
     await websocket.accept()
     await send_error(websocket, code=code, message=message)
     await websocket.close(code=close_code)

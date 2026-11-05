@@ -17,7 +17,12 @@ _DOWNLOAD_SNAPSHOT: Callable[..., str] = cast("Callable[..., str]", huggingface_
 
 
 def main() -> int:
-    """Download the exact checkpoint declared by Docker build arguments."""
+    """Download the exact checkpoint declared by Docker build arguments.
+
+    Returns:
+        The resulting number.
+
+    """
     model = os.environ["MODEL"]
     revision = os.environ["MODEL_REVISION"]
     target = os.environ["MODEL_PATH"]

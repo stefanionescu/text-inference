@@ -41,7 +41,15 @@ _REQUEST_TIMEOUT_SECONDS = 30.0
 
 @dataclass(frozen=True, slots=True)
 class ModelInspection:
-    """Immutable source identity and deployment quantization decision."""
+    """Immutable source identity and deployment quantization decision.
+
+    Attributes:
+        model: Model name or local checkpoint path.
+        resolved_revision: Revision of the resolved.
+        detected_format: Format of the detected.
+        plan: Prepared plan to carry out.
+
+    """
 
     model: str
     resolved_revision: str
@@ -55,7 +63,21 @@ def _json_request(
     *,
     is_missing_allowed: bool = False,
 ) -> object | None:
-    """Read one authenticated Hugging Face JSON response."""
+    """Read one authenticated Hugging Face JSON response.
+
+    Args:
+        path: File system path.
+        token: Hugging Face access token or token text.
+        is_missing_allowed: Whether missing is allowed.
+
+    Returns:
+        One authenticated Hugging Face JSON response.
+
+    Raises:
+        RuntimeError: Hugging Face request failed with HTTP `status`: `path`.
+        ValueError: Hugging Face request paths must be absolute.
+
+    """
     if not path.startswith("/"):
         message = "Hugging Face request paths must be absolute"
         raise ValueError(message)
@@ -77,7 +99,18 @@ def _json_request(
 
 
 def _mapping(value: object) -> dict[str, object]:
-    """Return one string-keyed JSON mapping."""
+    """Return one string-keyed JSON mapping.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        One string-keyed JSON mapping.
+
+    Raises:
+        TypeError: Hugging Face returned an invalid model response.
+
+    """
     if not isinstance(value, dict):
         message = "Hugging Face returned an invalid model response"
         raise TypeError(message)
@@ -85,7 +118,18 @@ def _mapping(value: object) -> dict[str, object]:
 
 
 def _local_payloads(model_folder: Path) -> list[tuple[str, object]]:
-    """Read supported local quantization configuration files."""
+    """Read supported local quantization configuration files.
+
+    Args:
+        model_folder: Folder of the model.
+
+    Returns:
+        Supported local quantization configuration files.
+
+    Raises:
+        FileNotFoundError: Model configuration was not found.
+
+    """
     payloads = [
         (filename, json.loads(config_path.read_text(encoding="utf-8")))
         for filename in QUANTIZATION_CONFIG_FILENAMES
@@ -98,7 +142,18 @@ def _local_payloads(model_folder: Path) -> list[tuple[str, object]]:
 
 
 def _pinned_revision(response: dict[str, object]) -> str:
-    """Read and validate one immutable Hub revision."""
+    """Read and validate one immutable Hub revision.
+
+    Args:
+        response: Decoded response fields.
+
+    Returns:
+        And validate one immutable Hub revision.
+
+    Raises:
+        ValueError: Hugging Face did not return an immutable model revision.
+
+    """
     resolved_revision = response.get("sha")
     if not isinstance(resolved_revision, str) or not _COMMIT_PATTERN.fullmatch(resolved_revision):
         message = "Hugging Face did not return an immutable model revision"
@@ -107,7 +162,15 @@ def _pinned_revision(response: dict[str, object]) -> str:
 
 
 def _sibling_filenames(response: dict[str, object]) -> set[str]:
-    """Read the model repository filenames advertised by the Hub API."""
+    """Read the model repository filenames advertised by the Hub API.
+
+    Args:
+        response: Decoded response fields.
+
+    Returns:
+        The model repository filenames advertised by the Hub API.
+
+    """
     siblings = response.get("siblings")
     if not isinstance(siblings, list):
         return set()
@@ -126,7 +189,21 @@ def _remote_payloads(
     filenames: set[str],
     token: str | None,
 ) -> list[tuple[str, object]]:
-    """Read the remote checkpoint files that may declare quantization."""
+    """Read the remote checkpoint files that may declare quantization.
+
+    Args:
+        model_path: Path of the model.
+        resolved_revision: Revision of the resolved.
+        filenames: Names of the files.
+        token: Hugging Face access token or token text.
+
+    Returns:
+        The remote checkpoint files that may declare quantization.
+
+    Raises:
+        FileNotFoundError: Model configuration was not found.
+
+    """
     payloads: list[tuple[str, object]] = []
     for filename in QUANTIZATION_CONFIG_FILENAMES:
         if filenames and filename not in filenames:
@@ -142,7 +219,17 @@ def _remote_payloads(
 
 
 def _remote_metadata(model: str, revision: str, token: str | None) -> tuple[str, list[tuple[str, object]]]:
-    """Resolve one immutable Hub revision and read its small config files."""
+    """Resolve one immutable Hub revision and read its small config files.
+
+    Args:
+        model: Model name or local checkpoint path.
+        revision: Model revision to use.
+        token: Hugging Face access token or token text.
+
+    Returns:
+        One immutable Hub revision and read its small config files.
+
+    """
     model_path = quote(model, safe="/")
     revision_path = quote(revision, safe="")
     metadata_path = f"/api/models/{model_path}/revision/{revision_path}"
@@ -157,7 +244,16 @@ def _remote_metadata(model: str, revision: str, token: str | None) -> tuple[str,
 
 
 def _validate_allowlist(model: str, engine: str) -> None:
-    """Require a local directory or an engine-allowlisted Hub model."""
+    """Require a local directory or an engine-allowlisted Hub model.
+
+    Args:
+        model: Model name or local checkpoint path.
+        engine: Inference engine that serves the request.
+
+    Raises:
+        ValueError: Model must be allowlisted for `engine` or a local directory: `model`.
+
+    """
     if Path(model).is_dir():
         return
     allowed_models = (
@@ -171,7 +267,15 @@ def _validate_allowlist(model: str, engine: str) -> None:
 
 
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse the internal early-inspection command."""
+    """Parse the internal early-inspection command.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The internal early-inspection command.
+
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--engine", required=True, choices=("trt", "vllm"))
@@ -188,7 +292,19 @@ def inspect_model(
     revision: str = DEFAULT_MODEL_REVISION,
     token: str | None = None,
 ) -> ModelInspection:
-    """Resolve source identity, detect metadata, and validate the requested action."""
+    """Resolve source identity, detect metadata, and validate the requested action.
+
+    Args:
+        model: Model name or local checkpoint path.
+        engine: Inference engine that serves the request.
+        requested_format: Format of the requested.
+        revision: Model revision to use.
+        token: Hugging Face access token or token text.
+
+    Returns:
+        Source identity, detect metadata, and validate the requested action.
+
+    """
     _validate_allowlist(model, engine)
     resolved_revision, detected_format = inspect_metadata(model, revision=revision, token=token)
     plan = build_quantization_plan(engine, detected_format, requested_format)
@@ -201,7 +317,20 @@ def inspect_metadata(
     revision: str = DEFAULT_MODEL_REVISION,
     token: str | None = None,
 ) -> tuple[str, str | None]:
-    """Resolve source identity and format without applying engine policy."""
+    """Resolve source identity and format without applying engine policy.
+
+    Args:
+        model: Model name or local checkpoint path.
+        revision: Model revision to use.
+        token: Hugging Face access token or token text.
+
+    Returns:
+        Source identity and format without applying engine policy.
+
+    Raises:
+        NotADirectoryError: Model path must be a directory.
+
+    """
     model_path = Path(model).expanduser()
     if model_path.exists() and not model_path.is_dir():
         message = "Model path must be a directory"
@@ -216,7 +345,18 @@ def inspect_metadata(
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Print fixed-key tab-separated inspection results for host orchestration."""
+    """Print fixed-key tab-separated inspection results for host orchestration.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The resulting number.
+
+    Raises:
+        ValueError: Inspection value for `key` is not safe to persist.
+
+    """
     arguments = _parse_arguments(argument_values)
     try:
         inspection = inspect_model(

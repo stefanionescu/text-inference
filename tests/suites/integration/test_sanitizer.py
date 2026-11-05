@@ -76,13 +76,26 @@ def test_sanitizer_literals(
     splits: list[int],
     expected: str,
 ) -> None:
-    """Test streaming sanitizer matches literal expected output."""
+    """Test streaming sanitizer matches literal expected output.
+
+    Args:
+        text: Text to process.
+        splits: Pieces of text to stream.
+        expected: Value that the test expects.
+
+    """
     assert _stream_chunks(text, splits) == expected
 
 
 @pytest.mark.parametrize(("text", "splits"), STREAMING_SANITIZER_CASES)
 def test_sanitizer_chunks(text: str, splits: list[int]) -> None:
-    """Test streaming sanitizer is chunk boundary stable."""
+    """Test streaming sanitizer is chunk boundary stable.
+
+    Args:
+        text: Text to process.
+        splits: Pieces of text to stream.
+
+    """
     streamed = _stream_chunks(text, splits)
     single_chunk = _stream_chunks(text, [])
     assert streamed == single_chunk

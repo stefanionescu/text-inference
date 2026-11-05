@@ -36,7 +36,14 @@ async def _run_request(
     request_id: str,
     operation: Callable[[], Awaitable[None]],
 ) -> None:
-    """Release matching request state when its task finishes."""
+    """Release matching request state when its task finishes.
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
+        operation: Function to run.
+
+    """
     try:
         await operation()
     finally:
@@ -52,6 +59,14 @@ def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:
     - The session doesn't exist
     - The session has is_cancel_requested=True
     - The session's active_request_id differs from the given request_id
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
+
+    Returns:
+        Whether a request has been cancelled or superseded.
+
     """
     if not state:
         return True
@@ -62,7 +77,15 @@ def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:
 
 
 def has_running_task(state: SessionState | None) -> bool:
-    """Check if the session has a running task."""
+    """Check if the session has a running task.
+
+    Args:
+        state: State of the session or test run.
+
+    Returns:
+        Whether the session has a running task.
+
+    """
     if state is None:
         return False
     task = state.active_request_task
@@ -73,6 +96,10 @@ def has_running_task(state: SessionState | None) -> bool:
 
 def begin_session_request(state: SessionState, request_id: str) -> bool:
     """Start tracking a new active request.
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
 
     Returns:
         False when the session is already closed; otherwise True.
@@ -92,7 +119,14 @@ def attach_request_task(
     request_id: str,
     task: asyncio.Task[object],
 ) -> None:
-    """Attach a task handle to the matching active request only."""
+    """Attach a task handle to the matching active request only.
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
+        task: Task to wait for or cancel.
+
+    """
     if state.lifecycle_state == "closed":
         return
     if state.active_request_id != request_id:
@@ -105,6 +139,10 @@ def cancel_session_requests(state: SessionState) -> None:
 
     Sets is_cancel_requested so any in-flight generation knows to stop yielding
     tokens.
+
+    Args:
+        state: State of the session or test run.
+
     """
     state.lifecycle_state = "cancelling"
     state.is_cancel_requested = True
@@ -124,6 +162,15 @@ def cleanup_session_requests(
     By default, cleanup only applies when request_id matches the current
     active request. This prevents stale background tasks from clearing newer
     request state.
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
+        is_forced: Whether it is forced.
+
+    Returns:
+        And clear request IDs from the session.
+
     """
     if not state:
         return {"active": ""}
@@ -139,7 +186,12 @@ def cleanup_session_requests(
 
 
 def close_session_requests(state: SessionState) -> None:
-    """Mark the session closed and clear all active request pointers."""
+    """Mark the session closed and clear all active request pointers.
+
+    Args:
+        state: State of the session or test run.
+
+    """
     state.lifecycle_state = "closed"
     state.is_cancel_requested = True
     state.active_request_id = None
@@ -152,7 +204,17 @@ async def spawn_session_task(
     request_id: str,
     operation: Callable[[], Awaitable[None]],
 ) -> asyncio.Task[None] | None:
-    """Atomically create and attach a supervised session request."""
+    """Atomically create and attach a supervised session request.
+
+    Args:
+        state: State of the session or test run.
+        request_id: ID of the request.
+        operation: Function to run.
+
+    Returns:
+        The task.
+
+    """
     async with state.request_lock:
         if state.lifecycle_state != "idle" or has_running_task(state):
             return None
@@ -165,7 +227,13 @@ async def spawn_session_task(
 
 
 async def abort_session_requests(state: SessionState | None, engine: Engine) -> None:
-    """Cancel and await active work, then clear only the captured request."""
+    """Cancel and await active work, then clear only the captured request.
+
+    Args:
+        state: State of the session or test run.
+        engine: Inference engine that serves the request.
+
+    """
     if state is None:
         return
     async with state.request_lock:

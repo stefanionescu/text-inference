@@ -28,7 +28,16 @@ if TYPE_CHECKING:
 
 
 def _milliseconds_since_sent(state: StreamState, timestamp: float | None) -> float | None:
-    """Calculate milliseconds elapsed since the request was sent."""
+    """Calculate milliseconds elapsed since the request was sent.
+
+    Args:
+        state: State of the session or test run.
+        timestamp: Time as seconds since the epoch.
+
+    Returns:
+        Milliseconds elapsed since the request was sent.
+
+    """
     if timestamp is None:
         return None
     return (timestamp - state.sent_timestamp) * 1000.0
@@ -40,7 +49,16 @@ def _milliseconds_since_sent(state: StreamState, timestamp: float | None) -> flo
 
 
 def record_token(state: StreamState, chunk: str) -> dict[str, float | None]:
-    """Record a streaming token and return any newly triggered metrics."""
+    """Record a streaming token and return any newly triggered metrics.
+
+    Args:
+        state: State of the session or test run.
+        chunk: One piece of streamed text.
+
+    Returns:
+        Any newly triggered metrics.
+
+    """
     metrics: dict[str, float | None] = {}
     if not chunk:
         return metrics
@@ -64,7 +82,16 @@ def record_token(state: StreamState, chunk: str) -> dict[str, float | None]:
 
 
 def finalize_metrics(state: StreamState, *, is_cancelled: bool = False) -> dict[str, Any]:
-    """Build the final metrics dict after streaming completes."""
+    """Build the final metrics dict after streaming completes.
+
+    Args:
+        state: State of the session or test run.
+        is_cancelled: Whether it is cancelled.
+
+    Returns:
+        The final metrics dict after streaming completes.
+
+    """
     done_timestamp = time.perf_counter()
     first_byte_latency_milliseconds = _milliseconds_since_sent(state, state.first_token_timestamp)
     stream_milliseconds = None
@@ -93,7 +120,20 @@ def finalize_metrics(state: StreamState, *, is_cancelled: bool = False) -> dict[
 
 
 async def consume_stream(websocket: WebSocketClientProtocol, state: StreamState) -> str:
-    """Consume streaming response until done message, tracking metrics."""
+    """Consume streaming response until done message, tracking metrics.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+
+    Returns:
+        The resulting text.
+
+    Raises:
+        RuntimeError: WebSocket closed before receiving 'done'.
+        StreamError: The operation fails with this error.
+
+    """
     async for message in iter_messages(websocket):
         message_type = message.get("type")
 

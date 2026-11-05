@@ -27,7 +27,17 @@ def select_rate_limiter(
     message_limiter: SlidingWindowRateLimiter,
     cancel_limiter: SlidingWindowRateLimiter,
 ) -> SlidingWindowRateLimiter | None:
-    """Pick which limiter applies to the message type (if any)."""
+    """Pick which limiter applies to the message type (if any).
+
+    Args:
+        message_type: Type of the message.
+        message_limiter: Rate limiter for message.
+        cancel_limiter: Rate limiter for cancel.
+
+    Returns:
+        Which limiter applies to the message type (if any).
+
+    """
     if message_type == "cancel":
         return cancel_limiter
     if message_type in {"ping", "pong", "end"}:
@@ -39,7 +49,16 @@ async def consume_limiter(
     websocket: WebSocket,
     limiter: SlidingWindowRateLimiter,
 ) -> bool:
-    """Attempt to consume a limiter token, sending an error on failure."""
+    """Attempt to consume a limiter token, sending an error on failure.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        limiter: Sliding-window rate limiter to apply.
+
+    Returns:
+        Whether the check passes.
+
+    """
     try:
         limiter.consume()
     except RateLimitError:

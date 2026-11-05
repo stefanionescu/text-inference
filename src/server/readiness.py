@@ -7,7 +7,14 @@ from dataclasses import dataclass
 
 @dataclass(slots=True)
 class ReadinessState:
-    """Track runtime initialization, public acceptance, and draining."""
+    """Track runtime initialization, public acceptance, and draining.
+
+    Attributes:
+        is_runtime_initialized: Whether runtime is initialized.
+        is_public_accepting: Whether public is accepting.
+        is_draining: Whether it is draining.
+
+    """
 
     is_runtime_initialized: bool = False
     is_public_accepting: bool = False

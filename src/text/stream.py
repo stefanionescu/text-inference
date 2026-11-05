@@ -73,7 +73,12 @@ class StreamingSanitizer:
         self._has_trimmed_stream_start = False
 
     def _sanitize_raw_tail(self) -> str:
-        """Sanitize the whole raw tail and record which one-shot steps stay pending."""
+        """Sanitize the whole raw tail and record which one-shot steps stay pending.
+
+        Returns:
+            The updated text.
+
+        """
         is_prefix_context_active = self._is_prefix_pending or (not self._has_trimmed_stream_start)
         is_capital_context_active = self._is_capital_pending or (not self._has_trimmed_stream_start)
         sanitized, is_prefix_pending, is_capital_pending = _sanitize_stream_chunk(
@@ -87,7 +92,15 @@ class StreamingSanitizer:
         return sanitized
 
     def push(self, chunk: str) -> str:
-        """Process a new raw chunk and return the sanitized delta."""
+        """Process a new raw chunk and return the sanitized delta.
+
+        Args:
+            chunk: One piece of streamed text.
+
+        Returns:
+            The sanitized delta.
+
+        """
         if not chunk:
             return ""
 
@@ -119,7 +132,12 @@ class StreamingSanitizer:
         return delta
 
     def flush(self) -> str:
-        """Emit any remaining buffered sanitized text."""
+        """Emit any remaining buffered sanitized text.
+
+        Returns:
+            The resulting text.
+
+        """
         if not self._raw_tail and not self._sanitized_tail:
             return ""
 
@@ -144,6 +162,14 @@ def _apply_leading_capital_stream(text: str, *, is_capital_pending: bool) -> tup
     """Streaming-friendly leading capital enforcement.
 
     Returns the transformed text and whether capitalization is still pending.
+
+    Args:
+        text: Text to process.
+        is_capital_pending: Whether capital is pending.
+
+    Returns:
+        The resulting items.
+
     """
     if not is_capital_pending:
         return text, False
@@ -156,7 +182,15 @@ def _apply_leading_capital_stream(text: str, *, is_capital_pending: bool) -> tup
 
 
 def _apply_stream_prefix(text: str) -> str:
-    """Remove leading freestyle prefixes from streamed output."""
+    """Remove leading freestyle prefixes from streamed output.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = FREESTYLE_PREFIX_PATTERN.sub("", text, count=1)
     if cleaned != text:
         cleaned = cleaned.lstrip()
@@ -164,7 +198,15 @@ def _apply_stream_prefix(text: str) -> str:
 
 
 def _normalize_stream_dots(text: str) -> str:
-    """Normalize ellipsis and dot spacing in streamed text."""
+    """Normalize ellipsis and dot spacing in streamed text.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = ELLIPSIS_PATTERN.sub("...", text)
     cleaned = NEWLINE_TOKEN_PATTERN.sub(" ", cleaned)
     cleaned = DOUBLE_DOT_SPACE_PATTERN.sub("...", cleaned)
@@ -176,7 +218,15 @@ def _normalize_stream_dots(text: str) -> str:
 
 
 def _verbalize_units(text: str) -> str:
-    """Verbalize temperature, degree, and percentage symbols."""
+    """Verbalize temperature, degree, and percentage symbols.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = DEGREES_FAHRENHEIT_PATTERN.sub(" degrees Fahrenheit", text)
     cleaned = DEGREES_CELSIUS_PATTERN.sub(" degrees Celsius", cleaned)
     cleaned = DEGREES_KELVIN_PATTERN.sub(" degrees Kelvin", cleaned)
@@ -185,7 +235,15 @@ def _verbalize_units(text: str) -> str:
 
 
 def _normalize_dashes(text: str) -> str:
-    """Normalize dash-like tokens into spoken text or spaces."""
+    """Normalize dash-like tokens into spoken text or spaces.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = SUBTRACTION_PATTERN.sub(r"\1 minus \2", text)
     cleaned = NEGATIVE_NUMBER_PATTERN.sub(r" minus \1", cleaned)
     cleaned = SINGLE_LETTER_SUFFIX_PATTERN.sub(r"\1\2", cleaned)
@@ -194,7 +252,15 @@ def _normalize_dashes(text: str) -> str:
 
 
 def _strip_markup_symbols(text: str) -> str:
-    """Remove markup, escaped quotes, and unsupported symbols."""
+    """Remove markup, escaped quotes, and unsupported symbols.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = text.replace("'", "'")
     cleaned = SPACE_BEFORE_PUNCT_PATTERN.sub(r"\1", cleaned)
     cleaned = _strip_escaped_quotes(cleaned)
@@ -205,7 +271,15 @@ def _strip_markup_symbols(text: str) -> str:
 
 
 def _sanitize_stream_text(text: str) -> str:
-    """Apply the core stream text sanitization pipeline."""
+    """Apply the core stream text sanitization pipeline.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     cleaned = verbalize_emails(text)
     cleaned = verbalize_phone_numbers(cleaned)
     cleaned = ACTION_EMOTE_PATTERN.sub("", cleaned)
@@ -224,7 +298,18 @@ def _sanitize_stream_chunk(
     is_capital_pending: bool,
     is_leading_whitespace_stripped: bool,
 ) -> tuple[str, bool, bool]:
-    """Run the streaming sanitization pipeline on a single chunk."""
+    """Run the streaming sanitization pipeline on a single chunk.
+
+    Args:
+        text: Text to process.
+        is_prefix_pending: Whether prefix is pending.
+        is_capital_pending: Whether capital is pending.
+        is_leading_whitespace_stripped: Whether leading whitespace is stripped.
+
+    Returns:
+        The resulting items.
+
+    """
     if not text:
         return "", is_prefix_pending, is_capital_pending
 
@@ -243,7 +328,16 @@ def _sanitize_stream_chunk(
 
 
 def _shared_prefix_length(left_text: str, right_text: str) -> int:
-    """Return the shared prefix length of two strings."""
+    """Return the shared prefix length of two strings.
+
+    Args:
+        left_text: Text of the left.
+        right_text: Text of the right.
+
+    Returns:
+        The shared prefix length of two strings.
+
+    """
     maximum_length = min(len(left_text), len(right_text))
     index = 0
     while index < maximum_length and left_text[index] == right_text[index]:
@@ -252,7 +346,15 @@ def _shared_prefix_length(left_text: str, right_text: str) -> int:
 
 
 def _normalize_exaggerated_oh(match: re.Match[str]) -> str:
-    """Normalize exaggerated oh/ooh spellings."""
+    """Normalize exaggerated oh/ooh spellings.
+
+    Args:
+        match: Regular expression match to rewrite.
+
+    Returns:
+        The updated text.
+
+    """
     text = match.group(0)
     oh_character_count = sum(1 for char in text if char.lower() == "o")
     h_character_count = sum(1 for char in text if char.lower() == "h")
@@ -262,28 +364,60 @@ def _normalize_exaggerated_oh(match: re.Match[str]) -> str:
 
 
 def _strip_leading_newline_tokens(text: str) -> str:
-    """Remove leading newline tokens without inserting padding."""
+    """Remove leading newline tokens without inserting padding.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     if not text:
         return ""
     return LEADING_NEWLINE_TOKENS_PATTERN.sub("", text)
 
 
 def _collapse_spaces(text: str) -> str:
-    """Collapse runs of spaces/tabs into a single space."""
+    """Collapse runs of spaces/tabs into a single space.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     if not text:
         return ""
     return COLLAPSE_SPACES_PATTERN.sub(" ", text)
 
 
 def _strip_asterisks(text: str) -> str:
-    """Remove asterisk markers used for emphasis."""
+    """Remove asterisk markers used for emphasis.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     if not text:
         return ""
     return text.replace("*", " ")
 
 
 def _strip_emoji_like_tokens(text: str) -> str:
-    """Remove unicode emojis and ASCII emoticons while collapsing spacing."""
+    """Remove unicode emojis and ASCII emoticons while collapsing spacing.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     if not text:
         return ""
     text = EMOJI_PATTERN.sub(" ", text)

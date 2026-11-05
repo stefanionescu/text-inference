@@ -23,7 +23,17 @@ def _make_state(
     active_request_id: str | None = None,
     is_cancel_requested: bool = False,
 ) -> SessionState:
-    """Build explicitly typed session state for request-tracking tests."""
+    """Build explicitly typed session state for request-tracking tests.
+
+    Args:
+        active_request_task: Task that runs the active request.
+        active_request_id: ID of the active request.
+        is_cancel_requested: Whether cancel is requested.
+
+    Returns:
+        Explicitly typed session state for request-tracking tests.
+
+    """
     return SessionState(
         meta={},
         active_request_task=active_request_task,

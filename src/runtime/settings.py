@@ -68,7 +68,17 @@ def _read_nullable_environment_text(
     name: str,
     default: str | None,
 ) -> str | None:
-    """Read a nullable stripped string setting from an environment mapping."""
+    """Read a nullable stripped string setting from an environment mapping.
+
+    Args:
+        environment: Environment variables to read.
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        A nullable stripped string setting from an environment mapping.
+
+    """
     raw_value = environment.get(name)
     if raw_value is None:
         return default
@@ -77,7 +87,20 @@ def _read_nullable_environment_text(
 
 
 def _read_environment_integer(environment: EnvironmentValues, name: str, default: int) -> int:
-    """Read an integer setting from an environment mapping."""
+    """Read an integer setting from an environment mapping.
+
+    Args:
+        environment: Environment variables to read.
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        An integer setting from an environment mapping.
+
+    Raises:
+        ValueError: `name` must be an integer, got `raw_value`.
+
+    """
     raw_value = environment.get(name)
     if raw_value is None or str(raw_value).strip() == "":
         return default
@@ -89,7 +112,20 @@ def _read_environment_integer(environment: EnvironmentValues, name: str, default
 
 
 def _read_environment_float(environment: EnvironmentValues, name: str, default: float) -> float:
-    """Read a float setting from an environment mapping."""
+    """Read a float setting from an environment mapping.
+
+    Args:
+        environment: Environment variables to read.
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        A float setting from an environment mapping.
+
+    Raises:
+        ValueError: `name` must be a float, got `raw_value`.
+
+    """
     raw_value = environment.get(name)
     if raw_value is None or str(raw_value).strip() == "":
         return default
@@ -101,7 +137,19 @@ def _read_environment_float(environment: EnvironmentValues, name: str, default: 
 
 
 def _read_environment_boolean(environment: EnvironmentValues, name: str) -> bool:
-    """Read an exact zero-or-one boolean setting."""
+    """Read an exact zero-or-one boolean setting.
+
+    Args:
+        environment: Environment variables to read.
+        name: Name to use for the lookup.
+
+    Returns:
+        An exact zero-or-one boolean setting.
+
+    Raises:
+        ValueError: `name` must be 0 or 1, got `raw_value`.
+
+    """
     raw_value = environment.get(name)
     if raw_value is None:
         return False
@@ -114,7 +162,15 @@ def _read_environment_boolean(environment: EnvironmentValues, name: str) -> bool
 
 
 def _build_history_settings(limits: LimitSettings) -> HistorySettings:
-    """Build history trimming settings from environment values."""
+    """Build history trimming settings from environment values.
+
+    Args:
+        limits: Limit settings to apply.
+
+    Returns:
+        History trimming settings from environment values.
+
+    """
     trigger_tokens = int(limits["HISTORY_MAX_TOKENS"])
     target_tokens = int(limits["TRIMMED_HISTORY_LENGTH"])
     return HistorySettings(
@@ -124,7 +180,16 @@ def _build_history_settings(limits: LimitSettings) -> HistorySettings:
 
 
 def _build_session_settings(environment: EnvironmentValues, limits: LimitSettings) -> SessionSettings:
-    """Build session limits and cache settings from environment values."""
+    """Build session limits and cache settings from environment values.
+
+    Args:
+        environment: Environment variables to read.
+        limits: Limit settings to apply.
+
+    Returns:
+        Session limits and cache settings from environment values.
+
+    """
     maximum_context_length = int(limits["MAXIMUM_CONTEXT_LENGTH"])
     maximum_output_tokens = int(limits["MAXIMUM_OUTPUT_TOKENS"])
     maximum_prompt_tokens = int(limits["PROMPT_MAX_TOKENS"])
@@ -145,7 +210,15 @@ def _build_session_settings(environment: EnvironmentValues, limits: LimitSetting
 
 
 def _build_sampling_settings(environment: EnvironmentValues) -> SamplingSettings:
-    """Build sampling settings from environment values."""
+    """Build sampling settings from environment values.
+
+    Args:
+        environment: Environment variables to read.
+
+    Returns:
+        Sampling settings from environment values.
+
+    """
     return SamplingSettings(
         temperature=_read_environment_float(environment, "TEMPERATURE", TEMPERATURE),
         top_p=_read_environment_float(environment, "TOP_P", TOP_P),
@@ -174,7 +247,16 @@ def _build_sampling_settings(environment: EnvironmentValues) -> SamplingSettings
 
 
 def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSettings) -> WebSocketSettings:
-    """Build WebSocket settings from environment values."""
+    """Build WebSocket settings from environment values.
+
+    Args:
+        environment: Environment variables to read.
+        limits: Limit settings to apply.
+
+    Returns:
+        WebSocket settings from environment values.
+
+    """
     return WebSocketSettings(
         maximum_connections=limits["MAX_CONCURRENT_CONNECTIONS"],
         idle_timeout_seconds=_read_environment_float(
@@ -222,7 +304,18 @@ def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSetti
 
 
 def read_settings(environment: EnvironmentValues | None = None) -> ApplicationSettings:
-    """Resolve environment variables into one typed settings object."""
+    """Resolve environment variables into one typed settings object.
+
+    Args:
+        environment: Environment variables to read.
+
+    Returns:
+        Environment variables into one typed settings object.
+
+    Raises:
+        ValueError: INFERENCE_ENGINE must be 'trt' or 'vllm', got `inference_engine`.
+
+    """
     active_environment = os.environ if environment is None else environment
     limits = read_limit_settings(environment=active_environment)
     inference_engine = active_environment.get("INFERENCE_ENGINE", "trt")

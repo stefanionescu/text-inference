@@ -17,7 +17,17 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class RequestSpanAttributes:
-    """Attributes for a request span."""
+    """Attributes for a request span.
+
+    Attributes:
+        request_id: ID of the request.
+        session_id: ID of the session.
+        client_id: ID of the client.
+        model: Model name or local checkpoint path.
+        prompt_tokens: Token count of the prompt.
+        temperature: Sampling temperature.
+
+    """
 
     request_id: str
     session_id: str = ""
@@ -28,13 +38,26 @@ class RequestSpanAttributes:
 
 
 def _resource_name() -> str:
-    """Return the configured tracing service name."""
+    """Return the configured tracing service name.
+
+    Returns:
+        The configured tracing service name.
+
+    """
     return read_environment_text("OTEL_RESOURCE_NAME", OTEL_RESOURCE_NAME)
 
 
 @contextmanager
 def session_span(*, client_id: str) -> Generator[trace.Span, None, None]:
-    """Outermost span wrapping the entire WebSocket connection."""
+    """Outermost span wrapping the entire WebSocket connection.
+
+    Args:
+        client_id: ID of the client.
+
+    Yields:
+        The next item from the stream.
+
+    """
     with trace.get_tracer(_resource_name()).start_as_current_span(
         SPAN_SESSION,
         attributes={"client.id": client_id},
@@ -44,7 +67,15 @@ def session_span(*, client_id: str) -> Generator[trace.Span, None, None]:
 
 @contextmanager
 def request_span(span_attributes: RequestSpanAttributes) -> Generator[trace.Span, None, None]:
-    """Per-message/turn span."""
+    """Per-message/turn span.
+
+    Args:
+        span_attributes: Span attributes.
+
+    Yields:
+        The next item from the stream.
+
+    """
     attributes: dict[str, str | int | float] = {"request.id": span_attributes.request_id}
     if span_attributes.session_id:
         attributes["session.id"] = span_attributes.session_id
@@ -67,7 +98,17 @@ def generation_span(
     completion_tokens: int = 0,
     finish_reason: str = "",
 ) -> Generator[trace.Span, None, None]:
-    """Engine generation call span."""
+    """Engine generation call span.
+
+    Args:
+        engine_type: Type of the engine.
+        completion_tokens: Token count of the completion.
+        finish_reason: Finish reason.
+
+    Yields:
+        The next item from the stream.
+
+    """
     attributes: dict[str, str] = {}
     if engine_type:
         attributes["engine.type"] = engine_type

@@ -50,7 +50,19 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class HistorySequence:
-    """Inputs for one history recall sequence."""
+    """Inputs for one history recall sequence.
+
+    Attributes:
+        websocket: WebSocket connection of the client.
+        session_id: ID of the session.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        prompt: Prompt text.
+        sampling: Sampling overrides of the request.
+        timeout_seconds: Timeout in seconds.
+        ttfb_samples: Samples of first-byte time.
+
+    """
 
     websocket: WebSocketClientProtocol
     session_id: str
@@ -64,7 +76,17 @@ class HistorySequence:
 
 @dataclass(frozen=True)
 class HistoryRunRequest:
-    """Connection and prompt inputs for one history replay."""
+    """Connection and prompt inputs for one history replay.
+
+    Attributes:
+        server_url: Server URL.
+        api_key: Key of the API.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        timeout_seconds: Timeout in seconds.
+        sampling: Sampling overrides of the request.
+
+    """
 
     server_url: str
     api_key: str | None
@@ -80,7 +102,19 @@ class HistoryRunRequest:
 
 
 async def _collect_response(websocket: WebSocketClientProtocol, state: StreamState) -> str:
-    """Collect streaming response until done message, tracking metrics."""
+    """Collect streaming response until done message, tracking metrics.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+
+    Returns:
+        Streaming response until done message, tracking metrics.
+
+    Raises:
+        ServerError.decode_message: The operation fails with this error.
+
+    """
     try:
         return await consume_stream(websocket, state)
     except StreamError as exception:
@@ -93,7 +127,15 @@ def _print_exchange(
     reply: str,
     metrics: dict[str, Any],
 ) -> None:
-    """Print a formatted exchange."""
+    """Print a formatted exchange.
+
+    Args:
+        index: Zero-based position.
+        user_text: Text of the user.
+        reply: Reply text of the assistant.
+        metrics: Timing metrics of the request.
+
+    """
     write_line(exchange_header(index=index))
     write_line(f"  {format_user(user_text)}")
     write_line(f"  {format_assistant(reply)}")
@@ -107,7 +149,18 @@ async def _send_message_request(
     user_text: str,
     index: int,
 ) -> tuple[str, dict[str, Any]]:
-    """Send a message request and collect the response with metrics tracking."""
+    """Send a message request and collect the response with metrics tracking.
+
+    Args:
+        sequence: History sequence to update.
+        context: Session values that the prompt or request reads.
+        user_text: Text of the user.
+        index: Zero-based position.
+
+    Returns:
+        The resulting items.
+
+    """
     payload = build_message_payload(user_text, sampling=context.sampling)
 
     state = StreamState()
@@ -125,7 +178,13 @@ def _print_header(
     personality: str,
     gender: str,
 ) -> None:
-    """Print the test header."""
+    """Print the test header.
+
+    Args:
+        personality: Name of the personality profile.
+        gender: Name of the gender profile.
+
+    """
     write_line(f"\n{section_header('HISTORY RECALL TEST')}")
     write_line(dim(f"  warm history: {len(WARM_HISTORY)} messages"))
     write_line(dim(f"  recall tests: {len(HISTORY_RECALL_MESSAGES)} messages"))
@@ -133,7 +192,12 @@ def _print_header(
 
 
 async def _run_history_sequence(sequence: HistorySequence) -> None:
-    """Run through all history recall messages."""
+    """Run through all history recall messages.
+
+    Args:
+        sequence: History sequence to update.
+
+    """
     history: list[dict[str, str]] = list(WARM_HISTORY)
     context = SessionContext(
         session_id=sequence.session_id,
@@ -175,7 +239,12 @@ async def _run_history_sequence(sequence: HistorySequence) -> None:
 
 
 async def run_history_replay(request: HistoryRunRequest) -> None:
-    """Run the history recall test."""
+    """Run the history recall test.
+
+    Args:
+        request: Request to run.
+
+    """
     authenticated_url = build_websocket_url(request.server_url, api_key=request.api_key)
     authentication_headers = build_api_key_headers(api_key=request.api_key)
     ttfb_samples = TTFBSamples()

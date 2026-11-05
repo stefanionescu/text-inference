@@ -48,7 +48,18 @@ _CONNECTION_FAILURES = (OSError, TimeoutError, RuntimeError, ValueError, WebSock
 
 @dataclass(frozen=True)
 class NormalClientRequest:
-    """Inputs for one normal cancel-suite client."""
+    """Inputs for one normal cancel-suite client.
+
+    Attributes:
+        server_url: Server URL.
+        authentication_headers: Authentication headers.
+        context: Session values that the prompt or request reads.
+        client_id: ID of the client.
+        user_message: User message.
+        receive_timeout_seconds: Receive timeout in seconds.
+        wait_for_recovery: Event that lets recovery start.
+
+    """
 
     server_url: str
     authentication_headers: dict[str, str]
@@ -61,7 +72,20 @@ class NormalClientRequest:
 
 @dataclass(frozen=True)
 class CancelingClientRequest:
-    """Inputs for the canceling cancel-suite client."""
+    """Inputs for the canceling cancel-suite client.
+
+    Attributes:
+        server_url: Server URL.
+        authentication_headers: Authentication headers.
+        context: Session values that the prompt or request reads.
+        user_message: User message.
+        cancel_delay_seconds: Cancel delay in seconds.
+        drain_timeout_seconds: Drain timeout in seconds.
+        post_cancel_wait_seconds: Post cancel wait in seconds.
+        receive_timeout_seconds: Receive timeout in seconds.
+        recovery_done: Recovery done.
+
+    """
 
     server_url: str
     authentication_headers: dict[str, str]
@@ -77,7 +101,15 @@ class CancelingClientRequest:
 def _open_client_websocket(
     request: NormalClientRequest | CancelingClientRequest,
 ) -> AbstractAsyncContextManager[WebSocketClientProtocol]:
-    """Connect with the keepalive settings from the environment, retrying a failed connect."""
+    """Connect with the keepalive settings from the environment, retrying a failed connect.
+
+    Args:
+        request: Request to run.
+
+    Returns:
+        The abstract async context manager.
+
+    """
     return open_websocket(
         lambda: connect_websocket(
             request.server_url,

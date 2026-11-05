@@ -21,7 +21,15 @@ if TYPE_CHECKING:
 
 
 def _build_config(arguments: argparse.Namespace) -> BenchmarkConfig:
-    """Build benchmark configuration from CLI arguments."""
+    """Build benchmark configuration from CLI arguments.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    Returns:
+        Benchmark configuration from CLI arguments.
+
+    """
     message = choose_message(arguments.message, default_message=BENCHMARK_DEFAULT_MESSAGE)
     sampling = getattr(arguments, "sampling", None) or None
     is_double_ttfb_enabled = bool(arguments.is_double_ttfb_enabled)
@@ -42,6 +50,9 @@ def _build_config(arguments: argparse.Namespace) -> BenchmarkConfig:
 
 async def run_benchmark(arguments: argparse.Namespace) -> bool:
     """Parse benchmark arguments and execute the benchmark.
+
+    Args:
+        arguments: Parsed command-line arguments.
 
     Returns:
         True if all requests succeeded, False if any failed.

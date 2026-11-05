@@ -68,7 +68,17 @@ class _ChatTemplateTokenizer(ThreadSafeTokenizer):
         is_generation_prompt_added: bool = True,
         **_template_options: object,
     ) -> str:
-        """Join role-tagged messages, ending with an open assistant turn on request."""
+        """Join role-tagged messages, ending with an open assistant turn on request.
+
+        Args:
+            messages: Messages of the conversation.
+            is_generation_prompt_added: Whether generation prompt is added.
+            **_template_options: Template options.
+
+        Returns:
+            Role-tagged messages, ending with an open assistant turn on request.
+
+        """
         lines: list[str] = []
         for message in messages:
             lines.extend([f"<|im_start|>{message['role']}", message["content"], "<|im_end|>"])
@@ -186,17 +196,32 @@ def _build_test_tokenizer() -> ThreadSafeTokenizer:
 
 
 def build_local_tokenizer() -> ThreadSafeTokenizer:
-    """Return the deterministic unit-test tokenizer."""
+    """Return the deterministic unit-test tokenizer.
+
+    Returns:
+        The deterministic unit-test tokenizer.
+
+    """
     return _build_test_tokenizer()
 
 
 @contextmanager
 def use_local_tokenizers() -> Generator[ThreadSafeTokenizer, None, None]:
-    """Yield the deterministic local tokenizer."""
+    """Yield the deterministic local tokenizer.
+
+    Yields:
+        The deterministic local tokenizer.
+
+    """
     yield build_local_tokenizer()
 
 
 @contextmanager
 def use_punctuation_aware_tokenizers() -> Generator[_PunctuationAwareTokenizer, None, None]:
-    """Yield a punctuation-aware tokenizer."""
+    """Yield a punctuation-aware tokenizer.
+
+    Yields:
+        A punctuation-aware tokenizer.
+
+    """
     yield _PunctuationAwareTokenizer()

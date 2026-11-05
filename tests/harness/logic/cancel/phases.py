@@ -44,7 +44,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CancelLoop:
-    """Mutable state for the cancel receive loop."""
+    """Mutable state for the cancel receive loop.
+
+    Attributes:
+        is_cancel_sent: Whether cancel is sent.
+        is_cancelled: Whether it is cancelled.
+        error: Error text or error object to report.
+
+    """
 
     is_cancel_sent: bool = False
     is_cancelled: bool = False
@@ -76,7 +83,18 @@ async def _dispatch_until_done(
     receive_timeout_seconds: float,
     after_message: Callable[[], Awaitable[None]] | None = None,
 ) -> DispatchResult:
-    """Feed frames to the callbacks until one reports completion; a stream that just ends reports nothing."""
+    """Feed frames to the callbacks until one reports completion; a stream that just ends reports nothing.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        callbacks: Callback for each server message type.
+        receive_timeout_seconds: Receive timeout in seconds.
+        after_message: After message.
+
+    Returns:
+        The dispatch result.
+
+    """
     async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
         result = await dispatch_message(
             message,
@@ -132,7 +150,17 @@ async def consume_recovery_stream(
     *,
     receive_timeout_seconds: float,
 ) -> tuple[dict[str, Any], str | None, bool]:
-    """Stream one full response into state; a timeout or closed socket comes back as an error string."""
+    """Stream one full response into state; a timeout or closed socket comes back as an error string.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+        receive_timeout_seconds: Receive timeout in seconds.
+
+    Returns:
+        The resulting items.
+
+    """
     callbacks = build_phase_callbacks(state, is_recovery=True)
     is_cancelled = False
     error: str | None = None

@@ -21,7 +21,18 @@ if TYPE_CHECKING:
 
 
 def _mapping(value: object) -> dict[str, object]:
-    """Return a string-keyed metadata mapping."""
+    """Return a string-keyed metadata mapping.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        A string-keyed metadata mapping.
+
+    Raises:
+        TypeError: Model configuration must contain a JSON object.
+
+    """
     if not isinstance(value, dict):
         message = "Model configuration must contain a JSON object"
         raise TypeError(message)
@@ -29,7 +40,18 @@ def _mapping(value: object) -> dict[str, object]:
 
 
 def _declared_method(metadata: dict[str, object]) -> str:
-    """Read one exact declared quantization method."""
+    """Read one exact declared quantization method.
+
+    Args:
+        metadata: Metadata fields to read.
+
+    Returns:
+        One exact declared quantization method.
+
+    Raises:
+        ValueError: Quantization metadata must declare quant_method or quantization_method.
+
+    """
     methods = {value for field in QUANTIZATION_METHOD_FIELDS if isinstance((value := metadata.get(field)), str)}
     if not methods:
         message = "Quantization metadata must declare quant_method or quantization_method"
@@ -41,7 +63,16 @@ def _declared_method(metadata: dict[str, object]) -> str:
 
 
 def quantization_metadata(filename: str, payload: object) -> dict[str, object] | None:
-    """Extract quantization metadata from one supported configuration payload."""
+    """Extract quantization metadata from one supported configuration payload.
+
+    Args:
+        filename: Name of the file.
+        payload: Decoded message fields.
+
+    Returns:
+        Quantization metadata from one supported configuration payload.
+
+    """
     config = _mapping(payload)
     if filename == MODEL_CONFIG_FILENAME:
         quantization = config.get(QUANTIZATION_CONFIG_FIELD)
@@ -51,7 +82,19 @@ def quantization_metadata(filename: str, payload: object) -> dict[str, object] |
 
 
 def detect_metadata_format(metadata: dict[str, object]) -> str:
-    """Return the exact format represented by one metadata object."""
+    """Return the exact format represented by one metadata object.
+
+    Args:
+        metadata: Metadata fields to read.
+
+    Returns:
+        The exact format represented by one metadata object.
+
+    Raises:
+        TypeError: Quantization metadata must declare `MODELOPT_ALGORITHM_FIELD`.
+        ValueError: Unsupported ModelOpt quantization algorithm: `algorithm`.
+
+    """
     method = _declared_method(metadata)
     if method != MODELOPT_METHOD:
         return method
@@ -67,7 +110,18 @@ def detect_metadata_format(metadata: dict[str, object]) -> str:
 
 
 def detect_payload_formats(payloads: list[tuple[str, object]]) -> str | None:
-    """Return the single quantization format declared across payloads."""
+    """Return the single quantization format declared across payloads.
+
+    Args:
+        payloads: Decoded messages.
+
+    Returns:
+        The single quantization format declared across payloads.
+
+    Raises:
+        ValueError: Conflicting quantization formats were declared: `sorted`.
+
+    """
     formats = {
         detect_metadata_format(metadata)
         for filename, payload in payloads
@@ -82,7 +136,18 @@ def detect_payload_formats(payloads: list[tuple[str, object]]) -> str | None:
 
 
 def fingerprint_local_source(model_folder: Path) -> str:
-    """Hash the names, sizes, and mtimes of checkpoint files, never reading multi-gigabyte weights."""
+    """Hash the names, sizes, and mtimes of checkpoint files, never reading multi-gigabyte weights.
+
+    Args:
+        model_folder: Folder of the model.
+
+    Returns:
+        The resulting text.
+
+    Raises:
+        ValueError: Local model does not contain checkpoint files.
+
+    """
     digest = hashlib.sha256()
     file_count = 0
     for path in sorted(model_folder.rglob("*")):

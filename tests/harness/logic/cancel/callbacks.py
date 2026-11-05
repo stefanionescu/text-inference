@@ -21,7 +21,15 @@ EXPECTED_MESSAGE_TYPES = frozenset({"token", "final", "done", "cancelled", "erro
 
 
 class DispatchResult(TypedDict, total=False):
-    """Completion state returned by cancel-suite dispatch callbacks."""
+    """Completion state returned by cancel-suite dispatch callbacks.
+
+    Attributes:
+        is_done: Whether it is done.
+        cancelled: Whether the operation is cancelled.
+        error: Error text or error object to report.
+        metrics: Timing metrics of the request.
+
+    """
 
     is_done: bool
     cancelled: bool
@@ -90,6 +98,9 @@ def build_phase_callbacks(state: StreamState, *, is_recovery: bool) -> dict[str,
 
     Returns:
         Dict mapping message types to handler functions.
+
+    Raises:
+        AssertionError: The test double reached a state that the test forbids.
 
     """
     finish: Callable[..., DispatchResult] = partial(_recovery_done, state) if is_recovery else _cancel_done

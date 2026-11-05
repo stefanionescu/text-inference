@@ -31,14 +31,32 @@ if TYPE_CHECKING:
 
 @dataclass
 class _ResetEngine:
-    """Return configured reset outcomes and retain attempt reasons."""
+    """Return configured reset outcomes and retain attempt reasons.
+
+    Attributes:
+        outcomes: Outcomes that the test double records.
+        reasons: Reasons that the record collects.
+        attempted: Event that is set after the first attempt.
+
+    """
 
     outcomes: list[bool | Exception]
     reasons: list[str] = field(default_factory=list)
     attempted: asyncio.Event = field(default_factory=asyncio.Event)
 
     async def reset_caches(self, reason: str) -> bool:
-        """Return or raise the next configured reset outcome."""
+        """Return or raise the next configured reset outcome.
+
+        Args:
+            reason: Reason text to report.
+
+        Returns:
+            Or raise the next configured reset outcome.
+
+        Raises:
+            outcome: The operation fails with this error.
+
+        """
         self.reasons.append(reason)
         outcome = self.outcomes.pop(0)
         if len(self.reasons) > 1:
@@ -50,7 +68,12 @@ class _ResetEngine:
 
 @dataclass
 class _PrefixResetRuntime:
-    """Record vLLM prefix-reset options."""
+    """Record vLLM prefix-reset options.
+
+    Attributes:
+        requests: Number of requests to send.
+
+    """
 
     requests: list[tuple[bool, bool]] = field(default_factory=list)
 
@@ -60,7 +83,19 @@ class _PrefixResetRuntime:
         reset_running_requests: bool = False,
         reset_connector: bool = False,
     ) -> bool:
-        """Record one prefix reset and reject preemptive requests."""
+        """Record one prefix reset and reject preemptive requests.
+
+        Args:
+            reset_running_requests: Reset running requests.
+            reset_connector: Reset connector.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            AssertionError: Test received a preemptive reset.
+
+        """
         self.requests.append((reset_running_requests, reset_connector))
         if reset_running_requests:
             message = "test received a preemptive reset"
@@ -121,7 +156,12 @@ def test_periodic_cache_timer() -> None:
 
 
 def test_declined_reset_backoff(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test a declined reset retries once after the fixed delay."""
+    """Test a declined reset retries once after the fixed delay.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     monkeypatch.setattr(cache_module, "CACHE_RESET_RETRY_SECONDS", 0.01)
 
     async def scenario() -> tuple[list[str], str]:

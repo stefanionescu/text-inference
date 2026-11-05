@@ -11,7 +11,14 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class PromptProfile:
-    """Immutable protocol prompt profile."""
+    """Immutable protocol prompt profile.
+
+    Attributes:
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        prompt: Prompt text.
+
+    """
 
     gender: str
     personality: str
@@ -20,7 +27,16 @@ class PromptProfile:
 
 @dataclass
 class LiveSession:
-    """Live test session state."""
+    """Live test session state.
+
+    Attributes:
+        session_id: ID of the session.
+        profile: Prompt profile to use.
+        history: Conversation history to use.
+        sampling: Sampling overrides of the request.
+        is_started: Whether it is started.
+
+    """
 
     session_id: str
     profile: PromptProfile
@@ -31,7 +47,15 @@ class LiveSession:
 
 @dataclass
 class StreamResult:
-    """Result of a streaming message exchange."""
+    """Result of a streaming message exchange.
+
+    Attributes:
+        text: Text to process.
+        is_successful: Whether it is successful.
+        error: Error text or error object to report.
+        is_cancelled: Whether it is cancelled.
+
+    """
 
     text: str
     is_successful: bool = True

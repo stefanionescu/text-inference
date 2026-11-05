@@ -27,7 +27,16 @@ WEBSOCKETS_HEADERS_VERSION = 13
 
 
 def _normalize_path_scheme(url: str, default_path: str) -> tuple[str, str, str, str, str]:
-    """Parse and normalize a WebSocket URL."""
+    """Parse and normalize a WebSocket URL.
+
+    Args:
+        url: Address to connect to.
+        default_path: Path of the default.
+
+    Returns:
+        And normalize a WebSocket URL.
+
+    """
     parts = urlsplit(url)
     scheme = parts.scheme or "ws"
     netloc = parts.netloc
@@ -48,7 +57,18 @@ def _normalize_path_scheme(url: str, default_path: str) -> tuple[str, str, str, 
 
 
 def _choose_receive_method(websocket: object) -> Callable[[], str | Awaitable[str]]:
-    """Support both `websockets` (recv) and Starlette/WebSocketTestClient (receive)."""
+    """Support both `websockets` (recv) and Starlette/WebSocketTestClient (receive).
+
+    Args:
+        websocket: WebSocket connection of the client.
+
+    Returns:
+        The callable.
+
+    Raises:
+        TypeError: Websocket-like object must expose receive() or recv().
+
+    """
     receiver = getattr(websocket, "receive", None)
     if not callable(receiver):
         receiver = getattr(websocket, "recv", None)
@@ -64,7 +84,20 @@ def read_api_key(
     *,
     api_key: str | None = None,
 ) -> str:
-    """Read the configured API key."""
+    """Read the configured API key.
+
+    Args:
+        api_key_variable: API key variable.
+        default_key: Key of the default.
+        api_key: Key of the API.
+
+    Returns:
+        The configured API key.
+
+    Raises:
+        ValueError: `api_key_variable` environment variable is required and must be set.
+
+    """
     resolved_key = api_key or os.getenv(api_key_variable) or default_key
     if not resolved_key:
         message = f"{api_key_variable} environment variable is required and must be set"
@@ -80,7 +113,22 @@ def build_websocket_url(
     api_key: str | None = None,
     default_path: str = DEFAULT_WEBSOCKET_PATH,
 ) -> str:
-    """Normalize a WebSocket URL after validating API-key availability."""
+    """Normalize a WebSocket URL after validating API-key availability.
+
+    Args:
+        url: Address to connect to.
+        api_key_variable: API key variable.
+        default_key: Key of the default.
+        api_key: Key of the API.
+        default_path: Path of the default.
+
+    Returns:
+        The updated text.
+
+    Raises:
+        ValueError: Invalid WebSocket URL '`url`'. Expected format ws(s)://host[:port][`default_path`].
+
+    """
     read_api_key(api_key_variable, default_key, api_key=api_key)
 
     scheme, netloc, path, query, fragment = _normalize_path_scheme(url, default_path)
@@ -96,13 +144,28 @@ def build_api_key_headers(
     *,
     api_key: str | None = None,
 ) -> dict[str, str]:
-    """Build auth headers for websocket connections."""
+    """Build auth headers for websocket connections.
+
+    Args:
+        api_key_variable: API key variable.
+        default_key: Key of the default.
+        api_key: Key of the API.
+
+    Returns:
+        Auth headers for websocket connections.
+
+    """
     resolved_key = read_api_key(api_key_variable, default_key, api_key=api_key)
     return {"X-API-Key": resolved_key}
 
 
 async def send_end_frame(websocket: object) -> None:
-    """Best-effort end signal to gracefully close the connection."""
+    """Best-effort end signal to gracefully close the connection.
+
+    Args:
+        websocket: WebSocket connection of the client.
+
+    """
     with contextlib.suppress(Exception):
         sender = getattr(websocket, "send", None)
         if not callable(sender):
@@ -117,7 +180,16 @@ async def receive_raw_frame(
     *,
     receive_timeout_seconds: float | None = None,
 ) -> str:
-    """Receive a single raw frame from a websocket-like object."""
+    """Receive a single raw frame from a websocket-like object.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        receive_timeout_seconds: Receive timeout in seconds.
+
+    Returns:
+        The resulting text.
+
+    """
     receiver = _choose_receive_method(websocket)
     receive_result = receiver()
     if inspect.isawaitable(receive_result):
@@ -140,6 +212,19 @@ async def open_websocket[ConnectionT](
     Retries `maximum_retries` times after the initial attempt, so the total
     attempts equal `maximum_retries + 1`. The `factory` must return a fresh async context
     manager each time (e.g., `lambda: websockets.connect(...)`).
+
+    Args:
+        factory: Function that creates the value.
+        maximum_retries: Largest allowed retries.
+        base_delay_seconds: Base delay in seconds.
+        backoff_factor: Backoff factor.
+
+    Yields:
+        The next item from the stream.
+
+    Raises:
+        Exception: The operation fails with this error.
+
     """
     attempt = 0
     delay = base_delay_seconds
@@ -165,6 +250,15 @@ def connect_websocket(url: str, *, headers: dict[str, str] | None = None, **opti
 
     websockets <13 (older client) expects ``extra_headers``.
     websockets >=13 (new client) expects ``additional_headers``.
+
+    Args:
+        url: Address to connect to.
+        headers: HTTP headers of the request.
+        **options: Options.
+
+    Returns:
+        The updated value.
+
     """
     websockets_major_version = int(version("websockets").split(".")[0])
     header_parameter = (

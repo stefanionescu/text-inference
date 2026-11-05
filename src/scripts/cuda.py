@@ -14,12 +14,32 @@ class CudaDriverVersionQuery(Protocol):
     """Callable CUDA driver version query."""
 
     def __call__(self) -> Sequence[object]:
-        """Return the CUDA driver query result."""
+        """Return the CUDA driver query result.
+
+        Returns:
+            The CUDA driver query result.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError
 
 
 def read_cuda_driver_version(query_driver_version: CudaDriverVersionQuery) -> tuple[int, int]:
-    """Call CUDA runtime driver version and validate its result shape."""
+    """Call CUDA runtime driver version and validate its result shape.
+
+    Args:
+        query_driver_version: Version of the query driver.
+
+    Returns:
+        The resulting items.
+
+    Raises:
+        RuntimeError: CudaDriverGetVersion returned an invalid result.
+        TypeError: CudaDriverGetVersion returned non-integer values.
+
+    """
     result = query_driver_version()
     if len(result) != CUDA_RESULT_LENGTH:
         message = "cudaDriverGetVersion returned an invalid result"

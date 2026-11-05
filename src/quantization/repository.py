@@ -11,7 +11,18 @@ _SHA1_HEX_LENGTH = 40
 
 
 def _read_git_directory(repository: Path) -> Path:
-    """Resolve ordinary clones and Git worktree metadata links."""
+    """Resolve ordinary clones and Git worktree metadata links.
+
+    Args:
+        repository: Path of the Git repository.
+
+    Returns:
+        Ordinary clones and Git worktree metadata links.
+
+    Raises:
+        RuntimeError: Invalid Git metadata file: `git_metadata`.
+
+    """
     git_metadata = repository / ".git"
     if git_metadata.is_dir():
         return git_metadata.resolve(strict=True)
@@ -23,7 +34,20 @@ def _read_git_directory(repository: Path) -> Path:
 
 
 def _read_reference(git_directory: Path, repository: Path, reference: str) -> str:
-    """Read one loose or packed Git reference."""
+    """Read one loose or packed Git reference.
+
+    Args:
+        git_directory: Git directory.
+        repository: Path of the Git repository.
+        reference: Reference text to compare with.
+
+    Returns:
+        One loose or packed Git reference.
+
+    Raises:
+        RuntimeError: Unable to resolve Git reference `reference` in `repository`.
+
+    """
     loose_reference = git_directory / reference
     if loose_reference.is_file():
         return loose_reference.read_text(encoding="utf-8").strip()
@@ -40,7 +64,18 @@ def _read_reference(git_directory: Path, repository: Path, reference: str) -> st
 
 
 def read_repository_revision(repository: Path) -> str:
-    """Return the checked-out SHA-1 revision from repository metadata."""
+    """Return the checked-out SHA-1 revision from repository metadata.
+
+    Args:
+        repository: Path of the Git repository.
+
+    Returns:
+        The checked-out SHA-1 revision from repository metadata.
+
+    Raises:
+        RuntimeError: Invalid Git revision in `repository`: `head_value`.
+
+    """
     git_directory = _read_git_directory(repository)
     head_value = (git_directory / "HEAD").read_text(encoding="utf-8").strip()
     if head_value.startswith("ref: "):

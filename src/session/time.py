@@ -22,7 +22,15 @@ from config.runtime.session_time import TIME_CLASSIFICATIONS
 
 @dataclass(frozen=True, slots=True)
 class SessionTimestamp:
-    """Structured representation of a session timestamp."""
+    """Structured representation of a session timestamp.
+
+    Attributes:
+        iso_timestamp: Time of the iso.
+        classification: Class of the error.
+        display: Text to show for the value.
+        timezone_name: Name of the timezone.
+
+    """
 
     iso_timestamp: str
     classification: str

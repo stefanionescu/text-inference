@@ -6,7 +6,16 @@ import os
 
 
 def read_environment_integer(name: str, default: int) -> int:
-    """Parse an integer from an environment variable."""
+    """Parse an integer from an environment variable.
+
+    Args:
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        An integer from an environment variable.
+
+    """
     raw_value = os.environ.get(name)
     if raw_value is None:
         return default
@@ -17,7 +26,16 @@ def read_environment_integer(name: str, default: int) -> int:
 
 
 def read_environment_float(name: str, default: float) -> float:
-    """Parse a float from an environment variable."""
+    """Parse a float from an environment variable.
+
+    Args:
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        A float from an environment variable.
+
+    """
     raw_value = os.environ.get(name)
     if raw_value is None:
         return default
@@ -28,7 +46,16 @@ def read_environment_float(name: str, default: float) -> float:
 
 
 def read_environment_text(name: str, default: str | None = None) -> str:
-    """Read a string from an environment variable."""
+    """Read a string from an environment variable.
+
+    Args:
+        name: Name to use for the lookup.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        A string from an environment variable.
+
+    """
     value = os.getenv(name, "")
     return value or default or ""
 

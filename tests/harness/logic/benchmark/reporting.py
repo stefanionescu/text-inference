@@ -60,7 +60,16 @@ def _format_error_hint(raw_error: str, all_errors: list[dict[str, Any]]) -> str:
 
 
 def _format_latency_line(label: str, samples: list[float]) -> str:
-    """Format a latency statistics line."""
+    """Format a latency statistics line.
+
+    Args:
+        label: Label to print.
+        samples: Latency samples.
+
+    Returns:
+        A latency statistics line.
+
+    """
     if not samples:
         return ""
     median_value = percentile(samples, 0.5)
@@ -99,7 +108,17 @@ def _print_tagged_section(tag: str, results: list[dict[str, Any]]) -> None:
 
 
 def percentile(values: list[float], fraction: float, *, is_previous_selected: bool = False) -> float:
-    """Return the selected percentile from a list of samples."""
+    """Return the selected percentile from a list of samples.
+
+    Args:
+        values: Values to check or convert.
+        fraction: Fraction between zero and one.
+        is_previous_selected: Whether previous is selected.
+
+    Returns:
+        The selected percentile from a list of samples.
+
+    """
     if not values:
         return 0.0
     sorted_values = sorted(values)
@@ -124,7 +143,16 @@ def print_report(
     *,
     is_double_ttfb_enabled: bool = False,
 ) -> None:
-    """Print benchmark summary report with consistent formatting."""
+    """Print benchmark summary report with consistent formatting.
+
+    Args:
+        server_url: Server URL.
+        requests: Number of requests to send.
+        concurrency: Number of workers that run at the same time.
+        results: Results of the test runs.
+        is_double_ttfb_enabled: Whether double first-byte time is enabled.
+
+    """
     successful_results = [result for result in results if result.get("ok")]
     errors = [result for result in results if not result.get("ok")]
     total_transactions = len(results)

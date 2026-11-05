@@ -27,7 +27,18 @@ if TYPE_CHECKING:
 
 
 async def _build_tokenizer(settings: ApplicationSettings) -> ThreadSafeTokenizer:
-    """Build the tokenizer used for prompt budgeting."""
+    """Build the tokenizer used for prompt budgeting.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The tokenizer used for prompt budgeting.
+
+    Raises:
+        RuntimeError: MODEL is required.
+
+    """
     if not settings.model.source:
         message = "MODEL is required"
         raise RuntimeError(message)
@@ -39,7 +50,17 @@ async def build_runtime_dependencies(
     connections: ConnectionRegistryProtocol,
     engine_builder: EngineBuilder,
 ) -> RuntimeDependencies:
-    """Build runtime dependencies eagerly."""
+    """Build runtime dependencies eagerly.
+
+    Args:
+        settings: Application settings.
+        connections: Registry of open connections.
+        engine_builder: Engine builder.
+
+    Returns:
+        Runtime dependencies eagerly.
+
+    """
     engine, tokenizer = await asyncio.gather(
         engine_builder(settings),
         _build_tokenizer(settings),

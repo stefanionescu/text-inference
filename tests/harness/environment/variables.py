@@ -10,7 +10,16 @@ import os
 
 
 def read_environment_integer(key: str, default: int) -> int:
-    """Read an integer from an environment variable with a fallback."""
+    """Read an integer from an environment variable with a fallback.
+
+    Args:
+        key: Lookup key.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        An integer from an environment variable with a fallback.
+
+    """
     raw_value = os.getenv(key)
     if raw_value is None:
         return default
@@ -21,7 +30,16 @@ def read_environment_integer(key: str, default: int) -> int:
 
 
 def read_environment_float(key: str, default: float) -> float:
-    """Read a float from an environment variable with a fallback."""
+    """Read a float from an environment variable with a fallback.
+
+    Args:
+        key: Lookup key.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        A float from an environment variable with a fallback.
+
+    """
     raw_value = os.getenv(key)
     if raw_value is None:
         return default

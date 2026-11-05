@@ -14,7 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 def build_flat_message(message_type: str, *, status: int | None = None, **fields: object) -> dict[str, object]:
-    """Build a flat WebSocket message dict."""
+    """Build a flat WebSocket message dict.
+
+    Args:
+        message_type: Type of the message.
+        status: Status code to report.
+        **fields: Fields.
+
+    Returns:
+        A flat WebSocket message dict.
+
+    """
     message: dict[str, object] = {"type": message_type}
     if status is not None:
         message["status"] = status
@@ -23,7 +33,16 @@ def build_flat_message(message_type: str, *, status: int | None = None, **fields
 
 
 async def safe_send_text(websocket: WebSocket, text: str) -> bool:
-    """Send text to the client, returning False if the socket is gone."""
+    """Send text to the client, returning False if the socket is gone.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        text: Text to process.
+
+    Returns:
+        Whether the check passes.
+
+    """
     try:
         await websocket.send_text(text)
     except WebSocketDisconnect:
@@ -36,7 +55,16 @@ async def safe_send_text(websocket: WebSocket, text: str) -> bool:
 
 
 async def safe_send_json(websocket: WebSocket, payload: dict[str, object]) -> bool:
-    """Send a JSON payload, swallowing client disconnects."""
+    """Send a JSON payload, swallowing client disconnects.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        payload: Decoded message fields.
+
+    Returns:
+        Whether the check passes.
+
+    """
     started_at = time.perf_counter()
     sent = await safe_send_text(websocket, json.dumps(payload))
     elapsed = time.perf_counter() - started_at
@@ -49,7 +77,18 @@ async def safe_send_json(websocket: WebSocket, payload: dict[str, object]) -> bo
 async def safe_send_flat(
     websocket: WebSocket, message_type: str, *, status: int | None = None, **fields: object
 ) -> bool:
-    """Send a flat-format JSON message."""
+    """Send a flat-format JSON message.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message_type: Type of the message.
+        status: Status code to report.
+        **fields: Fields.
+
+    Returns:
+        Whether the check passes.
+
+    """
     payload = build_flat_message(message_type, status=status, **fields)
     return await safe_send_json(websocket, payload)
 

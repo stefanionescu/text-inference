@@ -31,7 +31,21 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class QuantizationPolicy:
-    """Effective LLM Compressor recipe policy."""
+    """Effective LLM Compressor recipe policy.
+
+    Attributes:
+        model_type: Type of the model.
+        model_family: Model family.
+        scheme: Quantization scheme name.
+        weight_bits: Weight bits.
+        group_size: Group size.
+        is_symmetric: Whether it is symmetric.
+        targets: Layers that the recipe targets.
+        ignored_modules: Ignored modules.
+        awq_duo_scaling: AWQ duo scaling.
+        is_all_expert_calibration: Whether all expert is calibration.
+
+    """
 
     model_type: str
     model_family: str
@@ -45,7 +59,12 @@ class QuantizationPolicy:
     is_all_expert_calibration: bool
 
     def build_metadata(self) -> dict[str, object]:
-        """Return JSON-compatible recipe metadata."""
+        """Return JSON-compatible recipe metadata.
+
+        Returns:
+            JSON-compatible recipe metadata.
+
+        """
         return {
             "model_type": self.model_type,
             "model_family": self.model_family,
@@ -64,7 +83,16 @@ def choose_quantization_backend(
     quantization_format: str | None,
     model_config: Mapping[str, object],
 ) -> str | None:
-    """Choose the vLLM backend required by the checkpoint architecture."""
+    """Choose the vLLM backend required by the checkpoint architecture.
+
+    Args:
+        quantization_format: Format of the quantization.
+        model_config: Model config.
+
+    Returns:
+        The vLLM backend required by the checkpoint architecture.
+
+    """
     if quantization_format is None:
         return None
     if quantization_format == NVFP4_FORMAT:
@@ -76,7 +104,16 @@ def choose_quantization_backend(
 
 
 def validate_sequence_length(text_config: Mapping[str, object], sequence_length: int) -> None:
-    """Reject calibration lengths beyond an explicit text-model limit."""
+    """Reject calibration lengths beyond an explicit text-model limit.
+
+    Args:
+        text_config: Text config.
+        sequence_length: Sequence length.
+
+    Raises:
+        ValueError: Calibration sequence length `sequence_length` exceeds model limit `maximum_positions`.
+
+    """
     maximum_positions = text_config.get(MODEL_POSITION_LIMIT_FIELD)
     if isinstance(maximum_positions, int) and sequence_length > maximum_positions:
         message = f"Calibration sequence length {sequence_length} exceeds model limit {maximum_positions}"
@@ -87,7 +124,20 @@ def select_policy(
     model_config: Mapping[str, object],
     text_config: Mapping[str, object],
 ) -> QuantizationPolicy:
-    """Select a validated dense or architecture-specific MoE policy."""
+    """Select a validated dense or architecture-specific MoE policy.
+
+    Args:
+        model_config: Model config.
+        text_config: Text config.
+
+    Returns:
+        A validated dense or architecture-specific MoE policy.
+
+    Raises:
+        TypeError: Model configuration must declare a model type.
+        ValueError: MoE model type `model_type` is not supported for local compressed-tensors export.
+
+    """
     model_type = model_config.get(MODEL_TYPE_FIELD)
     if not isinstance(model_type, str) or not model_type:
         message = "Model configuration must declare a model type"

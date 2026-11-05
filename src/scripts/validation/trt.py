@@ -16,7 +16,15 @@ from src.scripts.cuda import read_cuda_driver_version
 
 
 def main() -> int:
-    """Validate every required TensorRT-LLM runtime dependency."""
+    """Validate every required TensorRT-LLM runtime dependency.
+
+    Returns:
+        The resulting number.
+
+    Raises:
+        RuntimeError: Libpython`python_version` is required.
+
+    """
     python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
     python_library = ctypes.util.find_library(f"python{python_version}")
     if python_library is None:

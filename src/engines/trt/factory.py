@@ -18,7 +18,18 @@ if TYPE_CHECKING:
 
 
 async def create_trt_engine(settings: ApplicationSettings) -> TRTEngine:
-    """Create the TensorRT-LLM 1.3.0rc20 public PyTorch backend."""
+    """Create the TensorRT-LLM 1.3.0rc20 public PyTorch backend.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The TensorRT-LLM 1.3.0rc20 public PyTorch backend.
+
+    Raises:
+        TypeError: Model vocabulary size must be an integer.
+
+    """
     model = require_local_model_directory(cast("str", settings.model.source))
     model_config = await asyncio.to_thread(
         AutoConfig.from_pretrained,

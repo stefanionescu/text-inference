@@ -42,7 +42,18 @@ async def _run_phase(
     phase: int,
     session_id: str,
 ) -> dict[str, Any]:
-    """Execute a single transaction phase with timeout handling."""
+    """Execute a single transaction phase with timeout handling.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        config: Settings for this run.
+        phase: Number of the test phase.
+        session_id: ID of the session.
+
+    Returns:
+        The resulting mapping.
+
+    """
     try:
         return await asyncio.wait_for(
             _send_stream(websocket, config, phase, session_id),
@@ -60,7 +71,18 @@ async def _send_stream(
     phase: int,
     session_id: str,
 ) -> dict[str, Any]:
-    """Bootstrap the first phase or send a message turn, then stream the response."""
+    """Bootstrap the first phase or send a message turn, then stream the response.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        config: Settings for this run.
+        phase: Number of the test phase.
+        session_id: ID of the session.
+
+    Returns:
+        The resulting mapping.
+
+    """
     if phase == 1:
         context = SessionContext(
             session_id=session_id,
@@ -87,7 +109,17 @@ async def _consume_stream(
     state: StreamState,
     phase: int,
 ) -> dict[str, Any]:
-    """Consume the response stream and collect metrics."""
+    """Consume the response stream and collect metrics.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+        phase: Number of the test phase.
+
+    Returns:
+        The resulting mapping.
+
+    """
     result: dict[str, Any] | None = None
     try:
         async for message in iter_messages(websocket):
@@ -104,7 +136,17 @@ async def _consume_stream(
 
 
 def _handle_stream_message(message: dict[str, Any], state: StreamState, phase: int) -> dict[str, Any] | None:
-    """Handle one benchmark stream message."""
+    """Handle one benchmark stream message.
+
+    Args:
+        message: Message to send, check, or report.
+        state: State of the session or test run.
+        phase: Number of the test phase.
+
+    Returns:
+        The resulting mapping.
+
+    """
     message_type = message.get("type")
     result = None
     if message_type == "token":
@@ -123,7 +165,16 @@ def _handle_stream_message(message: dict[str, Any], state: StreamState, phase: i
 
 
 def _build_success_result(metrics: dict[str, Any], phase: int) -> dict[str, Any]:
-    """Build a success result from tracker metrics."""
+    """Build a success result from tracker metrics.
+
+    Args:
+        metrics: Timing metrics of the request.
+        phase: Number of the test phase.
+
+    Returns:
+        A success result from tracker metrics.
+
+    """
     return {
         "ok": metrics.get("ok", True),
         "phase": phase,
@@ -134,7 +185,16 @@ def _build_success_result(metrics: dict[str, Any], phase: int) -> dict[str, Any]
 
 
 def _build_error_result(message: dict[str, Any], phase: int) -> dict[str, Any]:
-    """Build an error result from a server error message."""
+    """Build an error result from a server error message.
+
+    Args:
+        message: Message to send, check, or report.
+        phase: Number of the test phase.
+
+    Returns:
+        An error result from a server error message.
+
+    """
     error = ServerError.decode_message(message)
     return {
         "ok": False,
@@ -146,7 +206,15 @@ def _build_error_result(message: dict[str, Any], phase: int) -> dict[str, Any]:
 
 
 async def run_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
-    """Execute one or two transactions over a single WebSocket connection."""
+    """Execute one or two transactions over a single WebSocket connection.
+
+    Args:
+        config: Settings for this run.
+
+    Returns:
+        The resulting items.
+
+    """
     phases = 2 if config.is_double_ttfb_enabled else 1
     results: list[dict[str, Any]] = []
     authenticated_url = build_websocket_url(config.server_url, api_key=config.api_key)

@@ -19,7 +19,18 @@ def _build_license(
     *,
     hf_token: str | None,
 ) -> LicenseMetadata:
-    """Return scenario license metadata."""
+    """Return scenario license metadata.
+
+    Args:
+        model_name: Name of the model.
+        source_kind: Source kind.
+        source_revision: Revision of the source.
+        hf_token: Hugging Face token.
+
+    Returns:
+        Scenario license metadata.
+
+    """
     del model_name, source_kind, source_revision, hf_token
     return LicenseMetadata(
         identifier="scenario-license",
@@ -29,7 +40,16 @@ def _build_license(
 
 
 def _build_metadata(engine: str, quantization_format: str) -> dict[str, object]:
-    """Build scenario quantization provenance."""
+    """Build scenario quantization provenance.
+
+    Args:
+        engine: Inference engine that serves the request.
+        quantization_format: Format of the quantization.
+
+    Returns:
+        Scenario quantization provenance.
+
+    """
     return {
         "schema_version": 1,
         "cache_key": "scenario-cache-key",
@@ -52,7 +72,12 @@ def _build_metadata(engine: str, quantization_format: str) -> dict[str, object]:
 
 
 def test_vllm_card_provenance(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test the vLLM card includes quantization and calibration details."""
+    """Test the vLLM card includes quantization and calibration details.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     monkeypatch.setattr("src.hf.model_card.read_license", _build_license)
     metadata = _build_metadata("vllm", "compressed-tensors")
     metadata.update(
@@ -90,7 +115,12 @@ def test_vllm_card_provenance(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_trt_card_provenance(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test the TRT card includes ModelOpt checkpoint provenance."""
+    """Test the TRT card includes ModelOpt checkpoint provenance.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     monkeypatch.setattr("src.hf.model_card.read_license", _build_license)
     metadata = _build_metadata("trt", "int4_awq")
     metadata.update(

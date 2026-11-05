@@ -113,7 +113,16 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
 
     @override
     def count(self, text: str, *, are_special_tokens_added: bool = False) -> int:
-        """Test count."""
+        """Test count.
+
+        Args:
+            text: Text to process.
+            are_special_tokens_added: Whether special tokens are added.
+
+        Returns:
+            The resulting number.
+
+        """
         if not text.strip():
             return 0
         total = len(text.split())
@@ -123,7 +132,17 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
 
     @override
     def trim(self, text: str, maximum_tokens: int, retained_side: str = "end") -> str:
-        """Test trim."""
+        """Test trim.
+
+        Args:
+            text: Text to process.
+            maximum_tokens: Largest allowed tokens.
+            retained_side: Retained side.
+
+        Returns:
+            The resulting text.
+
+        """
         tokens = text.split()
         if maximum_tokens <= 0:
             return ""
@@ -134,7 +153,15 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
 
     @override
     def encode_ids(self, text: str) -> list[int]:
-        """Test encode ids."""
+        """Test encode ids.
+
+        Args:
+            text: Text to process.
+
+        Returns:
+            The resulting items.
+
+        """
         tokens = text.split()
         token_count = len(tokens)
         return list(range(token_count))

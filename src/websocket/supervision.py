@@ -33,7 +33,18 @@ async def supervise_turn(
     request_id: str,
     state: SessionState,
 ) -> None:
-    """Run a request operation with tracing, metrics, and error handling."""
+    """Run a request operation with tracing, metrics, and error handling.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        operation: Function to run.
+        request_id: ID of the request.
+        state: State of the session or test run.
+
+    Raises:
+        asyncio.CancelledError: The task was cancelled.
+
+    """
     started_at = time.perf_counter()
     model = str(state.meta.get("model") or "")
     client_id = str(state.meta.get("client_id") or "")

@@ -52,24 +52,56 @@ if TYPE_CHECKING:
 
 
 def _resource_name() -> str:
-    """Return the configured OpenTelemetry service name."""
+    """Return the configured OpenTelemetry service name.
+
+    Returns:
+        The configured OpenTelemetry service name.
+
+    """
     return read_environment_text("OTEL_RESOURCE_NAME", OTEL_RESOURCE_NAME)
 
 
 def _histogram(meter: metrics.Meter, spec: tuple[str, str, str]) -> metrics.Histogram:
-    """Create a histogram from a metric spec."""
+    """Create a histogram from a metric spec.
+
+    Args:
+        meter: OpenTelemetry meter that creates the instruments.
+        spec: Description of the value to read.
+
+    Returns:
+        A histogram from a metric spec.
+
+    """
     name, unit, description = spec
     return meter.create_histogram(name, unit=unit, description=description)
 
 
 def _counter(meter: metrics.Meter, spec: tuple[str, str, str]) -> metrics.Counter:
-    """Create a counter from a metric spec."""
+    """Create a counter from a metric spec.
+
+    Args:
+        meter: OpenTelemetry meter that creates the instruments.
+        spec: Description of the value to read.
+
+    Returns:
+        A counter from a metric spec.
+
+    """
     name, unit, description = spec
     return meter.create_counter(name, unit=unit, description=description)
 
 
 def _updown(meter: metrics.Meter, spec: tuple[str, str, str]) -> metrics.UpDownCounter:
-    """Create an up-down counter from a metric spec."""
+    """Create an up-down counter from a metric spec.
+
+    Args:
+        meter: OpenTelemetry meter that creates the instruments.
+        spec: Description of the value to read.
+
+    Returns:
+        An up-down counter from a metric spec.
+
+    """
     name, unit, description = spec
     return meter.create_up_down_counter(name, unit=unit, description=description)
 
@@ -111,14 +143,24 @@ class MetricInstruments:
     )
 
     def __init__(self, meter: metrics.Meter) -> None:
-        """Initialize all metric instruments from one meter."""
+        """Initialize all metric instruments from one meter.
+
+        Args:
+            meter: OpenTelemetry meter that creates the instruments.
+
+        """
         self._initialize_histograms(meter)
         self._initialize_counters(meter)
         self.active_connections = _updown(meter, METRIC_ACTIVE_CONNECTIONS)
         self.active_generations = _updown(meter, METRIC_ACTIVE_GENERATIONS)
 
     def _initialize_histograms(self, meter: metrics.Meter) -> None:
-        """Initialize request and lifecycle duration histograms."""
+        """Initialize request and lifecycle duration histograms.
+
+        Args:
+            meter: OpenTelemetry meter that creates the instruments.
+
+        """
         self.ttft = _histogram(meter, METRIC_TTFT)
         self.request_latency = _histogram(meter, METRIC_REQUEST_LATENCY)
         self.token_latency = _histogram(meter, METRIC_TOKEN_LATENCY)
@@ -132,7 +174,12 @@ class MetricInstruments:
         self.websocket_send_latency = _histogram(meter, METRIC_WEBSOCKET_SEND_LATENCY)
 
     def _initialize_counters(self, meter: metrics.Meter) -> None:
-        """Initialize cumulative event counters."""
+        """Initialize cumulative event counters.
+
+        Args:
+            meter: OpenTelemetry meter that creates the instruments.
+
+        """
         self.requests_total = _counter(meter, METRIC_REQUESTS_TOTAL)
         self.tokens_generated_total = _counter(meter, METRIC_TOKENS_GENERATED_TOTAL)
         self.prompt_tokens_total = _counter(meter, METRIC_PROMPT_TOKENS_TOTAL)
@@ -154,7 +201,12 @@ class MetricInstruments:
 
 @dataclass(slots=True)
 class _MetricState:
-    """Process-wide metric instrument state."""
+    """Process-wide metric instrument state.
+
+    Attributes:
+        instruments: Metric instruments.
+
+    """
 
     instruments: MetricInstruments | None = None
 
@@ -163,7 +215,12 @@ _METRIC_STATE = _MetricState()
 
 
 def get_metrics() -> MetricInstruments:
-    """Return the global MetricInstruments (no-op meter if OTel not initialized)."""
+    """Return the global MetricInstruments (no-op meter if OTel not initialized).
+
+    Returns:
+        The global MetricInstruments (no-op meter if OTel not initialized).
+
+    """
     if _METRIC_STATE.instruments is None:
         meter = metrics.get_meter(_resource_name())
         _METRIC_STATE.instruments = MetricInstruments(meter)
@@ -171,7 +228,12 @@ def get_metrics() -> MetricInstruments:
 
 
 def initialize_metrics(gpu_provider: GPUProvider | None = None) -> None:
-    """Create MetricInstruments from the global meter and register GPU observables."""
+    """Create MetricInstruments from the global meter and register GPU observables.
+
+    Args:
+        gpu_provider: GPU provider.
+
+    """
     meter = metrics.get_meter(_resource_name())
     _METRIC_STATE.instruments = MetricInstruments(meter)
     if gpu_provider is not None:

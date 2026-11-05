@@ -65,7 +65,20 @@ CompletionCounter = Callable[[str], int]
 
 @dataclass(slots=True)
 class StreamConfig:
-    """Configuration for streaming."""
+    """Configuration for streaming.
+
+    Attributes:
+        session_id: ID of the session.
+        request_id: ID of the request.
+        prompt: Prompt text.
+        sampling_parameters: Sampling parameters.
+        engine: Inference engine that serves the request.
+        timeout_seconds: Timeout in seconds.
+        count_completion_tokens: Token count of the count completion.
+        flush_milliseconds: Flush in milliseconds.
+        cancellation_check: Cancellation check.
+
+    """
 
     session_id: str
     request_id: str
@@ -99,7 +112,12 @@ class StreamController:
     """
 
     def __init__(self, config: StreamConfig) -> None:
-        """Initialize stream controller state."""
+        """Initialize stream controller state.
+
+        Args:
+            config: Settings for this run.
+
+        """
         self._config = config
         self._full_text: str = ""  # Cumulative generated text
         self._first_byte_latency_milliseconds: float | None = None
@@ -109,11 +127,21 @@ class StreamController:
         self._start_time: float | None = None  # Stream start time
 
     def __aiter__(self) -> AsyncIterator[str]:
-        """Enable async iteration: `async for chunk in controller`."""
+        """Enable async iteration: `async for chunk in controller`.
+
+        Returns:
+            The async iterator.
+
+        """
         return self.iter_text()
 
     def _log_stream_start(self) -> float:
-        """Log stream start and return the monotonic start time."""
+        """Log stream start and return the monotonic start time.
+
+        Returns:
+            The monotonic start time.
+
+        """
         start = time.perf_counter()
         config = self._config
         self._start_time = start
@@ -128,7 +156,12 @@ class StreamController:
         return start
 
     async def _iter_emitted_chunks(self) -> AsyncGenerator[str, None]:
-        """Yield buffered chunks produced from engine deltas."""
+        """Yield buffered chunks produced from engine deltas.
+
+        Yields:
+            Buffered chunks produced from engine deltas.
+
+        """
         async for output in _stream_timed(self._config):
             delta = self._extract_delta(output)
             if not delta:
@@ -159,7 +192,12 @@ class StreamController:
         )
 
     def _log_stream_end(self, start: float) -> None:
-        """Log stream completion with elapsed time and output length."""
+        """Log stream completion with elapsed time and output length.
+
+        Args:
+            start: Start time or start position.
+
+        """
         elapsed_milliseconds = (time.perf_counter() - start) * 1000.0
         config = self._config
         logger.info(
@@ -172,7 +210,12 @@ class StreamController:
         )
 
     def _completion_token_count(self) -> int:
-        """Return the exact completion token count."""
+        """Return the exact completion token count.
+
+        Returns:
+            The exact completion token count.
+
+        """
         return max(0, int(self._config.count_completion_tokens(self._full_text)))
 
     async def iter_text(self) -> AsyncGenerator[str, None]:
@@ -182,8 +225,8 @@ class StreamController:
             Text chunks (possibly buffered based on flush_milliseconds).
 
         Raises:
-            asyncio.TimeoutError: If generation exceeds timeout_seconds.
-            StreamCancelledError: If cancel_check returns True.
+            Exception: The operation fails with this error.
+            TimeoutError: The wait ran out of time.
 
         """
         metrics = get_metrics()
@@ -214,7 +257,15 @@ class StreamController:
                 yield tail
 
     async def _iter_generation_chunks(self, start: float) -> AsyncGenerator[str, None]:
-        """Yield chunks while recording generation span metadata."""
+        """Yield chunks while recording generation span metadata.
+
+        Args:
+            start: Start time or start position.
+
+        Yields:
+            Chunks while recording generation span metadata.
+
+        """
         metrics = get_metrics()
         last_emit = start
         with generation_span(engine_type=type(self._config.engine).__name__) as generation_trace_span:
@@ -228,7 +279,15 @@ class StreamController:
             generation_trace_span.set_attribute("finish_reason", "complete")
 
     def _finalize_generation(self, start: float) -> str:
-        """Record final stream metrics and return any buffered tail."""
+        """Record final stream metrics and return any buffered tail.
+
+        Args:
+            start: Start time or start position.
+
+        Returns:
+            Any buffered tail.
+
+        """
         metrics = get_metrics()
         metrics.active_generations.add(-1)
         elapsed = time.perf_counter() - start
@@ -243,7 +302,15 @@ class StreamController:
         return tail
 
     def _extract_delta(self, output: EngineOutput) -> str:
-        """Extract new text from the cumulative engine output."""
+        """Extract new text from the cumulative engine output.
+
+        Args:
+            output: Engine output for this step.
+
+        Returns:
+            New text from the cumulative engine output.
+
+        """
         text = output.text
         delta = text if not text.startswith(self._full_text) else text[len(self._full_text) :]
         if not delta:
@@ -254,7 +321,15 @@ class StreamController:
         return delta
 
     def _emit(self, delta: str) -> list[str]:
-        """Buffer or emit a generation delta according to flush settings."""
+        """Buffer or emit a generation delta according to flush settings.
+
+        Args:
+            delta: Text added since the previous chunk.
+
+        Returns:
+            The resulting items.
+
+        """
         config = self._config
         if config.flush_milliseconds <= 0:
             self._record_ttfb()
@@ -273,7 +348,12 @@ class StreamController:
         return [chunk]
 
     def _flush_tail(self) -> str:
-        """Return any buffered text that was not flushed during streaming."""
+        """Return any buffered text that was not flushed during streaming.
+
+        Returns:
+            Any buffered text that was not flushed during streaming.
+
+        """
         if self._config.flush_milliseconds <= 0 or not self._buffer:
             return ""
         chunk = "".join(self._buffer)
@@ -308,7 +388,19 @@ class StreamController:
 async def _stream_timed(
     request: StreamConfig,
 ) -> AsyncGenerator[EngineOutput, None]:
-    """Stream generation with timeout and cancellation support."""
+    """Stream generation with timeout and cancellation support.
+
+    Args:
+        request: Request to run.
+
+    Yields:
+        Generation with timeout and cancellation support.
+
+    Raises:
+        StreamCancelledError: The operation fails with this error.
+        TimeoutError: The wait ran out of time.
+
+    """
     stream = request.engine.generate_stream(
         prompt=request.prompt,
         sampling_parameters=request.sampling_parameters,
@@ -329,7 +421,15 @@ async def _stream_timed(
 
 
 async def _is_cancellation_requested(cancellation_check: CancelCheck) -> bool:
-    """Return whether the optional cancellation callback has fired."""
+    """Return whether the optional cancellation callback has fired.
+
+    Args:
+        cancellation_check: Cancellation check.
+
+    Returns:
+        Whether the optional cancellation callback has fired.
+
+    """
     if cancellation_check is None:
         return False
     result = cancellation_check()

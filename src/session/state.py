@@ -11,7 +11,13 @@ from dataclasses import field, dataclass
 
 @dataclass
 class HistoryMessage:
-    """One stored history message."""
+    """One stored history message.
+
+    Attributes:
+        role: Chat role of the message.
+        content: Text content of the message.
+
+    """
 
     role: Literal["user", "assistant"]
     content: str

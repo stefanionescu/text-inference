@@ -8,7 +8,16 @@ from dataclasses import dataclass
 
 @dataclass(slots=True)
 class TokenizerValidationResult:
-    """Result of tokenizer validation."""
+    """Result of tokenizer validation.
+
+    Attributes:
+        is_valid: Whether it is valid.
+        error_message: Error message.
+        model_path: Path of the model.
+        has_tokenizer_json: Whether a tokenizer JSON exists.
+        has_tokenizer_config: Whether a tokenizer config exists.
+
+    """
 
     is_valid: bool
     error_message: str | None
@@ -18,7 +27,20 @@ class TokenizerValidationResult:
 
 
 def require_local_model_directory(model_path: str | Path) -> Path:
-    """Return an existing resolved local model directory."""
+    """Return an existing resolved local model directory.
+
+    Args:
+        model_path: Path of the model.
+
+    Returns:
+        An existing resolved local model directory.
+
+    Raises:
+        FileNotFoundError: Model directory does not exist: `candidate`.
+        NotADirectoryError: Model path must be a directory: `resolved`.
+        ValueError: Model path is empty.
+
+    """
     if not str(model_path):
         message = "Model path is empty"
         raise ValueError(message)

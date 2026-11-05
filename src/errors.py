@@ -8,14 +8,16 @@ class ValidationError(Exception):
     both an error_code (for programmatic handling) and a message
     (for human-readable error responses).
 
-    Attributes:
-        error_code: Machine-parseable error identifier.
-        message: Human-readable error description.
-
     """
 
     def __init__(self, error_code: str, message: str) -> None:
-        """Initialize validation error details."""
+        """Initialize validation error details.
+
+        Args:
+            error_code: Code of the error.
+            message: Message to send, check, or report.
+
+        """
         super().__init__(message)
         self.error_code = error_code
         self.message = message
@@ -36,11 +38,6 @@ class RateLimitError(Exception):
     This exception provides information about when the client can retry
     and the limit that was exceeded.
 
-    Attributes:
-        retry_after_seconds: Seconds until a new slot becomes available.
-        limit: The maximum allowed events per window.
-        window_seconds: The duration of the rate limit window.
-
     """
 
     def __init__(
@@ -51,7 +48,15 @@ class RateLimitError(Exception):
         window_seconds: float,
         message: str | None = None,
     ) -> None:
-        """Initialize rate-limit retry metadata."""
+        """Initialize rate-limit retry metadata.
+
+        Args:
+            retry_after_seconds: Retry after in seconds.
+            limit: Largest number to allow.
+            window_seconds: Window in seconds.
+            message: Message to send, check, or report.
+
+        """
         super().__init__(message or "rate limit exceeded")
         self.retry_after_seconds = max(0.0, float(retry_after_seconds))
         self.limit = max(0, int(limit))

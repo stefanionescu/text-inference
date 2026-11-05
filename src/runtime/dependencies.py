@@ -18,22 +18,56 @@ if TYPE_CHECKING:
 
 
 class ConnectionRegistryProtocol(Protocol):
-    """Connection registry behavior required by request runtime."""
+    """Connection registry behavior required by request runtime.
+
+    Attributes:
+        active_connections: Active connections.
+
+    """
 
     active_connections: set[WebSocket]
 
     async def connect(self, websocket: WebSocket) -> bool:
-        """Admit a WebSocket connection."""
+        """Admit a WebSocket connection.
+
+        Args:
+            websocket: WebSocket connection of the client.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(websocket)
 
     async def disconnect(self, websocket: WebSocket) -> None:
-        """Release a WebSocket connection."""
+        """Release a WebSocket connection.
+
+        Args:
+            websocket: WebSocket connection of the client.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(websocket)
 
 
 @dataclass(slots=True)
 class RuntimeDependencies:
-    """Process-wide runtime services initialized during startup."""
+    """Process-wide runtime services initialized during startup.
+
+    Attributes:
+        connections: Registry of open connections.
+        session_runtime: Session runtime.
+        engine: Inference engine that serves the request.
+        cache_reset_coordinator: Cache reset coordinator.
+        tokenizer: Tokenizer to use.
+        settings: Application settings.
+
+    """
 
     connections: ConnectionRegistryProtocol
     session_runtime: SessionRuntime
@@ -43,7 +77,12 @@ class RuntimeDependencies:
     settings: ApplicationSettings
 
     def can_reset_cache(self) -> bool:
-        """Return whether engine cache reset is available."""
+        """Return whether engine cache reset is available.
+
+        Returns:
+            Whether engine cache reset is available.
+
+        """
         return self.engine.can_reset_cache and self.cache_reset_coordinator is not None
 
     async def reset_engine_caches(
@@ -52,7 +91,16 @@ class RuntimeDependencies:
         *,
         is_rate_limit_bypassed: bool = False,
     ) -> bool:
-        """Reset engine caches when the runtime supports it."""
+        """Reset engine caches when the runtime supports it.
+
+        Args:
+            reason: Reason text to report.
+            is_rate_limit_bypassed: Whether rate limit is bypassed.
+
+        Returns:
+            Whether the check passes.
+
+        """
         coordinator = self.cache_reset_coordinator
         if coordinator is None:
             return False

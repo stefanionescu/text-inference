@@ -35,7 +35,21 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class GenerationRequest:
-    """Inputs needed to stream one generation."""
+    """Inputs needed to stream one generation.
+
+    Attributes:
+        state: State of the session or test run.
+        prompt: Prompt text.
+        engine: Inference engine that serves the request.
+        tokenizer: Tokenizer to use.
+        session_settings: Settings for session.
+        timeout_settings: Settings for timeout.
+        sampling_settings: Settings for sampling.
+        request_id: ID of the request.
+        sampling_overrides: Sampling overrides.
+        prompt_token_count: Number of prompt token items.
+
+    """
 
     state: SessionState
     prompt: str
@@ -50,7 +64,16 @@ class GenerationRequest:
 
 
 def _build_logit_bias_map(tokenizer: ThreadSafeTokenizer, *, sampling_settings: SamplingSettings) -> dict[int, float]:
-    """Build logit bias map from text tokens to token IDs."""
+    """Build logit bias map from text tokens to token IDs.
+
+    Args:
+        tokenizer: Tokenizer to use.
+        sampling_settings: Settings for sampling.
+
+    Returns:
+        Logit bias map from text tokens to token IDs.
+
+    """
     if not sampling_settings.logit_bias:
         return {}
 
@@ -73,7 +96,16 @@ async def _stream_sanitized(
     *,
     is_sanitization_enabled: bool,
 ) -> AsyncGenerator[str, None]:
-    """Yield stream chunks through the output sanitizer when enabled."""
+    """Yield stream chunks through the output sanitizer when enabled.
+
+    Args:
+        stream: Stream to read from.
+        is_sanitization_enabled: Whether sanitization is enabled.
+
+    Yields:
+        Stream chunks through the output sanitizer when enabled.
+
+    """
     sanitizer = StreamingSanitizer() if is_sanitization_enabled else None
     async for chunk in stream:
         if sanitizer is None:
@@ -93,7 +125,16 @@ def build_sampling_overrides(
     *,
     sampling_settings: SamplingSettings,
 ) -> dict[str, float | int | bool]:
-    """Resolve request sampling overrides against configured defaults."""
+    """Resolve request sampling overrides against configured defaults.
+
+    Args:
+        overrides: Values that replace the defaults.
+        sampling_settings: Settings for sampling.
+
+    Returns:
+        Request sampling overrides against configured defaults.
+
+    """
     return {
         "temperature": float(overrides.get("temperature", sampling_settings.temperature)),
         "top_p": float(overrides.get("top_p", sampling_settings.top_p)),
@@ -107,7 +148,19 @@ def build_sampling_overrides(
 
 
 async def run_generation(request: GenerationRequest) -> AsyncGenerator[str, None]:
-    """Stream generation with optional micro-coalescing."""
+    """Stream generation with optional micro-coalescing.
+
+    Args:
+        request: Request to run.
+
+    Yields:
+        Generation with optional micro-coalescing.
+
+    Raises:
+        ValueError: Prompt exceeds exact context budget before engine call (`resolved_prompt_token_count` >
+            `maximum_context_length`).
+
+    """
     request_id = request.request_id or f"generation-{uuid.uuid4()}"
 
     overrides = build_sampling_overrides(

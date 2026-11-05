@@ -33,7 +33,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class SessionDispatch:
-    """Inputs needed to dispatch one session message."""
+    """Inputs needed to dispatch one session message.
+
+    Attributes:
+        websocket: WebSocket connection of the client.
+        message_type: Type of the message.
+        message: Message to send, check, or report.
+        state: State of the session or test run.
+        is_started: Whether it is started.
+        runtime_dependencies: Runtime dependencies.
+
+    """
 
     websocket: WebSocket
     message_type: str
@@ -47,7 +57,16 @@ async def _handle_control_message(
     websocket: WebSocket,
     message_type: str,
 ) -> bool:
-    """Process ping/pong/end messages; return True if connection should close."""
+    """Process ping/pong/end messages; return True if connection should close.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message_type: Type of the message.
+
+    Returns:
+        Whether the check passes.
+
+    """
     if message_type == "ping":
         await safe_send_flat(websocket, "pong")
         return False
@@ -63,7 +82,16 @@ async def _handle_control_message(
 
 
 async def _parse_incoming(websocket: WebSocket, raw_message: str) -> dict[str, Any] | None:
-    """Parse raw text into a flat message dict or None on error."""
+    """Parse raw text into a flat message dict or None on error.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        raw_message: Unvalidated message as received.
+
+    Returns:
+        A flat message dict or None on error.
+
+    """
     started_at = time.perf_counter()
     try:
         parsed = parse_client_message(raw_message, websocket_settings=websocket.app.state.settings.websocket)
@@ -84,7 +112,18 @@ async def _apply_rate_limit(
     message_limiter: SlidingWindowRateLimiter,
     cancel_limiter: SlidingWindowRateLimiter,
 ) -> bool:
-    """Apply the appropriate rate limiter for one message type."""
+    """Apply the appropriate rate limiter for one message type.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message_type: Type of the message.
+        message_limiter: Rate limiter for message.
+        cancel_limiter: Rate limiter for cancel.
+
+    Returns:
+        The updated value.
+
+    """
     limiter = select_rate_limiter(message_type, message_limiter, cancel_limiter)
     if limiter is None:
         return True
@@ -92,7 +131,15 @@ async def _apply_rate_limit(
 
 
 async def _handle_start_command(dispatch: SessionDispatch) -> bool:
-    """Process an initial start command and return session-start state."""
+    """Process an initial start command and return session-start state.
+
+    Args:
+        dispatch: Session callbacks that handle each frame.
+
+    Returns:
+        Session-start state.
+
+    """
     if dispatch.is_started:
         await send_error(
             dispatch.websocket,
@@ -113,7 +160,15 @@ async def _handle_start_command(dispatch: SessionDispatch) -> bool:
 
 
 async def _handle_message_command(dispatch: SessionDispatch) -> bool:
-    """Process a follow-up message command."""
+    """Process a follow-up message command.
+
+    Args:
+        dispatch: Session callbacks that handle each frame.
+
+    Returns:
+        Whether the check passes.
+
+    """
     if not dispatch.is_started:
         await send_error(
             dispatch.websocket,
@@ -137,7 +192,15 @@ async def _handle_message_command(dispatch: SessionDispatch) -> bool:
 
 
 async def _handle_turn_command(dispatch: SessionDispatch) -> bool:
-    """Process start or message commands and return the updated started flag."""
+    """Process start or message commands and return the updated started flag.
+
+    Args:
+        dispatch: Session callbacks that handle each frame.
+
+    Returns:
+        The updated started flag.
+
+    """
     if dispatch.message_type == "start":
         return await _handle_start_command(dispatch)
     if dispatch.message_type == "message":
@@ -146,7 +209,15 @@ async def _handle_turn_command(dispatch: SessionDispatch) -> bool:
 
 
 async def _dispatch_session_message(dispatch: SessionDispatch) -> bool:
-    """Dispatch a session message. Returns the new 'started' flag."""
+    """Dispatch a session message. Returns the new 'started' flag.
+
+    Args:
+        dispatch: Session callbacks that handle each frame.
+
+    Returns:
+        Whether the check passes.
+
+    """
     if dispatch.message_type in {"start", "message"}:
         return await _handle_turn_command(dispatch)
     if dispatch.message_type == "cancel":
@@ -171,7 +242,19 @@ async def run_receiver(
     *,
     state: SessionState,
 ) -> None:
-    """Receive and dispatch messages using the connection-owned session state."""
+    """Receive and dispatch messages using the connection-owned session state.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        lifecycle: Tracker for the WebSocket connection lifecycle.
+        rate_limiters: Rate limiters.
+        runtime_dependencies: Runtime dependencies.
+        state: State of the session or test run.
+
+    Raises:
+        Exception: The operation fails with this error.
+
+    """
     message_limiter, cancel_limiter = rate_limiters
     is_started = False
 

@@ -45,7 +45,17 @@ logger = getLogger(__name__)
 
 @dataclass(frozen=True)
 class ConnectionFinalization:
-    """Inputs for WebSocket connection teardown."""
+    """Inputs for WebSocket connection teardown.
+
+    Attributes:
+        websocket: WebSocket connection of the client.
+        runtime_dependencies: Runtime dependencies.
+        lifecycle: Tracker for the WebSocket connection lifecycle.
+        state: State of the session or test run.
+        is_admitted: Whether it is admitted.
+        generation_count: Number of generation items.
+
+    """
 
     websocket: WebSocket
     runtime_dependencies: RuntimeDependencies
@@ -56,7 +66,20 @@ class ConnectionFinalization:
 
 
 async def _prepare_connection(websocket: WebSocket, runtime_dependencies: RuntimeDependencies) -> bool:
-    """Authenticate and admit a WebSocket connection."""
+    """Authenticate and admit a WebSocket connection.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        runtime_dependencies: Runtime dependencies.
+
+    Returns:
+        Whether the check passes.
+
+    Raises:
+        RuntimeError: The operation cannot finish.
+        WebSocketDisconnect: The operation fails with this error.
+
+    """
     connections = runtime_dependencies.connections
     if not await authenticate_websocket(
         websocket,
@@ -95,7 +118,16 @@ async def _prepare_connection(websocket: WebSocket, runtime_dependencies: Runtim
 
 
 async def _cleanup_session(runtime_dependencies: RuntimeDependencies, state: SessionState) -> float:
-    """Clean up session resources on disconnect and return duration."""
+    """Clean up session resources on disconnect and return duration.
+
+    Args:
+        runtime_dependencies: Runtime dependencies.
+        state: State of the session or test run.
+
+    Returns:
+        Duration.
+
+    """
     started_at = time.perf_counter()
     duration = max(0.0, time.monotonic() - state.created_at)
     try:
@@ -110,7 +142,15 @@ async def _cleanup_session(runtime_dependencies: RuntimeDependencies, state: Ses
 def _create_rate_limiters(
     runtime_dependencies: RuntimeDependencies,
 ) -> tuple[SlidingWindowRateLimiter, SlidingWindowRateLimiter]:
-    """Initialize per-connection rate limiters from startup settings."""
+    """Initialize per-connection rate limiters from startup settings.
+
+    Args:
+        runtime_dependencies: Runtime dependencies.
+
+    Returns:
+        The resulting items.
+
+    """
     settings = runtime_dependencies.settings.websocket
     return (
         SlidingWindowRateLimiter(
@@ -125,14 +165,28 @@ def _create_rate_limiters(
 
 
 async def _stop_lifecycle(lifecycle: WebSocketLifecycle | None) -> None:
-    """Stop a lifecycle watchdog if one was started."""
+    """Stop a lifecycle watchdog if one was started.
+
+    Args:
+        lifecycle: Tracker for the WebSocket connection lifecycle.
+
+    """
     if lifecycle is not None:
         with contextlib.suppress(RuntimeError):
             await lifecycle.stop()
 
 
 async def _cleanup_state(runtime_dependencies: RuntimeDependencies, state: SessionState | None) -> float:
-    """Cleanup session state and return its duration."""
+    """Cleanup session state and return its duration.
+
+    Args:
+        runtime_dependencies: Runtime dependencies.
+        state: State of the session or test run.
+
+    Returns:
+        Its duration.
+
+    """
     if state is not None:
         try:
             return await _cleanup_session(runtime_dependencies, state)
@@ -146,7 +200,16 @@ async def _cleanup_state(runtime_dependencies: RuntimeDependencies, state: Sessi
 
 
 async def _disconnect_admitted(finalization: ConnectionFinalization, session_duration: float) -> int:
-    """Disconnect an admitted socket and return remaining connection count."""
+    """Disconnect an admitted socket and return remaining connection count.
+
+    Args:
+        finalization: Finalization.
+        session_duration: Session duration.
+
+    Returns:
+        Remaining connection count.
+
+    """
     if not finalization.is_admitted:
         return 0
 
@@ -167,7 +230,12 @@ async def _disconnect_admitted(finalization: ConnectionFinalization, session_dur
 
 
 async def _finalize_connection(finalization: ConnectionFinalization) -> None:
-    """Run teardown actions after the connection loop exits."""
+    """Run teardown actions after the connection loop exits.
+
+    Args:
+        finalization: Finalization.
+
+    """
     await _stop_lifecycle(finalization.lifecycle)
     session_duration = await _cleanup_state(finalization.runtime_dependencies, finalization.state)
     remaining = await _disconnect_admitted(finalization, session_duration)
@@ -176,7 +244,16 @@ async def _finalize_connection(finalization: ConnectionFinalization) -> None:
 
 
 def _start_lifecycle(websocket: WebSocket, runtime_dependencies: RuntimeDependencies) -> WebSocketLifecycle:
-    """Create and start the WebSocket lifecycle watchdog."""
+    """Create and start the WebSocket lifecycle watchdog.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        runtime_dependencies: Runtime dependencies.
+
+    Returns:
+        And start the WebSocket lifecycle watchdog.
+
+    """
     lifecycle = WebSocketLifecycle(
         websocket,
         idle_timeout_seconds=runtime_dependencies.settings.websocket.idle_timeout_seconds,
@@ -192,7 +269,15 @@ async def _run_accepted_connection(
     lifecycle: WebSocketLifecycle,
     state: SessionState,
 ) -> None:
-    """Run the receiver for an admitted WebSocket connection."""
+    """Run the receiver for an admitted WebSocket connection.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        runtime_dependencies: Runtime dependencies.
+        lifecycle: Tracker for the WebSocket connection lifecycle.
+        state: State of the session or test run.
+
+    """
     metrics = get_metrics()
     metrics.active_connections.add(1)
     add_breadcrumb("Connection accepted", category="server")
@@ -231,14 +316,26 @@ async def _run_accepted_connection(
 
 
 async def clear_after_last_disconnect(finalization: ConnectionFinalization, remaining: int) -> None:
-    """Clear engine caches when the last client disconnects."""
+    """Clear engine caches when the last client disconnects.
+
+    Args:
+        finalization: Finalization.
+        remaining: Amount that is still left.
+
+    """
     if remaining == 0:
         with contextlib.suppress(RuntimeError):
             await finalization.runtime_dependencies.clear_caches_on_disconnect()
 
 
 async def handle_websocket_connection(websocket: WebSocket, runtime_dependencies: RuntimeDependencies) -> None:
-    """Route one WebSocket connection through the message loop."""
+    """Route one WebSocket connection through the message loop.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        runtime_dependencies: Runtime dependencies.
+
+    """
     client = websocket.client
     client_id = f"{client.host}:{client.port}" if client else "unknown"
     tokens = set_log_context(client_id=client_id)

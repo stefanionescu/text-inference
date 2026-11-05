@@ -10,7 +10,15 @@ _EXAMPLE_FOLDER = Path(__file__).with_name("examples")
 
 
 def _read_warm_history() -> list[dict[str, str]]:
-    """Load warm-history messages from JSON fixture examples."""
+    """Load warm-history messages from JSON fixture examples.
+
+    Returns:
+        Warm-history messages from JSON fixture examples.
+
+    Raises:
+        TypeError: Warm history fixture must be a list.
+
+    """
     raw: object = json.loads((_EXAMPLE_FOLDER / "warm_history.json").read_text(encoding="utf-8"))
     if not isinstance(raw, list):
         message = "warm history fixture must be a list"

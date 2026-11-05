@@ -20,7 +20,17 @@ def parse_upload_arguments(
     *,
     is_format_required: bool,
 ) -> argparse.Namespace:
-    """Parse the stable upload flags; only the TensorRT command also requires --format."""
+    """Parse the stable upload flags; only the TensorRT command also requires --format.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+        description: Description.
+        is_format_required: Whether format is required.
+
+    Returns:
+        The stable upload flags; only the TensorRT command also requires --format.
+
+    """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument("--repo-id", required=True)
@@ -31,7 +41,18 @@ def parse_upload_arguments(
 
 
 def require_checkpoint_folder(checkpoint_folder: str) -> Path:
-    """Resolve the flag value to an existing path, rejecting anything but a directory."""
+    """Resolve the flag value to an existing path, rejecting anything but a directory.
+
+    Args:
+        checkpoint_folder: Folder of the checkpoint.
+
+    Returns:
+        The flag value to an existing path, rejecting anything but a directory.
+
+    Raises:
+        NotADirectoryError: Checkpoint must be a directory.
+
+    """
     resolved_folder = Path(checkpoint_folder).resolve(strict=True)
     if not resolved_folder.is_dir():
         message = "Checkpoint must be a directory"
@@ -47,7 +68,17 @@ def publish_checkpoint(
     commit_message: str,
     ignore_patterns: Sequence[str],
 ) -> None:
-    """Write the card into the checkpoint, then create the Hub repository and upload the folder."""
+    """Write the card into the checkpoint, then create the Hub repository and upload the folder.
+
+    Args:
+        checkpoint_folder: Folder of the checkpoint.
+        model_card: Model card.
+        arguments: Parsed command-line arguments.
+        hf_token: Hugging Face token.
+        commit_message: Commit message.
+        ignore_patterns: Ignore patterns.
+
+    """
     (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
 
     hf_client = HfApi(token=hf_token)

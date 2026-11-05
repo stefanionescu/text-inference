@@ -48,12 +48,6 @@ class WebSocketLifecycle:
     This class manages the lifecycle of a single WebSocket connection,
     specifically handling idle timeout detection and enforcement.
 
-    Attributes:
-        _websocket: The WebSocket connection being managed.
-        _idle_timeout_seconds: Seconds of inactivity before closing.
-        _watchdog_tick_seconds: How often to check for idleness.
-        _last_activity_time: Monotonic timestamp of last activity.
-
     """
 
     def __init__(
@@ -63,7 +57,15 @@ class WebSocketLifecycle:
         watchdog_tick_seconds: float,
         idle_close_code: int | None = None,
     ) -> None:
-        """Initialize lifecycle timers for one WebSocket."""
+        """Initialize lifecycle timers for one WebSocket.
+
+        Args:
+            websocket: WebSocket connection of the client.
+            idle_timeout_seconds: Idle timeout in seconds.
+            watchdog_tick_seconds: Watchdog tick in seconds.
+            idle_close_code: Code of the idle close.
+
+        """
         self._websocket = websocket
         self._idle_timeout_seconds = float(idle_timeout_seconds)
         self._watchdog_tick_seconds = float(watchdog_tick_seconds)
@@ -82,14 +84,24 @@ class WebSocketLifecycle:
             logger.debug("monotonic clock moved backward while touching websocket lifecycle")
 
     def has_idle_timed_out(self) -> bool:
-        """Check whether the watchdog has fired an idle timeout close."""
+        """Check whether the watchdog has fired an idle timeout close.
+
+        Returns:
+            Whether the watchdog has fired an idle timeout close.
+
+        """
         has_timed_out = self._idle_timeout_event.is_set()
         if has_timed_out:
             self._watchdog_stop_event.set()
         return has_timed_out
 
     def start(self) -> asyncio.Task[None]:
-        """Start the watchdog task (idempotent)."""
+        """Start the watchdog task (idempotent).
+
+        Returns:
+            The task.
+
+        """
         task = self._watchdog_task
         if task is None:
             self._watchdog_task = asyncio.create_task(self._watchdog_loop())
@@ -111,6 +123,10 @@ class WebSocketLifecycle:
 
         Runs until stopped or idle timeout is reached. Closes the WebSocket
         with an appropriate code when idle timeout expires.
+
+        Raises:
+            asyncio.CancelledError: The task was cancelled.
+
         """
         watchdog_tick_seconds = self._watchdog_tick_seconds
         try:

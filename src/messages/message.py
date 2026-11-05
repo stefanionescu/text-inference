@@ -32,7 +32,15 @@ async def _send_turn_error(
     message: str,
     is_close_requested: bool = False,
 ) -> None:
-    """Send a turn-planning error and optionally close the socket."""
+    """Send a turn-planning error and optionally close the socket.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        code: Error or close code.
+        message: Message to send, check, or report.
+        is_close_requested: Whether close is requested.
+
+    """
     await send_error(websocket, code=code, message=message)
     if is_close_requested:
         await websocket.close(code=1008)
@@ -45,7 +53,18 @@ async def plan_message_turn(
     *,
     session_runtime: SessionRuntime,
 ) -> TurnRequest | None:
-    """Build a validated turn plan from a follow-up message payload."""
+    """Build a validated turn plan from a follow-up message payload.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message: Message to send, check, or report.
+        state: State of the session or test run.
+        session_runtime: Session runtime.
+
+    Returns:
+        A validated turn plan from a follow-up message payload.
+
+    """
     started_at = time.perf_counter()
     try:
         raw_user_utterance = message.get("user_utterance")

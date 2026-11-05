@@ -14,7 +14,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class _StreamPrinter:
-    """Print streaming tokens to standard output."""
+    """Print streaming tokens to standard output.
+
+    Attributes:
+        is_header_printed: Whether header is printed.
+
+    """
 
     is_header_printed: bool = False
 
@@ -35,7 +40,14 @@ class _StreamPrinter:
 
 @dataclass
 class _StreamContext:
-    """Track state during response streaming."""
+    """Track state during response streaming.
+
+    Attributes:
+        state: State of the session or test run.
+        printer: Object that prints streamed text.
+        pending_ttfb_milliseconds: Pending first-byte time in milliseconds.
+
+    """
 
     state: StreamState
     printer: _StreamPrinter = field(default_factory=_StreamPrinter)

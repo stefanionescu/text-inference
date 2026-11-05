@@ -51,7 +51,18 @@ def _run_authentication(
     authentication_failures: dict[str, deque[float]] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> bool:
-    """Authenticate one connection against the API key "secret", by default with no earlier failures."""
+    """Authenticate one connection against the API key "secret", by default with no earlier failures.
+
+    Args:
+        headers: HTTP headers of the request.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+        clock: Function that returns the current time.
+
+    Returns:
+        Whether the check passes.
+
+    """
     websocket = _FakeWebSocket(headers=headers)
     policy = authentication_module.build_authentication_policy(
         authentication_settings=AuthenticationSettings(api_key="secret"),
@@ -77,7 +88,13 @@ def _run_authentication(
     ],
 )
 def test_authentication_outcomes(headers: dict[str, str], *, is_authenticated: bool) -> None:
-    """Test websocket authentication accepts valid headers and rejects invalid inputs."""
+    """Test websocket authentication accepts valid headers and rejects invalid inputs.
+
+    Args:
+        headers: HTTP headers of the request.
+        is_authenticated: Whether it is authenticated.
+
+    """
     assert _run_authentication(headers) is is_authenticated
 
 

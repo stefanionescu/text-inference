@@ -35,7 +35,12 @@ configure_logging()
 
 
 async def _shutdown_runtime(application: FastAPI) -> None:
-    """Shutdown runtime dependencies and telemetry."""
+    """Shutdown runtime dependencies and telemetry.
+
+    Args:
+        application: FastAPI application to serve or test.
+
+    """
     runtime_dependencies = getattr(application.state, "runtime_dependencies", None)
     try:
         if runtime_dependencies is not None:
@@ -51,11 +56,30 @@ def _build_public_lifespan(
     gpu_provider: GPUProvider | None,
     readiness_state: ReadinessState,
 ) -> Callable[[FastAPI], AbstractAsyncContextManager[None]]:
-    """Build the public application lifespan manager."""
+    """Build the public application lifespan manager.
+
+    Args:
+        settings: Application settings.
+        engine_builder: Engine builder.
+        gpu_provider: GPU provider.
+        readiness_state: State of the readiness.
+
+    Returns:
+        The public application lifespan manager.
+
+    """
 
     @contextlib.asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
-        """Initialize runtime dependencies and drain them on shutdown."""
+        """Initialize runtime dependencies and drain them on shutdown.
+
+        Args:
+            application: FastAPI application to serve or test.
+
+        Raises:
+            Exception: The operation fails with this error.
+
+        """
         start_time = time.monotonic()
         readiness_state.start_initializing()
         validate_settings(settings)
@@ -93,7 +117,15 @@ def _build_public_lifespan(
 
 
 async def websocket_endpoint(websocket: WebSocket) -> None:
-    """Process one public WebSocket connection."""
+    """Process one public WebSocket connection.
+
+    Args:
+        websocket: WebSocket connection of the client.
+
+    Raises:
+        RuntimeError: Runtime dependencies are not initialized.
+
+    """
     runtime_dependencies = getattr(websocket.app.state, "runtime_dependencies", None)
     if runtime_dependencies is None:
         message = "Runtime dependencies are not initialized"
@@ -102,7 +134,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
 
 async def readiness_status(request: Request) -> JSONResponse:
-    """Report event-loop health or public runtime readiness."""
+    """Report event-loop health or public runtime readiness.
+
+    Args:
+        request: Request to run.
+
+    Returns:
+        The jsonresponse.
+
+    """
     if request.url.path == "/healthz":
         return JSONResponse({"status": "alive"})
     readiness_state: ReadinessState = request.app.state.readiness_state
@@ -119,7 +159,19 @@ def create_public_application(
     readiness_state: ReadinessState | None = None,
     is_lifecycle_enabled: bool = True,
 ) -> FastAPI:
-    """Create the public WebSocket-only application."""
+    """Create the public WebSocket-only application.
+
+    Args:
+        settings: Application settings.
+        engine_builder: Engine builder.
+        gpu_provider: GPU provider.
+        readiness_state: State of the readiness.
+        is_lifecycle_enabled: Whether lifecycle is enabled.
+
+    Returns:
+        The public WebSocket-only application.
+
+    """
     active_readiness_state = ReadinessState() if readiness_state is None else readiness_state
     lifespan = (
         _build_public_lifespan(
@@ -140,7 +192,15 @@ def create_public_application(
 
 
 def create_readiness_application(readiness_state: ReadinessState) -> FastAPI:
-    """Create the fixed loopback health and readiness application."""
+    """Create the fixed loopback health and readiness application.
+
+    Args:
+        readiness_state: State of the readiness.
+
+    Returns:
+        The fixed loopback health and readiness application.
+
+    """
     application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     application.state.readiness_state = readiness_state
     application.get("/healthz")(readiness_status)

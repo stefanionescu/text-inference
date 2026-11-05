@@ -6,7 +6,15 @@ _TRAILING_CHARS = {'"', "'", ")", "]", "}"}
 
 
 def contains_complete_sentence(text: str) -> bool:
-    """Return True if the text contains a complete sentence terminator."""
+    """Return True if the text contains a complete sentence terminator.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        True if the text contains a complete sentence terminator.
+
+    """
     for index, char in enumerate(text):
         if char not in ".!?":
             continue
@@ -19,7 +27,16 @@ def contains_complete_sentence(text: str) -> bool:
 
 
 def has_minimum_word_count(text: str, minimum_words: int) -> bool:
-    """Return whether text has the minimum whitespace-delimited word count."""
+    """Return whether text has the minimum whitespace-delimited word count.
+
+    Args:
+        text: Text to process.
+        minimum_words: Smallest allowed words.
+
+    Returns:
+        Whether text has the minimum whitespace-delimited word count.
+
+    """
     return len(text.strip().split()) >= minimum_words
 
 

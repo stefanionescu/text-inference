@@ -55,7 +55,13 @@ def test_unsupported_moe_rejected(
     model_type: str,
     text_config: dict[str, object],
 ) -> None:
-    """Test nested and alternate expert fields cannot select a generic recipe."""
+    """Test nested and alternate expert fields cannot select a generic recipe.
+
+    Args:
+        model_type: Type of the model.
+        text_config: Text config.
+
+    """
     with pytest.raises(ValueError, match="is not supported"):
         select_policy({"model_type": model_type}, text_config)
 

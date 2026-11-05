@@ -17,12 +17,28 @@ class IdleTimeoutError(ConnectionClosedError):
         close_code: int | None = WEBSOCKET_IDLE_CLOSE_CODE,
         close_reason: str | None = WEBSOCKET_IDLE_CLOSE_REASON,
     ) -> None:
-        """Build an idle-timeout close error."""
+        """Build an idle-timeout close error.
+
+        Args:
+            message: Message to send, check, or report.
+            close_code: Code of the close.
+            close_reason: Close reason.
+
+        """
         super().__init__(message, close_code=close_code, close_reason=close_reason)
 
     @staticmethod
     def matches(close_code: int | None, close_reason: str | None) -> bool:
-        """Return whether close metadata represents an idle timeout."""
+        """Return whether close metadata represents an idle timeout.
+
+        Args:
+            close_code: Code of the close.
+            close_reason: Close reason.
+
+        Returns:
+            Whether close metadata represents an idle timeout.
+
+        """
         if close_code == WEBSOCKET_IDLE_CLOSE_CODE:
             return True
         if close_reason is None:

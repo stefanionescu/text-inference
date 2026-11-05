@@ -47,7 +47,16 @@ def test_quantization_matrix(
     expected_action: str,
     runtime_format: str | None,
 ) -> None:
-    """Test unchanged, exported, and online deployment decisions."""
+    """Test unchanged, exported, and online deployment decisions.
+
+    Args:
+        engine: Inference engine that serves the request.
+        source_format: Format of the source.
+        requested_format: Format of the requested.
+        expected_action: Expected action.
+        runtime_format: Format of the runtime.
+
+    """
     plan = build_quantization_plan(engine, source_format, requested_format)
 
     assert plan.action == expected_action
@@ -79,7 +88,12 @@ def test_unexportable_request_rejected() -> None:
 
 
 def test_local_inspection_identity(tmp_path: Path) -> None:
-    """Test local inspection separates source identity and runtime format."""
+    """Test local inspection separates source identity and runtime format.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     model_folder = tmp_path / "model"
     model_folder.mkdir()
     config = {"quantization_config": {"quant_method": AWQ_FORMAT}}

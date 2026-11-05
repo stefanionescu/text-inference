@@ -21,7 +21,15 @@ if TYPE_CHECKING:
 
 
 def build_start_payload(session: LiveSession) -> dict[str, Any]:
-    """Build the bootstrap-only start payload for a live session turn."""
+    """Build the bootstrap-only start payload for a live session turn.
+
+    Args:
+        session: Session to use.
+
+    Returns:
+        The bootstrap-only start payload for a live session turn.
+
+    """
     context = SessionContext(
         session_id=session.session_id,
         gender=session.profile.gender,
@@ -33,7 +41,16 @@ def build_start_payload(session: LiveSession) -> dict[str, Any]:
 
 
 def build_message_payload(session: LiveSession, user_text: str) -> dict[str, Any]:
-    """Build the message payload for subsequent live session turns."""
+    """Build the message payload for subsequent live session turns.
+
+    Args:
+        session: Session to use.
+        user_text: Text of the user.
+
+    Returns:
+        The message payload for subsequent live session turns.
+
+    """
     return build_websocket_message_payload(
         user_text,
         sampling=session.sampling,

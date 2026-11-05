@@ -15,7 +15,12 @@ CUDA_MISMATCH_EXIT_CODE = 42
 
 
 def test_cuda_import_failure(tmp_path: Path) -> None:
-    """Retain the import error after Python clears the exception target."""
+    """Retain the import error after Python clears the exception target.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     (tmp_path / "torch.py").write_text(
         'from types import SimpleNamespace\n__version__ = "test"\nversion = SimpleNamespace(cuda="12.0")\n',
         encoding="utf-8",

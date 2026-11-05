@@ -34,7 +34,20 @@ from .clients import NormalClientRequest, CancelingClientRequest, run_normal_cli
 
 @dataclass(frozen=True)
 class CancelSuiteRequest:
-    """Inputs for the multi-client cancel test suite."""
+    """Inputs for the multi-client cancel test suite.
+
+    Attributes:
+        server_url: Server URL.
+        api_key: Key of the API.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        client_count: Number of client items.
+        cancel_delay_seconds: Cancel delay in seconds.
+        drain_timeout_seconds: Drain timeout in seconds.
+        post_cancel_wait_seconds: Post cancel wait in seconds.
+        receive_timeout_seconds: Receive timeout in seconds.
+
+    """
 
     server_url: str
     api_key: str | None

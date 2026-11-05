@@ -77,7 +77,20 @@ async def stream_exchange(
     state: StreamState,
     exchange_index: int,
 ) -> tuple[str, dict[str, Any]]:
-    """Stream a single exchange and return the assistant response and metrics."""
+    """Stream a single exchange and return the assistant response and metrics.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+        exchange_index: Exchange index.
+
+    Returns:
+        The assistant response and metrics.
+
+    Raises:
+        RuntimeError: WebSocket closed before receiving 'done'.
+
+    """
     callbacks = _build_exchange_callbacks(state, exchange_index)
     is_done_seen = False
     done_payload: dict[str, Any] | None = None

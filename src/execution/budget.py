@@ -15,7 +15,15 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class PromptFitResult:
-    """Exact prompt-fit result used before engine calls."""
+    """Exact prompt-fit result used before engine calls.
+
+    Attributes:
+        history_messages: History messages.
+        user_utterance: User utterance.
+        prompt: Prompt text.
+        prompt_tokens: Token count of the prompt.
+
+    """
 
     history_messages: list[HistoryMessage]
     user_utterance: str
@@ -25,7 +33,17 @@ class PromptFitResult:
 
 @dataclass(frozen=True, slots=True)
 class PromptBudgetRequest:
-    """Inputs required to fit a prompt into the context budget."""
+    """Inputs required to fit a prompt into the context budget.
+
+    Attributes:
+        static_prefix: Static prefix.
+        runtime_text: Text of the runtime.
+        history_messages: History messages.
+        user_utterance: User utterance.
+        maximum_prompt_tokens: Largest allowed prompt tokens.
+        maximum_user_tokens: Largest allowed user tokens.
+
+    """
 
     static_prefix: str
     runtime_text: str
@@ -37,7 +55,17 @@ class PromptBudgetRequest:
 
 @dataclass(frozen=True, slots=True)
 class _PromptFitContext:
-    """Immutable prompt fitting inputs shared across trim attempts."""
+    """Immutable prompt fitting inputs shared across trim attempts.
+
+    Attributes:
+        static_prefix: Static prefix.
+        runtime_text: Text of the runtime.
+        history_turns: History turns.
+        tokenizer: Tokenizer to use.
+        maximum_prompt_tokens: Largest allowed prompt tokens.
+        maximum_user_tokens: Largest allowed user tokens.
+
+    """
 
     static_prefix: str
     runtime_text: str
@@ -48,7 +76,16 @@ class _PromptFitContext:
 
 
 def _build_prompt(context: _PromptFitContext, user_utterance: str) -> tuple[str, int]:
-    """Build a prompt candidate and count its tokens."""
+    """Build a prompt candidate and count its tokens.
+
+    Args:
+        context: Session values that the prompt or request reads.
+        user_utterance: User utterance.
+
+    Returns:
+        A prompt candidate and count its tokens.
+
+    """
     prompt = build_prefixed_prompt(
         context.static_prefix,
         context.runtime_text,
@@ -60,7 +97,16 @@ def _build_prompt(context: _PromptFitContext, user_utterance: str) -> tuple[str,
 
 
 def _count_user_tokens(user_utterance: str, tokenizer: ThreadSafeTokenizer) -> int:
-    """Count tokens in a normalized user utterance."""
+    """Count tokens in a normalized user utterance.
+
+    Args:
+        user_utterance: User utterance.
+        tokenizer: Tokenizer to use.
+
+    Returns:
+        Tokens in a normalized user utterance.
+
+    """
     return len(tokenizer.encode_ids((user_utterance or "").strip()))
 
 
@@ -70,7 +116,17 @@ def _limit_user_utterance(
     *,
     maximum_user_tokens: int | None,
 ) -> str:
-    """Return the longest user text allowed by the user-token cap."""
+    """Return the longest user text allowed by the user-token cap.
+
+    Args:
+        raw_user_utterance: Unvalidated user utterance as received.
+        tokenizer: Tokenizer to use.
+        maximum_user_tokens: Largest allowed user tokens.
+
+    Returns:
+        The longest user text allowed by the user-token cap.
+
+    """
     user_utterance = (raw_user_utterance or "").strip()
     if not user_utterance:
         return ""
@@ -86,7 +142,17 @@ def _trim_user_utterance(
     remaining_tokens: int,
     tokenizer: ThreadSafeTokenizer,
 ) -> str:
-    """Trim raw user text to the requested token budget."""
+    """Trim raw user text to the requested token budget.
+
+    Args:
+        raw_user_utterance: Unvalidated user utterance as received.
+        remaining_tokens: Token count of the remaining.
+        tokenizer: Tokenizer to use.
+
+    Returns:
+        The updated text.
+
+    """
     user_utterance = (raw_user_utterance or "").strip()
     if remaining_tokens <= 0 or not user_utterance:
         return ""
@@ -98,7 +164,19 @@ def _trim_user_utterance(
 
 
 def _fit_user_utterance(context: _PromptFitContext, raw_user_utterance: str) -> tuple[str, str, int]:
-    """Find the longest user text that fits the prompt context."""
+    """Find the longest user text that fits the prompt context.
+
+    Args:
+        context: Session values that the prompt or request reads.
+        raw_user_utterance: Unvalidated user utterance as received.
+
+    Returns:
+        The longest user text that fits the prompt context.
+
+    Raises:
+        ValueError: Prompt exceeds exact context budget even after removing all history and trimming the user turn.
+
+    """
     user_utterance = (raw_user_utterance or "").strip()
     if not user_utterance:
         prompt, prompt_tokens = _build_prompt(context, "")
@@ -138,7 +216,19 @@ def fit_prompt_to_budget(
     request: PromptBudgetRequest,
     tokenizer: ThreadSafeTokenizer,
 ) -> PromptFitResult:
-    """Fit the exact templated prompt to budget with one raw-user fit path."""
+    """Fit the exact templated prompt to budget with one raw-user fit path.
+
+    Args:
+        request: Request to run.
+        tokenizer: Tokenizer to use.
+
+    Returns:
+        The exact templated prompt to budget with one raw-user fit path.
+
+    Raises:
+        ValueError: Prompt exceeds exact context budget before engine call.
+
+    """
     fit_context = _PromptFitContext(
         static_prefix=request.static_prefix,
         runtime_text=request.runtime_text,

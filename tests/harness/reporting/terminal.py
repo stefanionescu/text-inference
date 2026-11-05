@@ -15,7 +15,16 @@ _USE_COLOR = sys.stdout.isatty()
 
 
 def _format_ansi_text(code: str, text: str) -> str:
-    """Wrap text in ANSI color codes if output is a tty."""
+    """Wrap text in ANSI color codes if output is a tty.
+
+    Args:
+        code: Error or close code.
+        text: Text to process.
+
+    Returns:
+        The updated text.
+
+    """
     formatted = f"\033[{code}m{text}\033[0m"
     if not _USE_COLOR:
         return text
@@ -23,7 +32,12 @@ def _format_ansi_text(code: str, text: str) -> str:
 
 
 def write_line(value: object = "") -> None:
-    """Write one value followed by a newline."""
+    """Write one value followed by a newline.
+
+    Args:
+        value: Value to check or convert.
+
+    """
     text = f"{value}\n"
     written = sys.stdout.write(text)
     if written < len(text):
@@ -31,7 +45,13 @@ def write_line(value: object = "") -> None:
 
 
 def write_text(value: object = "", *, is_flush_requested: bool = False) -> None:
-    """Write one value without appending a newline."""
+    """Write one value without appending a newline.
+
+    Args:
+        value: Value to check or convert.
+        is_flush_requested: Whether flush is requested.
+
+    """
     text = str(value)
     sys.stdout.write(text)
     if is_flush_requested:
@@ -53,7 +73,16 @@ magenta = partial(_format_ansi_text, "35")
 
 
 def section_header(title: str, width: int = 60) -> str:
-    """Create a prominent section header."""
+    """Create a prominent section header.
+
+    Args:
+        title: Title to print.
+        width: Column width of the output.
+
+    Returns:
+        A prominent section header.
+
+    """
     padding = width - len(title) - 4
     left = padding // 2
     right = padding - left
@@ -61,14 +90,32 @@ def section_header(title: str, width: int = 60) -> str:
 
 
 def case_header(name: str) -> str:
-    """Create a test case header."""
+    """Create a test case header.
+
+    Args:
+        name: Name to use for the lookup.
+
+    Returns:
+        A test case header.
+
+    """
     header = section_header(name)
     prefix = "\n"
     return f"{prefix}{header}"
 
 
 def exchange_header(index: int | None = None, profile: str | None = None, gender: str | None = None) -> str:
-    """Create an exchange header with optional profile metadata."""
+    """Create an exchange header with optional profile metadata.
+
+    Args:
+        index: Zero-based position.
+        profile: Prompt profile to use.
+        gender: Name of the gender profile.
+
+    Returns:
+        An exchange header with optional profile metadata.
+
+    """
     label_fields: list[str] = []
     if index is not None:
         label_fields.append(f"#{index:02d}")
@@ -84,7 +131,12 @@ def exchange_header(index: int | None = None, profile: str | None = None, gender
 
 
 def exchange_footer() -> str:
-    """Create an exchange footer."""
+    """Create an exchange footer.
+
+    Returns:
+        An exchange footer.
+
+    """
     width = 55
     border = "└" + "─" * width
     return dim(border)
@@ -96,21 +148,45 @@ def exchange_footer() -> str:
 
 
 def format_user(text: str) -> str:
-    """Format a user message."""
+    """Format a user message.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        A user message.
+
+    """
     label = cyan("USER")
     prefix = f"{label}  "
     return f"{prefix}{text}"
 
 
 def format_assistant(text: str) -> str:
-    """Format an assistant message."""
+    """Format an assistant message.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        An assistant message.
+
+    """
     label = magenta("ASST")
     prefix = f"{label}  "
     return f"{prefix}{text}"
 
 
 def format_metrics_inline(metrics: dict[str, Any]) -> str:
-    """Format metrics as a compact inline string."""
+    """Format metrics as a compact inline string.
+
+    Args:
+        metrics: Timing metrics of the request.
+
+    Returns:
+        Metrics as a compact inline string.
+
+    """
     metric_fields: list[str] = []
 
     first_byte_latency_milliseconds = metrics.get("ttfb_ms")
@@ -143,14 +219,31 @@ def format_metrics_inline(metrics: dict[str, Any]) -> str:
 
 
 def format_pass(label: str) -> str:
-    """Format a passing test result."""
+    """Format a passing test result.
+
+    Args:
+        label: Label to print.
+
+    Returns:
+        A passing test result.
+
+    """
     status = green("✓ PASS")
     prefix = f"{status}  "
     return f"{prefix}{label}"
 
 
 def format_fail(label: str, reason: str = "") -> str:
-    """Format a failing test result."""
+    """Format a failing test result.
+
+    Args:
+        label: Label to print.
+        reason: Reason text to report.
+
+    Returns:
+        A failing test result.
+
+    """
     suffix = f": {reason}" if reason else ""
     status = red("✗ FAIL")
     prefix = f"{status}  "
@@ -158,7 +251,15 @@ def format_fail(label: str, reason: str = "") -> str:
 
 
 def format_status(text: str) -> str:
-    """Format informational text."""
+    """Format informational text.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        Informational text.
+
+    """
     indent = "  "
     status_text = f"{indent}{text}"
     return dim(status_text)
@@ -174,7 +275,17 @@ def format_ttfb_summary(
     stats: dict[str, float | int],
     label: str = "TTFB",
 ) -> str:
-    """Format TTFB summary statistics in a readable table row."""
+    """Format TTFB summary statistics in a readable table row.
+
+    Args:
+        kind: Kind of record.
+        stats: Summary statistics.
+        label: Label to print.
+
+    Returns:
+        TTFB summary statistics in a readable table row.
+
+    """
     statistic_fields = [
         f"{bold(label)} {yellow(kind):>4}",
         f"first={stats['first']:>6.0f}ms",
@@ -194,28 +305,62 @@ def format_ttfb_summary(
 
 
 def connection_test_header(name: str) -> str:
-    """Create a connection test section header."""
+    """Create a connection test section header.
+
+    Args:
+        name: Name to use for the lookup.
+
+    Returns:
+        A connection test section header.
+
+    """
     title = bold(f"▶ {name.upper()}")
     suffix = " connection test"
     return f"\n{title}{suffix}"
 
 
 def connection_status(label: str, message: str) -> str:
-    """Format a connection status update."""
+    """Format a connection status update.
+
+    Args:
+        label: Label to print.
+        message: Message to send, check, or report.
+
+    Returns:
+        A connection status update.
+
+    """
     indent = "  "
     status_text = f"{indent}[{label}] {message}"
     return dim(status_text)
 
 
 def connection_pass(label: str) -> str:
-    """Format a connection test pass."""
+    """Format a connection test pass.
+
+    Args:
+        label: Label to print.
+
+    Returns:
+        A connection test pass.
+
+    """
     icon = green("✓")
     status = green("PASS")
     return f"  {icon} [{label}] {status}"
 
 
 def connection_fail(label: str, reason: str) -> str:
-    """Format a connection test failure."""
+    """Format a connection test failure.
+
+    Args:
+        label: Label to print.
+        reason: Reason text to report.
+
+    Returns:
+        A connection test failure.
+
+    """
     icon = red("✗")
     status = red("FAIL")
     return f"  {icon} [{label}] {status}: {reason}"

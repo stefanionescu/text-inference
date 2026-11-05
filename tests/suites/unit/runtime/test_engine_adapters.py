@@ -40,7 +40,12 @@ class _FakeGeneration:
     completion_event: asyncio.Event | None = None
 
     def __aiter__(self) -> AsyncIterator[_FakeChunk]:
-        """Iterate over test generation chunks."""
+        """Iterate over test generation chunks.
+
+        Returns:
+            The async iterator.
+
+        """
 
         async def _chunks() -> AsyncIterator[_FakeChunk]:
             for chunk in self.chunks:
@@ -61,7 +66,17 @@ class _FakeLLM:
     is_shutdown_called: bool = False
 
     def generate_async(self, prompt: str, sampling_params: object, *, streaming: bool) -> _FakeGeneration:
-        """Return the configured asynchronous generation."""
+        """Return the configured asynchronous generation.
+
+        Args:
+            prompt: Prompt text.
+            sampling_params: Sampling params.
+            streaming: Whether the call streams its output.
+
+        Returns:
+            The configured asynchronous generation.
+
+        """
         _ = (prompt, sampling_params, streaming)
         return self.generation
 
@@ -74,7 +89,12 @@ class _FakeSamplingParams:
     """Stand in for the selected backend's exact sampling class."""
 
     def __init__(self, **values: object) -> None:
-        """Store constructor values."""
+        """Store constructor values.
+
+        Args:
+            **values: Values to check or convert.
+
+        """
         self.values = values
 
 
@@ -185,7 +205,12 @@ def test_trt_logit_bias() -> None:
 
 
 def test_trt_startup(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Bootstrap a TRT adapter without creating a cache reset coordinator."""
+    """Bootstrap a TRT adapter without creating a cache reset coordinator.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     engine = TRTEngine(_FakeLLM(_FakeGeneration(chunks=[])), _FakeSamplingParams, 8)
     tokenizer = build_local_tokenizer()
     monkeypatch.setattr(bootstrap, "_build_tokenizer", AsyncMock(return_value=tokenizer))

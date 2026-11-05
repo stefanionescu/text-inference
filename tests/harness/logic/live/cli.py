@@ -26,7 +26,16 @@ logger = logging.getLogger("live")
 
 @dataclass(slots=True)
 class InteractiveRunner:
-    """Own the interactive CLI session lifecycle."""
+    """Own the interactive CLI session lifecycle.
+
+    Attributes:
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+        is_banner_shown: Whether banner is shown.
+        standard_input_task: Task that runs the standard input.
+        close_task: Task that runs the close.
+
+    """
 
     client: LiveClient
     registry: PromptProfileRegistry
@@ -52,7 +61,15 @@ class InteractiveRunner:
                 loop.remove_signal_handler(signal.SIGINT)
 
     def _install_sigint_hook(self, loop: asyncio.AbstractEventLoop) -> bool:
-        """Install a signal handler for graceful Ctrl+C handling."""
+        """Install a signal handler for graceful Ctrl+C handling.
+
+        Args:
+            loop: Event loop or loop state to use.
+
+        Returns:
+            Whether the check passes.
+
+        """
         is_installed = False
         try:
             loop.add_signal_handler(signal.SIGINT, self._handle_sigint)
@@ -63,7 +80,12 @@ class InteractiveRunner:
         return is_installed
 
     def _start_background_tasks(self) -> tuple[asyncio.Task[None], asyncio.Task[None]]:
-        """Create background tasks for input loop and disconnect monitoring."""
+        """Create background tasks for input loop and disconnect monitoring.
+
+        Returns:
+            Background tasks for input loop and disconnect monitoring.
+
+        """
         loop_task = asyncio.create_task(self._run_input_loop())
         disconnect_task = asyncio.create_task(self._watch_disconnect())
         return loop_task, disconnect_task
@@ -73,7 +95,13 @@ class InteractiveRunner:
         loop_task: asyncio.Task[None],
         disconnect_task: asyncio.Task[None],
     ) -> None:
-        """Wait for either input loop or disconnect, then clean up the other."""
+        """Wait for either input loop or disconnect, then clean up the other.
+
+        Args:
+            loop_task: Task that runs the loop.
+            disconnect_task: Task that runs the disconnect.
+
+        """
         done, _ = await asyncio.wait(
             {loop_task, disconnect_task},
             return_when=asyncio.FIRST_COMPLETED,
@@ -93,7 +121,13 @@ class InteractiveRunner:
         *,
         suppress: tuple[type[BaseException], ...] = (asyncio.CancelledError,),
     ) -> None:
-        """Cancel a task and suppress specified exceptions."""
+        """Cancel a task and suppress specified exceptions.
+
+        Args:
+            task: Task to wait for or cancel.
+            suppress: Exception types to ignore.
+
+        """
         if task.done():
             return
         task.cancel()
@@ -101,7 +135,12 @@ class InteractiveRunner:
             await task
 
     async def _finalize_task[TaskResult](self, task: asyncio.Task[TaskResult] | None) -> None:
-        """Ensure a task is cancelled and awaited during cleanup."""
+        """Ensure a task is cancelled and awaited during cleanup.
+
+        Args:
+            task: Task to wait for or cancel.
+
+        """
         if not task:
             return
         is_task_complete = task.done()
@@ -124,7 +163,15 @@ class InteractiveRunner:
                 break
 
     async def _read_loop_line(self) -> str | None:
-        """Read one input line, returning None when the loop should stop."""
+        """Read one input line, returning None when the loop should stop.
+
+        Returns:
+            One input line, returning None when the loop should stop.
+
+        Raises:
+            TestClientError: The operation fails with this error.
+
+        """
         line: str | None = None
         try:
             line = await self._read_line()
@@ -140,7 +187,15 @@ class InteractiveRunner:
         return line
 
     async def _dispatch_line(self, line: str) -> bool:
-        """Dispatch one input line and return whether the loop should exit."""
+        """Dispatch one input line and return whether the loop should exit.
+
+        Args:
+            line: One line of text.
+
+        Returns:
+            Whether the loop should exit.
+
+        """
         is_exit_requested = False
         if not line:
             return is_exit_requested
@@ -160,7 +215,15 @@ class InteractiveRunner:
         return is_exit_requested
 
     def _handle_stream_result(self, result: StreamResult) -> bool:
-        """Handle a sent message result and return whether the loop should exit."""
+        """Handle a sent message result and return whether the loop should exit.
+
+        Args:
+            result: Result of one test run.
+
+        Returns:
+            Whether the loop should exit.
+
+        """
         if result.is_successful:
             return False
         error_message = "" if result.error is None else result.error.format_for_user()
@@ -171,7 +234,15 @@ class InteractiveRunner:
         return True
 
     async def _read_line(self) -> str:
-        """Read a line from stdin asynchronously."""
+        """Read a line from stdin asynchronously.
+
+        Returns:
+            A line from stdin asynchronously.
+
+        Raises:
+            InputClosedError: Input cancelled.
+
+        """
         loop = asyncio.get_running_loop()
         if self.standard_input_task:
             self.standard_input_task.cancel()
@@ -196,7 +267,12 @@ class InteractiveRunner:
         self.close_task = asyncio.create_task(self.client.close())
 
     def _print_error(self, message: str) -> None:
-        """Print an error message in a user-friendly format."""
+        """Print an error message in a user-friendly format.
+
+        Args:
+            message: Message to send, check, or report.
+
+        """
         warning_label = yellow("WARN")
         prompt_label = cyan("USER")
         write_line(f"\n{warning_label}  {message}\n")
@@ -224,7 +300,18 @@ class InteractiveRunner:
 
 
 async def _read_standard_input(prompt: str) -> str:
-    """Async wrapper around input() that runs in an executor."""
+    """Async wrapper around input() that runs in an executor.
+
+    Args:
+        prompt: Prompt text.
+
+    Returns:
+        The resulting text.
+
+    Raises:
+        InputClosedError: Stdin closed.
+
+    """
     loop = asyncio.get_running_loop()
     prompt_text = prompt
     try:
@@ -243,7 +330,14 @@ async def run_interactive_loop(
     *,
     is_banner_shown: bool = True,
 ) -> None:
-    """Run the interactive command loop."""
+    """Run the interactive command loop.
+
+    Args:
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+        is_banner_shown: Whether banner is shown.
+
+    """
     runner = InteractiveRunner(client, registry, is_banner_shown=is_banner_shown)
     await runner.run()
 

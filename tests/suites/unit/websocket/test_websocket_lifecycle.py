@@ -16,7 +16,13 @@ class _FakeWebSocket:
         self.close_calls: list[tuple[int, str]] = []
 
     async def close(self, *, code: int, reason: str) -> None:
-        """Test close."""
+        """Test close.
+
+        Args:
+            code: Error or close code.
+            reason: Reason text to report.
+
+        """
         self.close_calls.append((code, reason))
 
 

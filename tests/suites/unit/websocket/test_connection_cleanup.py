@@ -20,7 +20,13 @@ def test_receiver_failure_cleanup(
     exception_type: type[Exception],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Abort active engine work and close state after handled or escaping failures."""
+    """Abort active engine work and close state after handled or escaping failures.
+
+    Args:
+        exception_type: Type of the exception.
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     websocket = Mock(client=None, send_text=AsyncMock())
     dependencies = Mock(spec=RuntimeDependencies)
     dependencies.engine = AsyncMock()
@@ -31,7 +37,16 @@ def test_receiver_failure_cleanup(
     states: list[SessionState] = []
 
     async def receive(*_arguments: object, state: SessionState) -> None:
-        """Simulate a receiver failing with tracked generation still active."""
+        """Simulate a receiver failing with tracked generation still active.
+
+        Args:
+            *_arguments: Arguments.
+            state: State of the session or test run.
+
+        Raises:
+            exception_type: Receiver failed.
+
+        """
         state.active_request_id = "active-generation"
         state.lifecycle_state = "running"
         states.append(state)

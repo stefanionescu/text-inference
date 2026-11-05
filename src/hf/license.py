@@ -20,7 +20,14 @@ from config.model.quantization import HUB_SOURCE_KIND
 
 @dataclass(frozen=True, slots=True)
 class LicenseMetadata:
-    """License fields rendered into one Hugging Face model card."""
+    """License fields rendered into one Hugging Face model card.
+
+    Attributes:
+        identifier: Identifier of the record.
+        name: Name to use for the lookup.
+        link: Link to the source model.
+
+    """
 
     identifier: str
     name: str
@@ -28,7 +35,16 @@ class LicenseMetadata:
 
 
 def _read_card_field(card_metadata: object, field_name: str) -> str | None:
-    """Return one non-empty string from model-card metadata."""
+    """Return one non-empty string from model-card metadata.
+
+    Args:
+        card_metadata: Card metadata.
+        field_name: Name of the field.
+
+    Returns:
+        One non-empty string from model-card metadata.
+
+    """
     value = getattr(card_metadata, field_name, None)
     return value.strip() if isinstance(value, str) and value.strip() else None
 
@@ -40,7 +56,18 @@ def read_license(
     *,
     hf_token: str | None,
 ) -> LicenseMetadata:
-    """Read source license fields or return the selected `other` fallback."""
+    """Read source license fields or return the selected `other` fallback.
+
+    Args:
+        model_name: Name of the model.
+        source_kind: Source kind.
+        source_revision: Revision of the source.
+        hf_token: Hugging Face token.
+
+    Returns:
+        Source license fields or return the selected `other` fallback.
+
+    """
     default_link = (
         HUGGING_FACE_MODEL_URL.format(model_name=model_name, source_revision=source_revision)
         if source_kind == HUB_SOURCE_KIND

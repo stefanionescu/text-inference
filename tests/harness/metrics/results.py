@@ -19,7 +19,18 @@ def error_result(
     error_code: str | None = None,
     is_recoverable: bool = False,
 ) -> dict[str, Any]:
-    """Create an error result dict with consistent structure."""
+    """Create an error result dict with consistent structure.
+
+    Args:
+        error: Error text or error object to report.
+        phase: Number of the test phase.
+        error_code: Code of the error.
+        is_recoverable: Whether it is recoverable.
+
+    Returns:
+        An error result dict with consistent structure.
+
+    """
     result: dict[str, Any] = {
         "ok": False,
         "error": error,
@@ -39,7 +50,18 @@ def success_result(
     first_sentence_ms: float | None = None,
     first_three_words_ms: float | None = None,
 ) -> dict[str, Any]:
-    """Create a success result dict with timing metrics."""
+    """Create a success result dict with timing metrics.
+
+    Args:
+        phase: Number of the test phase.
+        ttfb_ms: First-byte time in milliseconds.
+        first_sentence_ms: First sentence in milliseconds.
+        first_three_words_ms: First three words in milliseconds.
+
+    Returns:
+        A success result dict with timing metrics.
+
+    """
     return {
         "ok": True,
         "phase": phase,
@@ -50,7 +72,15 @@ def success_result(
 
 
 def result_to_dict(payload: BenchmarkMetrics) -> dict[str, Any]:
-    """Convert BenchmarkMetrics to a plain dict representation."""
+    """Convert BenchmarkMetrics to a plain dict representation.
+
+    Args:
+        payload: Decoded message fields.
+
+    Returns:
+        The updated value.
+
+    """
     result: dict[str, Any] = {"ok": payload.is_successful, "phase": payload.phase}
     if not payload.is_successful:
         result["error"] = payload.error

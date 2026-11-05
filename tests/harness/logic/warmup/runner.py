@@ -61,7 +61,23 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class WarmupConfig:
-    """Resolved inputs for one warmup run."""
+    """Resolved inputs for one warmup run.
+
+    Attributes:
+        server_url: Server URL.
+        authenticated_websocket_url: Authenticated websocket URL.
+        authentication_headers: Authentication headers.
+        api_key: Key of the API.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        sampling_overrides: Sampling overrides.
+        is_double_ttfb_enabled: Whether double first-byte time is enabled.
+        user_message: User message.
+        prompt: Prompt text.
+        timeout_seconds: Timeout in seconds.
+        transaction_count: Number of transaction items.
+
+    """
 
     server_url: str
     authenticated_websocket_url: str
@@ -78,7 +94,13 @@ class WarmupConfig:
 
 
 def _print_server_error_hint(error: ServerError, api_key: str) -> None:
-    """Print human-friendly hints for server errors."""
+    """Print human-friendly hints for server errors.
+
+    Args:
+        error: Error text or error object to report.
+        api_key: Key of the API.
+
+    """
     write_line(f"  {red('ERROR')} {error.error_code}: {error.message}")
     if error.error_code == "authentication_failed":
         preview = f"{api_key[:8]}..." if api_key else "missing"
@@ -95,7 +117,21 @@ async def _stream_exchange(
     api_key: str,
     exchange_index: int,
 ) -> tuple[str, dict[str, Any]]:
-    """Consume a single exchange, returning assistant text and metrics."""
+    """Consume a single exchange, returning assistant text and metrics.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        state: State of the session or test run.
+        api_key: Key of the API.
+        exchange_index: Exchange index.
+
+    Returns:
+        The resulting items.
+
+    Raises:
+        ServerError: The operation fails with this error.
+
+    """
     try:
         assistant_text, metrics = await stream_exchange(
             websocket,
@@ -119,7 +155,15 @@ def _print_transaction_result(
     assistant_text: str,
     metrics: dict[str, Any],
 ) -> None:
-    """Print formatted transaction result."""
+    """Print formatted transaction result.
+
+    Args:
+        phase: Number of the test phase.
+        user_message: User message.
+        assistant_text: Text of the assistant.
+        metrics: Timing metrics of the request.
+
+    """
     if phase:
         write_line(exchange_header(profile=phase.upper()))
     else:
@@ -219,7 +263,12 @@ async def _run_transactions(websocket: WebSocketClientProtocol, config: WarmupCo
 
 
 async def run_warmup(arguments: argparse.Namespace) -> None:
-    """Execute a single warmup request and report metrics."""
+    """Execute a single warmup request and report metrics.
+
+    Args:
+        arguments: Parsed command-line arguments.
+
+    """
     config = _select_config(arguments)
     _print_header(config)
 

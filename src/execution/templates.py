@@ -15,7 +15,15 @@ if TYPE_CHECKING:
 
 
 def _is_template_thinking_enabled() -> bool:
-    """Return the template thinking flag without importing runtime helpers."""
+    """Return the template thinking flag without importing runtime helpers.
+
+    Returns:
+        The template thinking flag without importing runtime helpers.
+
+    Raises:
+        ValueError: TEMPLATE_ENABLE_THINKING must be 0 or 1.
+
+    """
     value = os.getenv("TEMPLATE_ENABLE_THINKING")
     if value is None:
         return IS_TEMPLATE_THINKING_ENABLED
@@ -35,11 +43,27 @@ def _build_messages(
     history_messages: Sequence[HistoryMessage],
     user_utterance: str | None,
 ) -> list[dict[str, str]]:
-    """Build message dicts for the tokenizer template."""
+    """Build message dicts for the tokenizer template.
+
+    Args:
+        system_prompt: System prompt.
+        history_messages: History messages.
+        user_utterance: User utterance.
+
+    Returns:
+        Message dicts for the tokenizer template.
+
+    """
     messages: list[dict[str, str]] = []
 
     def _append_message(role: str, content: str) -> None:
-        """Append non-empty content, merging consecutive same-role messages."""
+        """Append non-empty content, merging consecutive same-role messages.
+
+        Args:
+            role: Chat role of the message.
+            content: Text content of the message.
+
+        """
         content = content.strip()
         if not content:
             return
@@ -67,7 +91,19 @@ def build_prefixed_prompt(
     user_utterance: str,
     tokenizer: ThreadSafeTokenizer,
 ) -> str:
-    """Build a prompt including the current user turn."""
+    """Build a prompt including the current user turn.
+
+    Args:
+        static_prefix: Static prefix.
+        runtime_text: Text of the runtime.
+        history_messages: History messages.
+        user_utterance: User utterance.
+        tokenizer: Tokenizer to use.
+
+    Returns:
+        A prompt including the current user turn.
+
+    """
     system_parts = [segment.strip() for segment in (static_prefix, runtime_text) if segment and segment.strip()]
     messages = _build_messages("\n\n".join(system_parts), history_messages, user_utterance)
     return tokenizer.apply_chat_template(

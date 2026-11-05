@@ -35,7 +35,18 @@ async def _send_json_frame(websocket: object, payload: dict[str, object]) -> Non
 
 
 def parse_message(raw_frame: str) -> dict[str, object]:
-    """Parse a raw WebSocket frame into a JSON dict."""
+    """Parse a raw WebSocket frame into a JSON dict.
+
+    Args:
+        raw_frame: Unvalidated frame as received.
+
+    Returns:
+        A JSON dict.
+
+    Raises:
+        MessageParseError: Invalid JSON frame: `raw_frame`.
+
+    """
     try:
         message = json.loads(raw_frame)
     except json.JSONDecodeError as exception:
@@ -57,7 +68,20 @@ def message_text(
     *,
     default: str | None = None,
 ) -> str | None:
-    """Return one optional string frame member."""
+    """Return one optional string frame member.
+
+    Args:
+        message: Message to send, check, or report.
+        key: Lookup key.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        One optional string frame member.
+
+    Raises:
+        TypeError: Websocket frame `key` must be a string.
+
+    """
     value = message.get(key, default)
     if value is None:
         return None
@@ -80,6 +104,12 @@ async def iter_messages(
         receive_timeout_seconds: Optional timeout applied to each recv call.
         is_invalid_ignored: Whether malformed frames are silently skipped.
 
+    Yields:
+        Parsed JSON messages from a websocket connection.
+
+    Raises:
+        MessageParseError: The operation fails with this error.
+
     """
     while True:
         raw_frame = await receive_raw_frame(websocket, receive_timeout_seconds=receive_timeout_seconds)
@@ -95,7 +125,17 @@ async def bootstrap_session(
     websocket: object,
     start_payload: dict[str, object],
 ) -> None:
-    """Send a bootstrap-only start payload and wait for the terminal done frame."""
+    """Send a bootstrap-only start payload and wait for the terminal done frame.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        start_payload: Start payload.
+
+    Raises:
+        RuntimeError: Unexpected websocket frame during bootstrap: `message`.
+        StreamError: The operation fails with this error.
+
+    """
     await _send_json_frame(websocket, start_payload)
     async for message in iter_messages(websocket):
         message_type = message.get("type")
@@ -116,7 +156,15 @@ async def send_initial_user_turn(
     *,
     sampling: dict[str, float | int | bool] | None = None,
 ) -> None:
-    """Bootstrap a session, then send the first real user message."""
+    """Bootstrap a session, then send the first real user message.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        start_payload: Start payload.
+        user_text: Text of the user.
+        sampling: Sampling overrides of the request.
+
+    """
     message_payload = build_message_payload(user_text, sampling=sampling)
     await bootstrap_session(websocket, start_payload)
     await _send_json_frame(websocket, message_payload)
@@ -131,6 +179,15 @@ async def dispatch_message[ResultT](
     """Dispatch a websocket message to a callback based on its `type` field.
 
     Callbacks can be synchronous or asynchronous callables.
+
+    Args:
+        message: Message to send, check, or report.
+        callbacks: Callback for each server message type.
+        default: Value to use when the setting is absent.
+
+    Returns:
+        The result t.
+
     """
     message_type = message.get("type")
     message_callback = callbacks.get(message_type) if isinstance(message_type, str) else None

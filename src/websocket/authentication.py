@@ -24,7 +24,15 @@ _AUTHENTICATION_FAILURES: dict[str, deque[float]] = {}
 
 @dataclass(frozen=True, slots=True)
 class AuthenticationPolicy:
-    """Authentication settings and mutable failure tracking."""
+    """Authentication settings and mutable failure tracking.
+
+    Attributes:
+        authentication_settings: Settings for authentication.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+        clock: Function that returns the current time.
+
+    """
 
     authentication_settings: AuthenticationSettings
     websocket_settings: WebSocketSettings
@@ -33,7 +41,15 @@ class AuthenticationPolicy:
 
 
 def _extract_bearer_key(value: str | None) -> str | None:
-    """Extract bearer token value from an Authorization header."""
+    """Extract bearer token value from an Authorization header.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        Bearer token value from an Authorization header.
+
+    """
     if not value:
         return None
     prefix = "bearer "
@@ -45,7 +61,15 @@ def _extract_bearer_key(value: str | None) -> str | None:
 
 
 def _select_api_key(*candidates: str | None) -> str | None:
-    """Return the first non-empty API key candidate from the provided values."""
+    """Return the first non-empty API key candidate from the provided values.
+
+    Args:
+        *candidates: Candidates.
+
+    Returns:
+        The first non-empty API key candidate from the provided values.
+
+    """
     candidate_values = candidates
     for candidate in candidate_values:
         if candidate:
@@ -59,7 +83,17 @@ def _validate_candidate(
     context: str,
     authentication_settings: AuthenticationSettings,
 ) -> tuple[bool, str | None, str]:
-    """Validate a candidate API key and return (is_valid, key, error_code)."""
+    """Validate a candidate API key and return (is_valid, key, error_code).
+
+    Args:
+        provided_key: Key of the provided.
+        context: Session values that the prompt or request reads.
+        authentication_settings: Settings for authentication.
+
+    Returns:
+        (is_valid, key, error_code).
+
+    """
     if not provided_key:
         logger.warning("%s missing API key", context)
         return False, None, "missing"
@@ -70,7 +104,15 @@ def _validate_candidate(
 
 
 def _client_failure_key(client_host: str | None) -> str:
-    """Return a stable auth failure key for a client host."""
+    """Return a stable auth failure key for a client host.
+
+    Args:
+        client_host: Client host.
+
+    Returns:
+        A stable auth failure key for a client host.
+
+    """
     raw_host = client_host or "unknown"
     stripped_host = raw_host.strip()
     return stripped_host or "unknown"
@@ -83,7 +125,18 @@ def _prune_failures(
     websocket_settings: WebSocketSettings,
     authentication_failures: dict[str, deque[float]],
 ) -> deque[float]:
-    """Drop expired auth failures and return the active window."""
+    """Drop expired auth failures and return the active window.
+
+    Args:
+        client_key: Key of the client.
+        current_time: Current time.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+
+    Returns:
+        The active window.
+
+    """
     entries = authentication_failures.setdefault(client_key, deque())
     cutoff = current_time - websocket_settings.rate_limit_window_seconds
     while entries and entries[0] <= cutoff:
@@ -98,7 +151,18 @@ def _is_authentication_throttled(
     authentication_failures: dict[str, deque[float]],
     clock: Callable[[], float],
 ) -> bool:
-    """Return whether a client has exceeded auth failure limits."""
+    """Return whether a client has exceeded auth failure limits.
+
+    Args:
+        client_key: Key of the client.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+        clock: Function that returns the current time.
+
+    Returns:
+        Whether a client has exceeded auth failure limits.
+
+    """
     current_time = clock()
     entries = _prune_failures(
         client_key, current_time, websocket_settings=websocket_settings, authentication_failures=authentication_failures
@@ -113,7 +177,15 @@ def _record_authentication_failure(
     authentication_failures: dict[str, deque[float]],
     clock: Callable[[], float],
 ) -> None:
-    """Record one authentication failure for a client."""
+    """Record one authentication failure for a client.
+
+    Args:
+        client_key: Key of the client.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+        clock: Function that returns the current time.
+
+    """
     current_time = clock()
     entries = _prune_failures(
         client_key, current_time, websocket_settings=websocket_settings, authentication_failures=authentication_failures
@@ -122,14 +194,28 @@ def _record_authentication_failure(
 
 
 def _clear_authentication_failures(client_key: str, *, authentication_failures: dict[str, deque[float]]) -> None:
-    """Clear recorded authentication failures for a client."""
+    """Clear recorded authentication failures for a client.
+
+    Args:
+        client_key: Key of the client.
+        authentication_failures: Authentication failures.
+
+    """
     failures = authentication_failures
     if client_key in failures:
         failures.pop(client_key, None)
 
 
 def _websocket_client_key(websocket: WebSocket) -> str:
-    """Return the auth failure key for a WebSocket request."""
+    """Return the auth failure key for a WebSocket request.
+
+    Args:
+        websocket: WebSocket connection of the client.
+
+    Returns:
+        The auth failure key for a WebSocket request.
+
+    """
     client = websocket.client
     host = client.host if client else None
     return _client_failure_key(host)
@@ -142,7 +228,18 @@ def build_authentication_policy(
     authentication_failures: dict[str, deque[float]] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> AuthenticationPolicy:
-    """Build an auth policy, defaulting to the shared failure store."""
+    """Build an auth policy, defaulting to the shared failure store.
+
+    Args:
+        authentication_settings: Settings for authentication.
+        websocket_settings: Settings for websocket.
+        authentication_failures: Authentication failures.
+        clock: Function that returns the current time.
+
+    Returns:
+        An auth policy, defaulting to the shared failure store.
+
+    """
     failures = _AUTHENTICATION_FAILURES if authentication_failures is None else authentication_failures
     return AuthenticationPolicy(
         authentication_settings=authentication_settings,

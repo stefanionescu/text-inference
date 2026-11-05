@@ -25,7 +25,17 @@ def validate_models(
     engine: str,
     quantization: str | None,
 ) -> list[str]:
-    """Validate model configuration against allowlists."""
+    """Validate model configuration against allowlists.
+
+    Args:
+        model: Model name or local checkpoint path.
+        engine: Inference engine that serves the request.
+        quantization: Name of the quantization format.
+
+    Returns:
+        The resulting items.
+
+    """
     errors: list[str] = []
 
     if engine not in QUANTIZATIONS_BY_ENGINE:

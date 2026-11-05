@@ -20,7 +20,17 @@ def _trim_oldest_turns(
     target_tokens: int,
     count_turn_tokens: Callable[[list[list[HistoryMessage]]], int],
 ) -> list[list[HistoryMessage]]:
-    """Drop oldest turns until their token count reaches the target."""
+    """Drop oldest turns until their token count reaches the target.
+
+    Args:
+        turns: Conversation turns.
+        target_tokens: Token count of the target.
+        count_turn_tokens: Function that counts the tokens of a turn.
+
+    Returns:
+        The updated value.
+
+    """
     total_tokens = count_turn_tokens(turns)
     if total_tokens <= target_tokens:
         return turns
@@ -39,7 +49,15 @@ def _trim_oldest_turns(
 
 
 def format_history(messages: list[HistoryMessage] | None) -> str:
-    """Render stored history as a role-labelled transcript."""
+    """Render stored history as a role-labelled transcript.
+
+    Args:
+        messages: Messages of the conversation.
+
+    Returns:
+        Stored history as a role-labelled transcript.
+
+    """
     if not messages:
         return ""
     chunks = [f"{message.role.title()}: {message.content.strip()}" for message in messages if message.content.strip()]
@@ -54,7 +72,16 @@ def trim_history(
     trigger_tokens: int | None = None,
     target_tokens: int | None = None,
 ) -> None:
-    """Trim stored messages when the transcript exceeds the trigger threshold."""
+    """Trim stored messages when the transcript exceeds the trigger threshold.
+
+    Args:
+        state: State of the session or test run.
+        config: Settings for this run.
+        tokenizer: Tokenizer to use.
+        trigger_tokens: Token count of the trigger.
+        target_tokens: Token count of the target.
+
+    """
     messages = state.history_messages
     if not messages:
         return
@@ -69,7 +96,15 @@ def trim_history(
     effective_target = max(1, min(effective_target, effective_trigger))
 
     def _count(candidate_turns: list[list[HistoryMessage]]) -> int:
-        """Count tokens in grouped history turns."""
+        """Count tokens in grouped history turns.
+
+        Args:
+            candidate_turns: Candidate turns.
+
+        Returns:
+            Tokens in grouped history turns.
+
+        """
         return tokenizer.count(format_history(flatten_turns(candidate_turns)))
 
     if _count(turns) <= effective_trigger:

@@ -48,11 +48,6 @@ class ConnectionRegistry:
     - Timeout-based connection admission
     - Atomic connect/disconnect operations
 
-    Attributes:
-        maximum_connections: Maximum allowed concurrent connections.
-        acquire_timeout_seconds: Maximum seconds to wait for a connection slot.
-        active_connections: Set of currently connected WebSocket instances.
-
     """
 
     def __init__(
@@ -60,7 +55,16 @@ class ConnectionRegistry:
         maximum_connections: int | None,
         acquire_timeout_seconds: float,
     ) -> None:
-        """Initialize connection tracking and concurrency limits."""
+        """Initialize connection tracking and concurrency limits.
+
+        Args:
+            maximum_connections: Largest allowed connections.
+            acquire_timeout_seconds: Acquire timeout in seconds.
+
+        Raises:
+            RuntimeError: MAX_CONCURRENT_CONNECTIONS not configured.
+
+        """
         if maximum_connections is None:
             message = "MAX_CONCURRENT_CONNECTIONS not configured"
             raise RuntimeError(message)
@@ -78,6 +82,9 @@ class ConnectionRegistry:
 
         Returns:
             True if connection was accepted, False if at capacity
+
+        Raises:
+            Exception: The operation fails with this error.
 
         """
         metrics = get_metrics()

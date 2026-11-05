@@ -51,10 +51,6 @@ class SlidingWindowRateLimiter:
     The limiter can be disabled by setting limit=0 or window_seconds=0,
     in which case consume() always succeeds.
 
-    Attributes:
-        limit: Maximum events allowed per window.
-        window_seconds: Duration of the sliding window.
-
     Example:
         # Allow 25 messages per 60 seconds
         limiter = SlidingWindowRateLimiter(limit=25, window_seconds=60)
@@ -73,7 +69,14 @@ class SlidingWindowRateLimiter:
         window_seconds: float,
         clock: Clock | None = None,
     ) -> None:
-        """Initialize a sliding-window limiter."""
+        """Initialize a sliding-window limiter.
+
+        Args:
+            limit: Largest number to allow.
+            window_seconds: Window in seconds.
+            clock: Function that returns the current time.
+
+        """
         self.limit = max(0, int(limit))
         self.window_seconds = max(0.0, float(window_seconds))
         self._clock = clock or time.monotonic

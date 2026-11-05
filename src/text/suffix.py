@@ -25,6 +25,13 @@ def unstable_suffix_length(text: str) -> int:
 
     Includes trailing whitespace, partial ellipsis (dots), and other
     characters that may change when more text arrives.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        Length of trailing unstable characters.
+
     """
     index = len(text)
     while index > 0 and text[index - 1] in TRAILING_STREAM_UNSTABLE_CHARS:
@@ -39,6 +46,13 @@ def html_entity_suffix_length(text: str) -> int:
     """Compute length of partial HTML entity at end.
 
     Matches patterns like "&amp" (incomplete entity).
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        Length of partial HTML entity at end.
+
     """
     match = re.search(r"&[A-Za-z]{0,10}$", text)
     if not match:
@@ -52,6 +66,13 @@ def html_tag_suffix_length(raw_text: str) -> int:
     Returns 0 if:
     - The last '<' has a matching '>' after it
     - The '<' is followed by a digit (e.g., '<3' heart emoticon, not a tag)
+
+    Args:
+        raw_text: Unvalidated text as received.
+
+    Returns:
+        Length to retain if last '<' is not closed.
+
     """
     suffix_length = 0
     last_opening_index = raw_text.rfind("<") if raw_text else -1
@@ -68,6 +89,13 @@ def email_suffix_length(raw_text: str) -> int:
 
     Keeps trailing characters that could form a valid email
     across chunk boundaries.
+
+    Args:
+        raw_text: Unvalidated text as received.
+
+    Returns:
+        Length to retain for partial email detection.
+
     """
     if not raw_text:
         return 0
@@ -87,6 +115,13 @@ def phone_suffix_length(raw_text: str) -> int:
     """Compute length to retain for partial phone number detection.
 
     Keeps trailing digits/+/-/spaces that could form a phone number.
+
+    Args:
+        raw_text: Unvalidated text as received.
+
+    Returns:
+        Length to retain for partial phone number detection.
+
     """
     if not raw_text:
         return 0
@@ -102,6 +137,13 @@ def emoticon_suffix_length(text: str) -> int:
     Keeps trailing characters that could form a complete emoticon
     across chunk boundaries. This prevents emitting partial emoticons
     like ':' or ':-' that should be stripped when completed as ':-)'
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        Length to retain for partial emoticon detection.
+
     """
     if not text:
         return 0
@@ -135,6 +177,15 @@ def compute_tail_lengths(
 
     Returns ``(stable_length, tail_length)`` where the first value is safe to
     emit and the second must remain buffered.
+
+    Args:
+        raw_tail: Unvalidated tail as received.
+        sanitized: Text after sanitization.
+        maximum_tail_length: Largest allowed tail length.
+
+    Returns:
+        How much of the sanitized text is stable vs tail to buffer.
+
     """
     if not sanitized:
         return 0, 0

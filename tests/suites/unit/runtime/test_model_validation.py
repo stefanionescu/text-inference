@@ -12,7 +12,12 @@ if TYPE_CHECKING:
 
 
 def test_vllm_model_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test a vLLM-only source cannot cross the TensorRT boundary."""
+    """Test a vLLM-only source cannot cross the TensorRT boundary.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     model = "example/vllm-only-model"
     monkeypatch.setattr(validate, "ALLOWED_VLLM_BASE_MODELS", [model])
 
@@ -24,7 +29,12 @@ def test_vllm_model_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_trt_model_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test a TensorRT-only source cannot cross the vLLM boundary."""
+    """Test a TensorRT-only source cannot cross the vLLM boundary.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     model = "example/trt-only-model"
     monkeypatch.setattr(validate, "ALLOWED_TRT_BASE_MODELS", [model])
 

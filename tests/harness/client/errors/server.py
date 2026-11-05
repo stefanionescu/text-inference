@@ -11,7 +11,12 @@ if TYPE_CHECKING:
 
 
 class ServerError(TestClientError):
-    """Raised when the server returns an error message."""
+    """Raised when the server returns an error message.
+
+    Attributes:
+        user_message: User message.
+
+    """
 
     _SUBCLASS_MAP: ClassVar[dict[str, type[ServerError]]] = {}
     _is_recoverable: ClassVar[bool] = False
@@ -24,7 +29,14 @@ class ServerError(TestClientError):
         *,
         extra: dict[str, object] | None = None,
     ) -> None:
-        """Initialize a server error."""
+        """Initialize a server error.
+
+        Args:
+            error_code: Code of the error.
+            message: Message to send, check, or report.
+            extra: Extra fields to include.
+
+        """
         self.error_code = error_code
         self.message = message
         self.extra = extra or {}
@@ -32,7 +44,15 @@ class ServerError(TestClientError):
 
     @classmethod
     def decode_message(cls, payload: dict[str, object]) -> ServerError:
-        """Create an appropriate ServerError subclass from a server error message."""
+        """Create an appropriate ServerError subclass from a server error message.
+
+        Args:
+            payload: Decoded message fields.
+
+        Returns:
+            An appropriate ServerError subclass from a server error message.
+
+        """
         raw_error_code = payload.get("code") or payload.get("error_code") or "unknown"
         error_code = raw_error_code if isinstance(raw_error_code, str) else str(raw_error_code)
         raw_message = payload.get("message")
@@ -47,7 +67,13 @@ class ServerError(TestClientError):
 
     @classmethod
     def register_codes(cls, codes: tuple[str, ...], error_class: type[ServerError]) -> None:
-        """Register an error class for server error codes."""
+        """Register an error class for server error codes.
+
+        Args:
+            codes: Error or close codes to accept.
+            error_class: Error class.
+
+        """
         for code in codes:
             cls._SUBCLASS_MAP[code] = error_class
 
@@ -68,11 +94,21 @@ class ServerError(TestClientError):
         return None
 
     def is_recoverable(self) -> bool:
-        """Return whether the client may retry after this error."""
+        """Return whether the client may retry after this error.
+
+        Returns:
+            Whether the client may retry after this error.
+
+        """
         return self._is_recoverable
 
     def format_for_user(self) -> str:
-        """Format the error for terminal output."""
+        """Format the error for terminal output.
+
+        Returns:
+            The error for terminal output.
+
+        """
         friendly_message = self.friendly_message
         if friendly_message:
             return friendly_message
@@ -82,7 +118,15 @@ class ServerError(TestClientError):
 
 
 def _register_error_code[ErrorT: type[ServerError]](*codes: str) -> Callable[[ErrorT], ErrorT]:
-    """Register error codes with their exception class."""
+    """Register error codes with their exception class.
+
+    Args:
+        *codes: Error or close codes to accept.
+
+    Returns:
+        The callable.
+
+    """
 
     def decorator(cls: ErrorT) -> ErrorT:
         registered_cls = cls

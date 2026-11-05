@@ -22,7 +22,19 @@ if TYPE_CHECKING:
 
 
 def _percentile(samples: Sequence[float], fraction: float) -> float:
-    """Compute the given percentile (0-1) from sorted samples."""
+    """Compute the given percentile (0-1) from sorted samples.
+
+    Args:
+        samples: Latency samples.
+        fraction: Fraction between zero and one.
+
+    Returns:
+        The given percentile (0-1) from sorted samples.
+
+    Raises:
+        ValueError: Percentile requires at least one sample.
+
+    """
     if not samples:
         message = "percentile requires at least one sample"
         raise ValueError(message)
@@ -41,7 +53,15 @@ def _percentile(samples: Sequence[float], fraction: float) -> float:
 
 
 def _parse_milliseconds(value: object) -> float | None:
-    """Return a numeric millisecond value when present."""
+    """Return a numeric millisecond value when present.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        A numeric millisecond value when present.
+
+    """
     if value is None:
         return None
     if isinstance(value, int | float):
@@ -50,7 +70,15 @@ def _parse_milliseconds(value: object) -> float | None:
 
 
 def _build_stats(samples: Sequence[float]) -> dict[str, float | int]:
-    """Build a stats dict from a sequence of samples."""
+    """Build a stats dict from a sequence of samples.
+
+    Args:
+        samples: Latency samples.
+
+    Returns:
+        A stats dict from a sequence of samples.
+
+    """
     count = len(samples)
     first = samples[0] if samples else 0
     return {
@@ -64,7 +92,15 @@ def _build_stats(samples: Sequence[float]) -> dict[str, float | int]:
 
 
 def _format_milliseconds(value: float | None) -> str:
-    """Format milliseconds value."""
+    """Format milliseconds value.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        Milliseconds value.
+
+    """
     if value is None:
         return "—"
     formatted = f"{value:.0f}"
@@ -77,7 +113,17 @@ def _format_stats_line(
     *,
     is_first_shown: bool = False,
 ) -> str:
-    """Format a stats line for a metric."""
+    """Format a stats line for a metric.
+
+    Args:
+        label: Label to print.
+        stats: Summary statistics.
+        is_first_shown: Whether first is shown.
+
+    Returns:
+        A stats line for a metric.
+
+    """
     fields = [f"  {bold(label):>10}"]
 
     if is_first_shown:
@@ -97,7 +143,13 @@ def _format_stats_line(
 
 
 def _emit_first_message(samples: TTFBSamples, sink: Callable[[str], None]) -> None:
-    """Emit first message latency (includes prefill overhead)."""
+    """Emit first message latency (includes prefill overhead).
+
+    Args:
+        samples: Latency samples.
+        sink: Function that receives each line of output.
+
+    """
     fields = [f"  {bold('FIRST')}  {dim('(includes prefill)')}"]
 
     if samples.samples:
@@ -111,7 +163,13 @@ def _emit_first_message(samples: TTFBSamples, sink: Callable[[str], None]) -> No
 
 
 def _emit_remaining_stats(samples: TTFBSamples, sink: Callable[[str], None]) -> None:
-    """Emit statistics for messages after the first."""
+    """Emit statistics for messages after the first.
+
+    Args:
+        samples: Latency samples.
+        sink: Function that receives each line of output.
+
+    """
     metrics = [
         ("TTFB", samples.samples[1:]),
         ("3-WORDS", samples.first_three_words_samples[1:] if len(samples.first_three_words_samples) > 1 else []),
@@ -126,7 +184,13 @@ def _emit_remaining_stats(samples: TTFBSamples, sink: Callable[[str], None]) -> 
 
 
 def _emit_single_stats(samples: TTFBSamples, sink: Callable[[str], None]) -> None:
-    """Emit stats when we only have a single sample."""
+    """Emit stats when we only have a single sample.
+
+    Args:
+        samples: Latency samples.
+        sink: Function that receives each line of output.
+
+    """
     metrics = [
         ("TTFB", samples.samples),
         ("3-WORDS", samples.first_three_words_samples),
@@ -146,7 +210,13 @@ def _emit_single_stats(samples: TTFBSamples, sink: Callable[[str], None]) -> Non
 
 
 def record_ttfb(samples: TTFBSamples, metrics: Mapping[str, Any]) -> None:
-    """Record latency values from a metrics dict."""
+    """Record latency values from a metrics dict.
+
+    Args:
+        samples: Latency samples.
+        metrics: Timing metrics of the request.
+
+    """
     first_byte_latency_milliseconds = _parse_milliseconds(metrics.get("ttfb_ms"))
     first_three_words_milliseconds = _parse_milliseconds(metrics.get("time_to_first_3_words_ms"))
     first_sentence_milliseconds = _parse_milliseconds(metrics.get("time_to_first_complete_sentence_ms"))
@@ -160,7 +230,15 @@ def record_ttfb(samples: TTFBSamples, metrics: Mapping[str, Any]) -> None:
 
 
 def has_ttfb_samples(samples: TTFBSamples) -> bool:
-    """Return True if any samples have been recorded."""
+    """Return True if any samples have been recorded.
+
+    Args:
+        samples: Latency samples.
+
+    Returns:
+        True if any samples have been recorded.
+
+    """
     primary_samples = samples.samples or samples.first_three_words_samples
     if primary_samples:
         return True
@@ -168,7 +246,13 @@ def has_ttfb_samples(samples: TTFBSamples) -> bool:
 
 
 def emit_ttfb_summary(samples: TTFBSamples, sink: Callable[[str], None]) -> None:
-    """Emit summary statistics with first message separated."""
+    """Emit summary statistics with first message separated.
+
+    Args:
+        samples: Latency samples.
+        sink: Function that receives each line of output.
+
+    """
     sink(section_header("LATENCY SUMMARY"))
 
     has_multiple_samples = len(samples.samples) > 1

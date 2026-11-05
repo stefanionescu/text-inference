@@ -16,7 +16,12 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class _OutputState:
-    """Process-wide dependency output routing state."""
+    """Process-wide dependency output routing state.
+
+    Attributes:
+        is_configured: Whether it is configured.
+
+    """
 
     is_configured: bool = False
 
@@ -25,7 +30,15 @@ _OUTPUT_STATE = _OutputState()
 
 
 def _build_capture_sink(log_path: str | None) -> logging.Handler:
-    """Create a raw dependency handler or a quiet sink."""
+    """Create a raw dependency handler or a quiet sink.
+
+    Args:
+        log_path: Path of the log.
+
+    Returns:
+        A raw dependency handler or a quiet sink.
+
+    """
     if log_path == "-":
         return logging.StreamHandler()
     if log_path:
@@ -34,7 +47,18 @@ def _build_capture_sink(log_path: str | None) -> logging.Handler:
 
 
 def is_raw_output_enabled(environment: Mapping[str, str] | None = None) -> bool:
-    """Return the exact debug-output flag, rejecting ambiguous values."""
+    """Return the exact debug-output flag, rejecting ambiguous values.
+
+    Args:
+        environment: Environment variables to read.
+
+    Returns:
+        The exact debug-output flag, rejecting ambiguous values.
+
+    Raises:
+        ValueError: LOGS_ENABLED must be 0 or 1, got `configured_value`.
+
+    """
     active_environment = os.environ if environment is None else environment
     configured_value = active_environment.get("LOGS_ENABLED", "0")
     if configured_value not in {"0", "1"}:

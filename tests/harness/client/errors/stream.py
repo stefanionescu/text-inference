@@ -9,7 +9,12 @@ class StreamError(TestClientError):
     """Raised when stream consumption encounters a server error."""
 
     def __init__(self, message: dict[str, object]) -> None:
-        """Initialize the error with the server message payload."""
+        """Initialize the error with the server message payload.
+
+        Args:
+            message: Message to send, check, or report.
+
+        """
         self.message = message
         super().__init__(str(message))
 

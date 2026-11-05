@@ -34,7 +34,16 @@ def open_test_client(
     *,
     session_settings: ApplicationSettings | None = None,
 ) -> Generator[TestClient, None, None]:
-    """Yield a client for the public app on a mock engine; session_settings override only the session runtime."""
+    """Yield a client for the public app on a mock engine; session_settings override only the session runtime.
+
+    Args:
+        settings: Application settings.
+        session_settings: Settings for session.
+
+    Yields:
+        A client for the public app on a mock engine; session_settings override only the session runtime.
+
+    """
     with use_local_tokenizers() as tokenizer:
         engine = AsyncMock()
         engine.can_reset_cache = False

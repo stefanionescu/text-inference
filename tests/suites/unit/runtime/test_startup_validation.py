@@ -14,7 +14,15 @@ if TYPE_CHECKING:
 
 
 def _valid_environment(model_folder: Path) -> dict[str, str]:
-    """Build the environment of a deployment that passes startup validation."""
+    """Build the environment of a deployment that passes startup validation.
+
+    Args:
+        model_folder: Folder of the model.
+
+    Returns:
+        The environment of a deployment that passes startup validation.
+
+    """
     (model_folder / "tokenizer.json").write_text("{}", encoding="utf-8")
     return {
         "API_KEY": "test-key",
@@ -25,14 +33,27 @@ def _valid_environment(model_folder: Path) -> dict[str, str]:
 
 
 def _validation_message(environment: dict[str, str]) -> str:
-    """Return the error that startup validation raises for an environment."""
+    """Return the error that startup validation raises for an environment.
+
+    Args:
+        environment: Environment variables to read.
+
+    Returns:
+        The error that startup validation raises for an environment.
+
+    """
     with pytest.raises(ValueError, match=r".+") as error:
         validate_settings(read_settings(environment=environment))
     return str(error.value)
 
 
 def test_valid_settings_pass(tmp_path: Path) -> None:
-    """A complete deployment environment starts without any error."""
+    """A complete deployment environment starts without any error.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     validate_settings(read_settings(environment=_valid_environment(tmp_path)))
 
 
@@ -63,7 +84,15 @@ def test_bad_setting_reports_error(
     raw_value: str,
     expected_error: str,
 ) -> None:
-    """Each out-of-range or unknown value stops startup and names its setting."""
+    """Each out-of-range or unknown value stops startup and names its setting.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+        setting_name: Name of the setting.
+        raw_value: Unvalidated value as received.
+        expected_error: Expected error.
+
+    """
     environment = _valid_environment(tmp_path)
     environment[setting_name] = raw_value
     assert expected_error in _validation_message(environment)
@@ -77,21 +106,38 @@ def test_bad_setting_reports_error(
     ],
 )
 def test_absent_setting_reports_error(tmp_path: Path, setting_name: str, expected_error: str) -> None:
-    """A required setting that the deployment leaves out stops startup."""
+    """A required setting that the deployment leaves out stops startup.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+        setting_name: Name of the setting.
+        expected_error: Expected error.
+
+    """
     environment = _valid_environment(tmp_path)
     del environment[setting_name]
     assert expected_error in _validation_message(environment)
 
 
 def test_missing_tokenizer_stops_startup(tmp_path: Path) -> None:
-    """A model folder without tokenizer files fails before any engine loads."""
+    """A model folder without tokenizer files fails before any engine loads.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     environment = _valid_environment(tmp_path)
     (tmp_path / "tokenizer.json").unlink()
     assert "MODEL tokenizer validation failed" in _validation_message(environment)
 
 
 def test_all_errors_reported_together(tmp_path: Path) -> None:
-    """An operator sees every bad setting in one failure, not one per restart."""
+    """An operator sees every bad setting in one failure, not one per restart.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     environment = _valid_environment(tmp_path)
     environment["KV_DTYPE"] = "unknown"
     environment["TEMPERATURE"] = "99"

@@ -44,7 +44,13 @@ async def _close_validation_error(
     websocket: WebSocket,
     error: ValidationError,
 ) -> None:
-    """Send a validation error and close the WebSocket."""
+    """Send a validation error and close the WebSocket.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        error: Error text or error object to report.
+
+    """
     settings_errors = {
         "missing_prompt",
         "invalid_prompt",
@@ -65,7 +71,15 @@ async def _send_turn_error(
     message: str,
     is_close_requested: bool = False,
 ) -> None:
-    """Send a start-turn error and optionally close the socket."""
+    """Send a start-turn error and optionally close the socket.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        code: Error or close code.
+        message: Message to send, check, or report.
+        is_close_requested: Whether close is requested.
+
+    """
     await send_error(websocket, code=code, message=message)
     if is_close_requested:
         await websocket.close(code=1008)
@@ -77,7 +91,17 @@ def _extract_prompt(
     count_tokens: Callable[[str], int],
     maximum_prompt_tokens: int,
 ) -> str:
-    """Extract and sanitize the required start prompt."""
+    """Extract and sanitize the required start prompt.
+
+    Args:
+        message: Message to send, check, or report.
+        count_tokens: Function that counts the tokens of a text.
+        maximum_prompt_tokens: Largest allowed prompt tokens.
+
+    Returns:
+        And sanitize the required start prompt.
+
+    """
     raw_prompt = message.get("prompt")
     required_prompt = require_prompt(
         raw_prompt,
@@ -102,7 +126,17 @@ def _start_inputs(
     count_tokens: Callable[[str], int],
     session_runtime: SessionRuntime,
 ) -> tuple[str, str, str, dict[str, float | int | bool]]:
-    """Resolve profile fields, prompt, and sampling overrides for start."""
+    """Resolve profile fields, prompt, and sampling overrides for start.
+
+    Args:
+        message: Message to send, check, or report.
+        count_tokens: Function that counts the tokens of a text.
+        session_runtime: Session runtime.
+
+    Returns:
+        Profile fields, prompt, and sampling overrides for start.
+
+    """
     gender = validate_required_gender(message.get("gender"))
     personality = validate_required_personality(message.get("personality"))
     prompt = _extract_prompt(
@@ -123,7 +157,17 @@ async def _start_inputs_checked(
     *,
     session_runtime: SessionRuntime,
 ) -> tuple[str, str, str, dict[str, float | int | bool]] | None:
-    """Resolve start inputs or reject the WebSocket payload."""
+    """Resolve start inputs or reject the WebSocket payload.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message: Message to send, check, or report.
+        session_runtime: Session runtime.
+
+    Returns:
+        Start inputs or reject the WebSocket payload.
+
+    """
     try:
         tokenizer = session_runtime.tokenizer
         return _start_inputs(
@@ -143,7 +187,17 @@ def history_messages(
     state: SessionState,
     message: dict[str, Any],
 ) -> list[HistoryMessage]:
-    """Import schema-validated start history through the history controller."""
+    """Import schema-validated start history through the history controller.
+
+    Args:
+        session_runtime: Session runtime.
+        state: State of the session or test run.
+        message: Message to send, check, or report.
+
+    Returns:
+        The resulting items.
+
+    """
     if state.history_messages or not isinstance(message.get("history"), list):
         return session_runtime.history.get_messages(state)
     imported = [
@@ -161,7 +215,18 @@ async def bootstrap_start_turn(
     *,
     session_runtime: SessionRuntime,
 ) -> bool:
-    """Initialize a fresh session from a start payload."""
+    """Initialize a fresh session from a start payload.
+
+    Args:
+        websocket: WebSocket connection of the client.
+        message: Message to send, check, or report.
+        state: State of the session or test run.
+        session_runtime: Session runtime.
+
+    Returns:
+        Whether the check passes.
+
+    """
     started_at = time.perf_counter()
     try:
         session_runtime.initialize_session(state)

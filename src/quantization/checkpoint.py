@@ -25,7 +25,15 @@ _CREATE_TOKENIZER: Callable[..., object] = cast("Callable[..., object]", AutoTok
 
 
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse checkpoint-validation arguments."""
+    """Parse checkpoint-validation arguments.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        Checkpoint-validation arguments.
+
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument("--engine", required=True, choices=QUANTIZATIONS_BY_ENGINE)
@@ -34,7 +42,13 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
 
 
 def copy_source_assets(source_folder: Path, checkpoint_folder: Path) -> None:
-    """Copy tokenizer, processor, template, and custom-code assets."""
+    """Copy tokenizer, processor, template, and custom-code assets.
+
+    Args:
+        source_folder: Folder of the source.
+        checkpoint_folder: Folder of the checkpoint.
+
+    """
     source_root = source_folder.resolve(strict=True)
     checkpoint_root = checkpoint_folder.resolve(strict=True)
     if source_root == checkpoint_root:
@@ -50,7 +64,15 @@ def copy_source_assets(source_folder: Path, checkpoint_folder: Path) -> None:
 
 
 def validate_tokenizer_assets(checkpoint_folder: Path) -> None:
-    """Require a locally loadable tokenizer."""
+    """Require a locally loadable tokenizer.
+
+    Args:
+        checkpoint_folder: Folder of the checkpoint.
+
+    Raises:
+        ValueError: The input is not valid.
+
+    """
     validation = validate_tokenizer_exists(str(checkpoint_folder))
     if not validation.is_valid:
         message = validation.error_message or "Checkpoint tokenizer validation failed"
@@ -63,7 +85,21 @@ def validate_tokenizer_assets(checkpoint_folder: Path) -> None:
 
 
 def validate_checkpoint(checkpoint_folder: Path, engine: str, expected_format: str) -> Path:
-    """Validate weights, tokenizer, and exact quantization metadata."""
+    """Validate weights, tokenizer, and exact quantization metadata.
+
+    Args:
+        checkpoint_folder: Folder of the checkpoint.
+        engine: Inference engine that serves the request.
+        expected_format: Format of the expected.
+
+    Returns:
+        The path.
+
+    Raises:
+        FileNotFoundError: Checkpoint config.json is missing.
+        ValueError: Quantization format `expected_format` is not supported by `engine`.
+
+    """
     validate_engine(engine)
     if expected_format not in QUANTIZATIONS_BY_ENGINE[engine]:
         message = f"Quantization format {expected_format!r} is not supported by {engine}"
@@ -85,7 +121,15 @@ def validate_checkpoint(checkpoint_folder: Path, engine: str, expected_format: s
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Validate one checkpoint."""
+    """Validate one checkpoint.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The resulting number.
+
+    """
     arguments = _parse_arguments(argument_values)
     validate_checkpoint(Path(arguments.checkpoint_folder), arguments.engine, arguments.quantization_format)
     return 0

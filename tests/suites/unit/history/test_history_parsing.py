@@ -45,7 +45,12 @@ def test_history_normalization() -> None:
 
 @pytest.mark.parametrize("item", [42, {"role": "user"}, {"role": "system", "content": "text"}])
 def test_history_shape_rejected(item: object) -> None:
-    """Reject malformed and unsupported history entries at the schema boundary."""
+    """Reject malformed and unsupported history entries at the schema boundary.
+
+    Args:
+        item: One item to check.
+
+    """
     with pytest.raises(ValueError, match="history"):
         parse_client_message(
             json.dumps({"type": "start", "v": 1, "history": [item]}),

@@ -16,7 +16,18 @@ class CacheResetEngine(Protocol):
     """Engine behavior required by cache reset coordination."""
 
     async def reset_caches(self, reason: str) -> bool:
-        """Attempt a non-preemptive prefix-cache reset."""
+        """Attempt a non-preemptive prefix-cache reset.
+
+        Args:
+            reason: Reason text to report.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(reason)
 
 
@@ -29,7 +40,19 @@ class CacheResetCallback(Protocol):
         *,
         is_rate_limit_bypassed: bool = False,
     ) -> bool:
-        """Attempt one coordinated cache reset."""
+        """Attempt one coordinated cache reset.
+
+        Args:
+            reason: Reason text to report.
+            is_rate_limit_bypassed: Whether rate limit is bypassed.
+
+        Returns:
+            Whether the check passes.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(reason, is_rate_limit_bypassed)
 
 
@@ -37,7 +60,12 @@ class CacheResetCoordinator:
     """Rate-limit resets and retry resets declined by active requests."""
 
     def __init__(self, reset_interval_seconds: float) -> None:
-        """Initialize cache reset coordination state."""
+        """Initialize cache reset coordination state.
+
+        Args:
+            reset_interval_seconds: Reset interval in seconds.
+
+        """
         self._reset_interval_seconds = max(0.0, float(reset_interval_seconds))
         self._lock = asyncio.Lock()
         self._reschedule_event = asyncio.Event()
@@ -58,7 +86,17 @@ class CacheResetCoordinator:
         *,
         is_rate_limit_bypassed: bool = False,
     ) -> bool:
-        """Attempt a non-preemptive reset after applying the local rate limit."""
+        """Attempt a non-preemptive reset after applying the local rate limit.
+
+        Args:
+            engine: Inference engine that serves the request.
+            reason: Reason text to report.
+            is_rate_limit_bypassed: Whether rate limit is bypassed.
+
+        Returns:
+            Whether the check passes.
+
+        """
         async with self._lock:
             now = time.monotonic()
             interval = self._reset_interval_seconds
@@ -89,13 +127,23 @@ class CacheResetCoordinator:
             return is_reset
 
     def _schedule_retry(self, outcome: str) -> None:
-        """Schedule one bounded retry after a declined or failed reset."""
+        """Schedule one bounded retry after a declined or failed reset.
+
+        Args:
+            outcome: Outcome label of the operation.
+
+        """
         self._last_outcome = outcome
         self._retry_at = time.monotonic() + CACHE_RESET_RETRY_SECONDS
         self._reschedule_event.set()
 
     def start_daemon(self, reset_callback: CacheResetCallback) -> None:
-        """Start the periodic daemon once when resets are enabled."""
+        """Start the periodic daemon once when resets are enabled.
+
+        Args:
+            reset_callback: Reset callback.
+
+        """
         if self._daemon_task and not self._daemon_task.done():
             return
         if self._reset_interval_seconds <= 0:
@@ -103,14 +151,24 @@ class CacheResetCoordinator:
         self._daemon_task = asyncio.create_task(self._daemon_loop(reset_callback))
 
     def _seconds_until_attempt(self) -> float:
-        """Return the delay until the next periodic or retry attempt."""
+        """Return the delay until the next periodic or retry attempt.
+
+        Returns:
+            The delay until the next periodic or retry attempt.
+
+        """
         now = time.monotonic()
         if self._retry_at is not None:
             return max(0.0, self._retry_at - now)
         return max(0.0, self._reset_interval_seconds - (now - self._last_reset))
 
     async def _daemon_loop(self, reset_callback: CacheResetCallback) -> None:
-        """Run periodic resets and fixed-delay retries without a tight loop."""
+        """Run periodic resets and fixed-delay retries without a tight loop.
+
+        Args:
+            reset_callback: Reset callback.
+
+        """
         logger.info("cache reset daemon started interval=%ss", self._reset_interval_seconds)
         while True:
             self._reschedule_event.clear()
@@ -122,7 +180,12 @@ class CacheResetCoordinator:
                 await reset_callback(reason, is_rate_limit_bypassed=True)
 
     async def stop_daemon(self) -> None:
-        """Cancel and await the cache daemon before engine shutdown."""
+        """Cancel and await the cache daemon before engine shutdown.
+
+        Raises:
+            outcome: The operation fails with this error.
+
+        """
         task = self._daemon_task
         self._daemon_task = None
         if task is None:

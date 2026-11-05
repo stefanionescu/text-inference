@@ -28,7 +28,21 @@ class _Tokenizer(Protocol):
         return_attention_mask: bool,
         return_token_type_ids: bool,
     ) -> Mapping[str, object]:
-        """Encode text into tokenizer fields."""
+        """Encode text into tokenizer fields.
+
+        Args:
+            text: Text to process.
+            add_special_tokens: Token count of the add special.
+            return_attention_mask: Return attention mask.
+            return_token_type_ids: Return token type IDs.
+
+        Returns:
+            Text into tokenizer fields.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(
             text,
             add_special_tokens,
@@ -43,7 +57,20 @@ class _Tokenizer(Protocol):
         skip_special_tokens: bool,
         clean_up_tokenization_spaces: bool,
     ) -> str:
-        """Decode token identifiers into text."""
+        """Decode token identifiers into text.
+
+        Args:
+            token_ids: Token identifiers.
+            skip_special_tokens: Token count of the skip special.
+            clean_up_tokenization_spaces: Clean up tokenization spaces.
+
+        Returns:
+            Token identifiers into text.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(
             token_ids,
             skip_special_tokens,
@@ -58,7 +85,21 @@ class _Tokenizer(Protocol):
         add_generation_prompt: bool,
         **template_options: object,
     ) -> object:
-        """Apply a tokenizer-owned chat template."""
+        """Apply a tokenizer-owned chat template.
+
+        Args:
+            messages: Messages of the conversation.
+            tokenize: Whether the call returns token identifiers.
+            add_generation_prompt: Add generation prompt.
+            **template_options: Template options.
+
+        Returns:
+            The updated value.
+
+        Raises:
+            NotImplementedError: The backend does not implement this call.
+
+        """
         raise NotImplementedError(
             messages,
             tokenize,
@@ -71,7 +112,12 @@ class ThreadSafeTokenizer:
     """Thread-safe adapter around one Transformers tokenizer."""
 
     def __init__(self, model_directory: str) -> None:
-        """Initialize a tokenizer from an existing local model directory."""
+        """Initialize a tokenizer from an existing local model directory.
+
+        Args:
+            model_directory: Model directory.
+
+        """
         self._lock = Lock()
         model_path = require_local_model_directory(model_directory)
         create_tokenizer: Callable[..., _Tokenizer] = cast(
@@ -93,6 +139,14 @@ class ThreadSafeTokenizer:
         """Encode text with optional special tokens.
 
         Must be called while holding ``self._lock``.
+
+        Args:
+            text: Text to process.
+            are_special_tokens_added: Whether special tokens are added.
+
+        Returns:
+            Text with optional special tokens.
+
         """
         encoded_input = self._tokenizer(
             text,
@@ -185,9 +239,6 @@ class ThreadSafeTokenizer:
 
         Returns:
             Formatted prompt string ready for generation.
-
-        Raises:
-            RuntimeError: If tokenizer has no chat template support.
 
         """
         with self._lock:

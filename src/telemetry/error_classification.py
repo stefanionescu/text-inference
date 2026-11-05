@@ -14,7 +14,15 @@ ERROR_TYPE_LABELS: tuple[tuple[type[BaseException], str], ...] = (
 
 
 def classify_error(exception: BaseException) -> str:
-    """Return the telemetry error type label for an exception."""
+    """Return the telemetry error type label for an exception.
+
+    Args:
+        exception: Exception to inspect.
+
+    Returns:
+        The telemetry error type label for an exception.
+
+    """
     for exception_type, label in ERROR_TYPE_LABELS:
         if isinstance(exception, exception_type):
             return label

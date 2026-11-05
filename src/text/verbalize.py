@@ -25,25 +25,57 @@ if TYPE_CHECKING:
 
 
 def verbalize_email(email: str) -> str:
-    """Convert email to spoken form: me@you.com → me at you dot com."""
+    """Convert email to spoken form: me@you.com → me at you dot com.
+
+    Args:
+        email: Email address text.
+
+    Returns:
+        The updated text.
+
+    """
     result = email.replace("@", " at ")
     return result.replace(".", " dot ")
 
 
 def verbalize_emails(text: str) -> str:
-    """Find and verbalize all email addresses in text."""
+    """Find and verbalize all email addresses in text.
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        And verbalize all email addresses in text.
+
+    """
     if not text:
         return ""
 
     def replace_email(match: re.Match[str]) -> str:
-        """Verbalize one matched email address."""
+        """Verbalize one matched email address.
+
+        Args:
+            match: Regular expression match to rewrite.
+
+        Returns:
+            The updated text.
+
+        """
         return verbalize_email(match.group(0))
 
     return EMAIL_PATTERN.sub(replace_email, text)
 
 
 def verbalize_phone_digit(char: str) -> str:
-    """Convert a single phone character to spoken form."""
+    """Convert a single phone character to spoken form.
+
+    Args:
+        char: One character of text.
+
+    Returns:
+        The updated text.
+
+    """
     if char == "+":
         return "plus"
     if char in DIGIT_WORDS:
@@ -52,7 +84,15 @@ def verbalize_phone_digit(char: str) -> str:
 
 
 def verbalize_phone_number(raw_number: str) -> str:
-    """Convert phone number to spoken form: +1 234 → plus one two three four."""
+    """Convert phone number to spoken form: +1 234 → plus one two three four.
+
+    Args:
+        raw_number: Unvalidated number as received.
+
+    Returns:
+        The updated text.
+
+    """
     words: list[str] = []
     for char in raw_number:
         word = verbalize_phone_digit(char)
@@ -66,6 +106,13 @@ def verbalize_phone_numbers(text: str) -> str:
 
     Uses libphonenumber to detect phone numbers. Only matches international
     format with explicit + country code (region=None).
+
+    Args:
+        text: Text to process.
+
+    Returns:
+        And verbalize phone numbers with international format (+XX...).
+
     """
     if not text:
         return text

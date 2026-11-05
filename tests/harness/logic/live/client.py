@@ -36,7 +36,12 @@ logger = logging.getLogger("live")
 
 
 def _log_server_error(message: dict[str, object]) -> None:
-    """Log a server error message."""
+    """Log a server error message.
+
+    Args:
+        message: Message to send, check, or report.
+
+    """
     error_code = message.get("error_code") or message.get("code")
     status = message.get("status")
     server_message = message.get("message")
@@ -57,7 +62,14 @@ class LiveClient:
     """High-level WebSocket client for interactive sessions."""
 
     def __init__(self, websocket: object, session: LiveSession, transaction_timeout_seconds: float) -> None:
-        """Initialize a live client around an open WebSocket."""
+        """Initialize a live client around an open WebSocket.
+
+        Args:
+            websocket: WebSocket connection of the client.
+            session: Session to use.
+            transaction_timeout_seconds: Transaction timeout in seconds.
+
+        """
         self.websocket: WebSocketClientProtocol = cast("WebSocketClientProtocol", websocket)
         self.session = session
         self.transaction_timeout_seconds = transaction_timeout_seconds
@@ -66,12 +78,28 @@ class LiveClient:
         self._close_task: asyncio.Task[None] | None = None
 
     async def send_user_message(self, text: str) -> StreamResult:
-        """Send a user message and return the result with assistant's response."""
+        """Send a user message and return the result with assistant's response.
+
+        Args:
+            text: Text to process.
+
+        Returns:
+            The result with assistant's response.
+
+        """
         async with asyncio.timeout(self.transaction_timeout_seconds):
             return await self._send_user_message(text)
 
     async def _send_user_message(self, text: str) -> StreamResult:
-        """Send and consume one complete live turn."""
+        """Send and consume one complete live turn.
+
+        Args:
+            text: Text to process.
+
+        Returns:
+            The stream result.
+
+        """
         if not self.session.is_started:
             await send_initial_user_turn(
                 self.websocket,
@@ -90,7 +118,12 @@ class LiveClient:
         return result
 
     async def close(self) -> None:
-        """Close the WebSocket connection gracefully."""
+        """Close the WebSocket connection gracefully.
+
+        Raises:
+            asyncio.CancelledError: The task was cancelled.
+
+        """
         if self._is_closed:
             return
         self._is_closed = True
@@ -115,7 +148,20 @@ class LiveClient:
             raise ConnectionClosedError(message) from exception
 
     async def _stream_response(self, state: StreamState, *, is_user_prompt_printed: bool = True) -> StreamResult:
-        """Stream and process the server response."""
+        """Stream and process the server response.
+
+        Args:
+            state: State of the session or test run.
+            is_user_prompt_printed: Whether user prompt is printed.
+
+        Returns:
+            The stream result.
+
+        Raises:
+            IdleTimeoutError: The operation fails with this error.
+            TestClientError: WebSocket closed before receiving 'done'.
+
+        """
         context = _StreamContext(state)
         try:
             async for message in iter_messages(self.websocket):
@@ -141,7 +187,17 @@ class LiveClient:
         *,
         is_user_prompt_printed: bool,
     ) -> StreamResult | None:
-        """Handle one server stream frame."""
+        """Handle one server stream frame.
+
+        Args:
+            message: Message to send, check, or report.
+            context: Session values that the prompt or request reads.
+            is_user_prompt_printed: Whether user prompt is printed.
+
+        Returns:
+            The stream result.
+
+        """
         message_type = message.get("type")
         result: StreamResult | None = None
         if message_type == "token":
@@ -185,7 +241,19 @@ class LiveClient:
         return StreamResult(text=context.state.completion_text, is_successful=True, is_cancelled=True)
 
     def _handle_error_frame(self, message: dict[str, object], context: _StreamContext) -> StreamResult:
-        """Handle an error message frame."""
+        """Handle an error message frame.
+
+        Args:
+            message: Message to send, check, or report.
+            context: Session values that the prompt or request reads.
+
+        Returns:
+            The stream result.
+
+        Raises:
+            error: The operation fails with this error.
+
+        """
         context.printer.finish()
         error = ServerError.decode_message(message)
         _log_server_error(message)

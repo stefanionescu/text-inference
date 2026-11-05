@@ -15,12 +15,22 @@ if TYPE_CHECKING:
 
 
 def build_cancel_payload() -> dict[str, Any]:
-    """Build a cancel message."""
+    """Build a cancel message.
+
+    Returns:
+        A cancel message.
+
+    """
     return {"type": "cancel", "v": WEBSOCKET_PROTOCOL_VERSION}
 
 
 def build_end_payload() -> dict[str, Any]:
-    """Build an end message."""
+    """Build an end message.
+
+    Returns:
+        An end message.
+
+    """
     return {"type": "end", "v": WEBSOCKET_PROTOCOL_VERSION}
 
 

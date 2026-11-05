@@ -14,7 +14,15 @@ if TYPE_CHECKING:
 
 
 def _validate_numeric_bounds(settings: ApplicationSettings) -> list[str]:
-    """Check numeric config values are within valid ranges."""
+    """Check numeric config values are within valid ranges.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The resulting items.
+
+    """
     errors: list[str] = []
     sampling_settings = settings.sampling
 
@@ -71,7 +79,15 @@ def _validate_numeric_bounds(settings: ApplicationSettings) -> list[str]:
 
 
 def _validate_required_settings(settings: ApplicationSettings) -> list[str]:
-    """Validate settings that must be present for startup."""
+    """Validate settings that must be present for startup.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The resulting items.
+
+    """
     errors: list[str] = []
     if not settings.authentication.api_key:
         errors.append("API_KEY environment variable is required")
@@ -88,7 +104,15 @@ def _validate_required_settings(settings: ApplicationSettings) -> list[str]:
 
 
 def _validate_model_settings(settings: ApplicationSettings) -> list[str]:
-    """Validate model selection settings."""
+    """Validate model selection settings.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The resulting items.
+
+    """
     errors: list[str] = []
     if not settings.model.source:
         errors.append("MODEL is required")
@@ -96,7 +120,15 @@ def _validate_model_settings(settings: ApplicationSettings) -> list[str]:
 
 
 def _validate_engine_settings(settings: ApplicationSettings) -> list[str]:
-    """Validate engine and quantization settings."""
+    """Validate engine and quantization settings.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The resulting items.
+
+    """
     errors: list[str] = []
     if settings.engine.inference_engine not in QUANTIZATIONS_BY_ENGINE:
         errors.append(
@@ -122,7 +154,15 @@ def _validate_engine_settings(settings: ApplicationSettings) -> list[str]:
 
 
 def _validate_tokenizer_settings(settings: ApplicationSettings) -> list[str]:
-    """Validate tokenizer availability for the configured model."""
+    """Validate tokenizer availability for the configured model.
+
+    Args:
+        settings: Application settings.
+
+    Returns:
+        The resulting items.
+
+    """
     if not settings.model.source:
         return []
     result = validate_tokenizer_exists(settings.model.source)
@@ -132,7 +172,15 @@ def _validate_tokenizer_settings(settings: ApplicationSettings) -> list[str]:
 
 
 def validate_settings(settings: ApplicationSettings) -> None:
-    """Validate resolved runtime settings once during startup."""
+    """Validate resolved runtime settings once during startup.
+
+    Args:
+        settings: Application settings.
+
+    Raises:
+        ValueError: The input is not valid.
+
+    """
     errors: list[str] = []
     errors.extend(_validate_required_settings(settings))
     errors.extend(_validate_model_settings(settings))

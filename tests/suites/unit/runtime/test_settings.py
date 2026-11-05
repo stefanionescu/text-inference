@@ -32,6 +32,11 @@ def test_settings_sequence_limits() -> None:
 
 @pytest.mark.parametrize("setting_name", ["ENFORCE_EAGER", "LOGS_ENABLED"])
 def test_settings_boolean_rejection(setting_name: str) -> None:
-    """Test boolean environment settings require an exact binary value."""
+    """Test boolean environment settings require an exact binary value.
+
+    Args:
+        setting_name: Name of the setting.
+
+    """
     with pytest.raises(ValueError, match=f"{setting_name} must be 0 or 1"):
         read_settings(environment={setting_name: "true"})

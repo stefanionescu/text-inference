@@ -19,7 +19,15 @@ from tests.harness.client.websocket import (
 
 
 def build_start_payload(session: ConversationSession) -> dict[str, Any]:
-    """Build the bootstrap-only start payload for a conversation turn."""
+    """Build the bootstrap-only start payload for a conversation turn.
+
+    Args:
+        session: Session to use.
+
+    Returns:
+        The bootstrap-only start payload for a conversation turn.
+
+    """
     context = SessionContext(
         session_id=session.session_id,
         gender=session.gender,
@@ -31,7 +39,16 @@ def build_start_payload(session: ConversationSession) -> dict[str, Any]:
 
 
 def build_message_payload(session: ConversationSession, user_text: str) -> dict[str, Any]:
-    """Build the message payload for subsequent conversation turns."""
+    """Build the message payload for subsequent conversation turns.
+
+    Args:
+        session: Session to use.
+        user_text: Text of the user.
+
+    Returns:
+        The message payload for subsequent conversation turns.
+
+    """
     return build_websocket_message_payload(
         user_text,
         sampling=session.sampling,

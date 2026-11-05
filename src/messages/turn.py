@@ -24,7 +24,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class TurnMessageRequest:
-    """Inputs needed to handle one start or message command."""
+    """Inputs needed to handle one start or message command.
+
+    Attributes:
+        websocket: WebSocket connection of the client.
+        message: Message to send, check, or report.
+        state: State of the session or test run.
+        message_type: Type of the message.
+        runtime_dependencies: Runtime dependencies.
+
+    """
 
     websocket: WebSocket
     message: dict[str, object]
@@ -34,7 +43,15 @@ class TurnMessageRequest:
 
 
 async def handle_turn_message(request: TurnMessageRequest) -> bool:
-    """Plan and dispatch one session turn message."""
+    """Plan and dispatch one session turn message.
+
+    Args:
+        request: Request to run.
+
+    Returns:
+        Whether the check passes.
+
+    """
     if request.message_type == "start":
         return await bootstrap_start_turn(
             request.websocket,

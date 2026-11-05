@@ -12,7 +12,15 @@ if TYPE_CHECKING:
 
 
 def _build_request(source_revision: str) -> QuantizationRequest:
-    """Build one scenario request."""
+    """Build one scenario request.
+
+    Args:
+        source_revision: Revision of the source.
+
+    Returns:
+        One scenario request.
+
+    """
     return QuantizationRequest(
         engine="vllm",
         quantization_format="compressed-tensors",
@@ -29,7 +37,12 @@ def _build_request(source_revision: str) -> QuantizationRequest:
 
 
 def test_matching_cache_reused(tmp_path: Path) -> None:
-    """Test identical source and policy metadata enables reuse."""
+    """Test identical source and policy metadata enables reuse.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     request = _build_request("a" * 40)
     write_provenance(
         tmp_path,
@@ -42,7 +55,12 @@ def test_matching_cache_reused(tmp_path: Path) -> None:
 
 
 def test_source_change_invalidates(tmp_path: Path) -> None:
-    """Test an upstream source update invalidates cached weights."""
+    """Test an upstream source update invalidates cached weights.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+
+    """
     original = _build_request("a" * 40)
     updated = _build_request("b" * 40)
     write_provenance(

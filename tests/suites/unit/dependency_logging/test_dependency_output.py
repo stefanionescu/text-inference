@@ -25,7 +25,13 @@ def test_log_flag_contract() -> None:
 
 
 def test_default_dependency_capture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test quiet mode routes dependency diagnostics to raw capture."""
+    """Test quiet mode routes dependency diagnostics to raw capture.
+
+    Args:
+        tmp_path: Pytest fixture that provides a temporary folder.
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     output_module = importlib.reload(output)
     capture_path = tmp_path / "dependencies.log"
     logger_name = "scenario.dependency.capture"
@@ -57,7 +63,12 @@ def test_default_dependency_capture(tmp_path: Path, monkeypatch: pytest.MonkeyPa
 
 
 def test_logs_preserve_sinks(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test raw mode leaves dependency logging unsuppressed."""
+    """Test raw mode leaves dependency logging unsuppressed.
+
+    Args:
+        monkeypatch: Pytest fixture that patches objects for one test.
+
+    """
     output_module = importlib.reload(output)
     logger_name = "scenario.dependency.visible"
     dependency_logger = logging.getLogger(logger_name)

@@ -47,7 +47,12 @@ def _parse_arguments() -> argparse.Namespace:
 
 
 def _add_benchmark_arguments(parser: argparse.ArgumentParser) -> None:
-    """Add benchmark-specific CLI arguments."""
+    """Add benchmark-specific CLI arguments.
+
+    Args:
+        parser: Argument parser to extend.
+
+    """
     parser.add_argument(
         "--requests",
         "-r",

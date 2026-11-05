@@ -30,7 +30,15 @@ _DOWNLOAD_SNAPSHOT: Callable[..., str] = cast("Callable[..., str]", huggingface_
 
 @dataclass(frozen=True, slots=True)
 class SourceIdentity:
-    """Stable identity for one quantization source."""
+    """Stable identity for one quantization source.
+
+    Attributes:
+        kind: Kind of record.
+        model: Model name or local checkpoint path.
+        requested_revision: Revision of the requested.
+        resolved_revision: Revision of the resolved.
+
+    """
 
     kind: str
     model: str
@@ -38,7 +46,12 @@ class SourceIdentity:
     resolved_revision: str
 
     def build_metadata(self) -> dict[str, object]:
-        """Return JSON-compatible source metadata."""
+        """Return JSON-compatible source metadata.
+
+        Returns:
+            JSON-compatible source metadata.
+
+        """
         return {
             "kind": self.kind,
             "model": self.model,
@@ -49,14 +62,28 @@ class SourceIdentity:
 
 @dataclass(frozen=True, slots=True)
 class SourceSnapshot:
-    """Acquired source identity and local checkpoint path."""
+    """Acquired source identity and local checkpoint path.
+
+    Attributes:
+        identity: Identity of the source checkpoint.
+        path: File system path.
+
+    """
 
     identity: SourceIdentity
     path: Path
 
 
 def _build_local_source(model_folder: Path) -> SourceSnapshot:
-    """Build the identity for a local source directory."""
+    """Build the identity for a local source directory.
+
+    Args:
+        model_folder: Folder of the model.
+
+    Returns:
+        The identity for a local source directory.
+
+    """
     path = model_folder.resolve(strict=True)
     return SourceSnapshot(
         identity=SourceIdentity(
@@ -76,7 +103,21 @@ def _acquire_hub_source(
     token: str | None,
     cache_folder: str | None,
 ) -> SourceSnapshot:
-    """Acquire one immutable Hugging Face snapshot."""
+    """Acquire one immutable Hugging Face snapshot.
+
+    Args:
+        model: Model name or local checkpoint path.
+        revision: Model revision to use.
+        token: Hugging Face access token or token text.
+        cache_folder: Folder of the cache.
+
+    Returns:
+        One immutable Hugging Face snapshot.
+
+    Raises:
+        ValueError: Hugging Face did not return an immutable model revision.
+
+    """
     resolved_revision = HfApi(token=token).model_info(repo_id=model, revision=revision).sha
     if not isinstance(resolved_revision, str) or not _COMMIT_PATTERN.fullmatch(resolved_revision):
         message = "Hugging Face did not return an immutable model revision"
@@ -99,7 +140,15 @@ def _acquire_hub_source(
 
 
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
-    """Parse source acquisition arguments."""
+    """Parse source acquisition arguments.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        Source acquisition arguments.
+
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--revision", default=DEFAULT_MODEL_REVISION)
@@ -113,7 +162,21 @@ def acquire_source(
     token: str | None,
     cache_folder: str | None,
 ) -> SourceSnapshot:
-    """Acquire a local directory or immutable Hugging Face snapshot."""
+    """Acquire a local directory or immutable Hugging Face snapshot.
+
+    Args:
+        model: Model name or local checkpoint path.
+        revision: Model revision to use.
+        token: Hugging Face access token or token text.
+        cache_folder: Folder of the cache.
+
+    Returns:
+        A local directory or immutable Hugging Face snapshot.
+
+    Raises:
+        NotADirectoryError: Model path must be a directory.
+
+    """
     model_path = Path(model).expanduser()
     if model_path.is_dir():
         return _build_local_source(model_path)
@@ -128,7 +191,20 @@ def derive_source_identity(
     source_folder: Path,
     revision: str,
 ) -> SourceIdentity:
-    """Derive source identity from an acquired local path."""
+    """Derive source identity from an acquired local path.
+
+    Args:
+        model: Model name or local checkpoint path.
+        source_folder: Folder of the source.
+        revision: Model revision to use.
+
+    Returns:
+        Source identity from an acquired local path.
+
+    Raises:
+        ValueError: Hugging Face snapshot path does not contain a commit revision.
+
+    """
     model_path = Path(model).expanduser()
     if model_path.is_dir():
         return _build_local_source(model_path).identity
@@ -146,7 +222,15 @@ def derive_source_identity(
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Acquire one model and print its local snapshot path."""
+    """Acquire one model and print its local snapshot path.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        One model and print its local snapshot path.
+
+    """
     arguments = _parse_arguments(argument_values)
     snapshot = acquire_source(
         arguments.model,

@@ -15,7 +15,14 @@ class ConnectionClosedError(WebSocketConnectionError):
         close_code: int | None = None,
         close_reason: str | None = None,
     ) -> None:
-        """Build a connection-closed error with optional close metadata."""
+        """Build a connection-closed error with optional close metadata.
+
+        Args:
+            message: Message to send, check, or report.
+            close_code: Code of the close.
+            close_reason: Close reason.
+
+        """
         self.close_code = close_code
         self.close_reason = close_reason
         parts = [message]

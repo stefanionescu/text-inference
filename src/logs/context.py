@@ -17,7 +17,14 @@ _CLIENT_ID: ContextVar[str] = ContextVar("client_id", default="-")
 
 @dataclass(frozen=True)
 class LogContext:
-    """Current structured logging context values."""
+    """Current structured logging context values.
+
+    Attributes:
+        session_id: ID of the session.
+        request_id: ID of the request.
+        client_id: ID of the client.
+
+    """
 
     session_id: str
     request_id: str
@@ -26,7 +33,12 @@ class LogContext:
 
 @dataclass(slots=True)
 class _LoggingState:
-    """Process-wide logging installation state."""
+    """Process-wide logging installation state.
+
+    Attributes:
+        is_context_installed: Whether context is installed.
+
+    """
 
     is_context_installed: bool = False
 
@@ -42,7 +54,16 @@ def _configure_log_record_factory() -> None:
     previous_factory = logging.getLogRecordFactory()
 
     def record_factory(*arguments: object, **keyword_arguments: object) -> logging.LogRecord:
-        """Create a log record with current context fields attached."""
+        """Create a log record with current context fields attached.
+
+        Args:
+            *arguments: Parsed command-line arguments.
+            **keyword_arguments: Keyword arguments.
+
+        Returns:
+            A log record with current context fields attached.
+
+        """
         record = previous_factory(*arguments, **keyword_arguments)
         record.session_id = _SESSION_ID.get()
         record.request_id = _REQUEST_ID.get()
@@ -59,7 +80,17 @@ def set_log_context(
     request_id: str | None = None,
     client_id: str | None = None,
 ) -> list[tuple[ContextVar[str], Token[str]]]:
-    """Set log context values and return tokens for reset."""
+    """Set log context values and return tokens for reset.
+
+    Args:
+        session_id: ID of the session.
+        request_id: ID of the request.
+        client_id: ID of the client.
+
+    Returns:
+        Tokens for reset.
+
+    """
     tokens: list[tuple[ContextVar[str], Token[str]]] = []
     if session_id is not None:
         tokens.append((_SESSION_ID, _SESSION_ID.set(session_id)))
@@ -71,7 +102,12 @@ def set_log_context(
 
 
 def current_log_context() -> LogContext:
-    """Return the current structured logging context snapshot."""
+    """Return the current structured logging context snapshot.
+
+    Returns:
+        The current structured logging context snapshot.
+
+    """
     session_id = _SESSION_ID.get()
     request_id = _REQUEST_ID.get()
     client_id = _CLIENT_ID.get()

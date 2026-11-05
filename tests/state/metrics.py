@@ -8,7 +8,16 @@ from dataclasses import field, dataclass
 
 @dataclass(frozen=True)
 class SessionContext:
-    """Immutable context for building session payloads."""
+    """Immutable context for building session payloads.
+
+    Attributes:
+        session_id: ID of the session.
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        prompt: Prompt text.
+        sampling: Sampling overrides of the request.
+
+    """
 
     session_id: str
     gender: str | None
@@ -19,7 +28,17 @@ class SessionContext:
 
 @dataclass
 class StreamState:
-    """Mutable state for stream metric tracking."""
+    """Mutable state for stream metric tracking.
+
+    Attributes:
+        sent_timestamp: Time of the sent.
+        completion_text: Text of the completion.
+        first_token_timestamp: Time of the first token.
+        first_sentence_timestamp: Time of the first sentence.
+        first_three_words_timestamp: Time of the first three words.
+        chunks: Number of chunks that arrived.
+
+    """
 
     sent_timestamp: float = field(default_factory=time.perf_counter)
     completion_text: str = ""
@@ -31,7 +50,14 @@ class StreamState:
 
 @dataclass
 class TTFBSamples:
-    """Accumulated TTFB and latency samples."""
+    """Accumulated TTFB and latency samples.
+
+    Attributes:
+        samples: Latency samples.
+        first_three_words_samples: Samples of first three words.
+        first_sentence_samples: Samples of first sentence.
+
+    """
 
     samples: list[float] = field(default_factory=list)
     first_three_words_samples: list[float] = field(default_factory=list)
@@ -40,7 +66,19 @@ class TTFBSamples:
 
 @dataclass
 class BenchmarkMetrics:
-    """Result payload for a single benchmark transaction."""
+    """Result payload for a single benchmark transaction.
+
+    Attributes:
+        is_successful: Whether it is successful.
+        phase: Number of the test phase.
+        error: Error text or error object to report.
+        error_code: Code of the error.
+        is_recoverable: Whether it is recoverable.
+        ttfb_ms: First-byte time in milliseconds.
+        first_sentence_ms: First sentence in milliseconds.
+        first_three_words_ms: First three words in milliseconds.
+
+    """
 
     is_successful: bool
     phase: int = 1

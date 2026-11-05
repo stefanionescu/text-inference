@@ -30,7 +30,18 @@ _PRIMARY_GPU_INDEX = 0
 
 
 def _string_key_mapping(value: object) -> dict[str, object]:
-    """Return a string-keyed model configuration mapping."""
+    """Return a string-keyed model configuration mapping.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        A string-keyed model configuration mapping.
+
+    Raises:
+        TypeError: Model configuration must be a string-keyed mapping.
+
+    """
     if not isinstance(value, dict) or not all(isinstance(key, str) for key in value):
         message = "Model configuration must be a string-keyed mapping"
         raise TypeError(message)
@@ -49,7 +60,15 @@ class _LLMCompressorRuntime:
         self,
         source_path: Path,
     ) -> tuple[Mapping[str, object], Mapping[str, object]]:
-        """Read model and decoder configuration from a local snapshot."""
+        """Read model and decoder configuration from a local snapshot.
+
+        Args:
+            source_path: Path of the source.
+
+        Returns:
+            Model and decoder configuration from a local snapshot.
+
+        """
         # reason: The snapshot path is verified and loading is restricted to local files.
         configuration = AutoConfig.from_pretrained(
             source_path,
@@ -68,7 +87,15 @@ class _LLMCompressorRuntime:
         policy: QuantizationPolicy,
         settings: QuantizationSettings,
     ) -> None:
-        """Create a compressed-tensors checkpoint with LLM Compressor."""
+        """Create a compressed-tensors checkpoint with LLM Compressor.
+
+        Args:
+            source: Source checkpoint to read.
+            checkpoint_folder: Folder of the checkpoint.
+            policy: Quantization policy to apply.
+            settings: Application settings.
+
+        """
         with load_context(AutoModelForCausalLM):
             # reason: The snapshot path is verified and loading is restricted to local files.
             model = AutoModelForCausalLM.from_pretrained(
@@ -103,7 +130,15 @@ class _LLMCompressorRuntime:
         )
 
     def environment_metadata(self, environment: Mapping[str, str]) -> Mapping[str, object]:
-        """Collect execution provenance that does not constrain cache reuse."""
+        """Collect execution provenance that does not constrain cache reuse.
+
+        Args:
+            environment: Environment variables to read.
+
+        Returns:
+            Execution provenance that does not constrain cache reuse.
+
+        """
         gpu_name = torch.cuda.get_device_name(_PRIMARY_GPU_INDEX) if torch.cuda.is_available() else "unavailable"
         return {
             "gpu_name": gpu_name,
@@ -114,7 +149,15 @@ class _LLMCompressorRuntime:
 
 
 def main(argument_values: Sequence[str] | None = None) -> int:
-    """Quantize one model through the pinned LLM Compressor public API."""
+    """Quantize one model through the pinned LLM Compressor public API.
+
+    Args:
+        argument_values: Command-line arguments to parse.
+
+    Returns:
+        The resulting number.
+
+    """
     return run_quantization(argument_values, environment=os.environ, compressor=_LLMCompressorRuntime())
 
 

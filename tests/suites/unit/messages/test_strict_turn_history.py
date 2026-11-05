@@ -26,7 +26,15 @@ def _start_payload(history: list[dict[str, str]]) -> dict[str, object]:
 
 
 def _run_bootstrap(start_payload: dict[str, object]) -> tuple[bool, SessionState, RecordingWebSocket]:
-    """Run start bootstrap on a new session and return what it reported, stored, and sent."""
+    """Run start bootstrap on a new session and return what it reported, stored, and sent.
+
+    Args:
+        start_payload: Start payload.
+
+    Returns:
+        What it reported, stored, and sent.
+
+    """
     state = SessionState(meta={})
     websocket = RecordingWebSocket()
     with use_local_tokenizers() as tokenizer:

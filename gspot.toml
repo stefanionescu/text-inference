@@ -9,6 +9,9 @@ print_width = 80
 quotes = "double"
 override = [{ paths = ["**/*.py"], indent_width = 4, print_width = 120 }]
 
+[python]
+docstring_convention = "google"
+
 [[import_rule]]
 name = "config-limits"
 paths = ["config/limits.py"]

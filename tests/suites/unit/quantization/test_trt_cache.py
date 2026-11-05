@@ -16,7 +16,14 @@ def test_cache_command_rebuilds(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Both cache paths accept argparse output and select rebuilding correctly."""
+    """Both cache paths accept argparse output and select rebuilding correctly.
+
+    Args:
+        is_forced: Whether it is forced.
+        monkeypatch: Pytest fixture that patches objects for one test.
+        capsys: Pytest fixture that captures standard output and standard error.
+
+    """
     monkeypatch.setattr(trt, "_build_request", Mock(return_value=object()))
     monkeypatch.setattr(trt, "cache_matches", Mock(return_value=False))
     arguments = [

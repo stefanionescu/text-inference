@@ -20,7 +20,17 @@ async def _handle_help_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """Display the supported command list."""
+    """Display the supported command list.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del argument, registry
     profile = client.session.profile
     print_help(profile.gender, profile.personality, is_verbose=True)
@@ -32,7 +42,17 @@ async def _handle_history_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """Print accumulated conversation history."""
+    """Print accumulated conversation history.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del argument, registry
     if not client.session.history:
         logger.info("History is empty")
@@ -51,7 +71,17 @@ async def _handle_genders_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """List unique genders available in the prompt registry."""
+    """List unique genders available in the prompt registry.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del argument, client
     logger.info("Available genders: %s", ", ".join(registry.available_genders()))
     return False
@@ -62,7 +92,17 @@ async def _handle_personalities_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """List unique personalities available in the prompt registry."""
+    """List unique personalities available in the prompt registry.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del argument, client
     logger.info("Available personalities: %s", ", ".join(registry.available_personalities()))
     return False
@@ -73,7 +113,17 @@ async def _handle_stats_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """Toggle response metrics when invoked without arguments."""
+    """Toggle response metrics when invoked without arguments.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del registry
     if argument:
         logger.warning("Usage: /stats")
@@ -88,7 +138,17 @@ async def _handle_stop_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """Stop and close the live session."""
+    """Stop and close the live session.
+
+    Args:
+        argument: One command-line argument.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     del argument, registry
     logger.info("Stopping live session...")
     await client.close()
@@ -97,7 +157,14 @@ async def _handle_stop_command(
 
 
 def print_help(gender: str, personality: str, *, is_verbose: bool = False) -> None:
-    """Print the live profile banner or detailed command list."""
+    """Print the live profile banner or detailed command list.
+
+    Args:
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+        is_verbose: Whether it is verbose.
+
+    """
     if is_verbose:
         write_line(
             f"\n{bold('Commands:')}\n"
@@ -132,7 +199,17 @@ async def dispatch_command(
     client: LiveClient,
     registry: PromptProfileRegistry,
 ) -> bool:
-    """Dispatch one exact slash command without aliases."""
+    """Dispatch one exact slash command without aliases.
+
+    Args:
+        command_line: Command line.
+        client: Test client that owns the connection.
+        registry: Registry of prompt profiles.
+
+    Returns:
+        Whether the check passes.
+
+    """
     command, *remaining_arguments = command_line.split(maxsplit=1)
     argument = remaining_arguments[0].strip() if remaining_arguments else ""
     command_callback = COMMAND_CALLBACKS.get(command.lower())

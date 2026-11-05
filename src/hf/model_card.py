@@ -16,7 +16,19 @@ if TYPE_CHECKING:
 
 
 def read_metadata_section(metadata: Mapping[str, object], field_name: str) -> dict[str, object]:
-    """Read one required metadata mapping."""
+    """Read one required metadata mapping.
+
+    Args:
+        metadata: Metadata fields to read.
+        field_name: Name of the field.
+
+    Returns:
+        One required metadata mapping.
+
+    Raises:
+        TypeError: Quantization metadata field `field_name` must be an object.
+
+    """
     value = metadata.get(field_name)
     if not isinstance(value, dict):
         message = f"Quantization metadata field {field_name} must be an object"
@@ -25,7 +37,19 @@ def read_metadata_section(metadata: Mapping[str, object], field_name: str) -> di
 
 
 def read_metadata_text(metadata: Mapping[str, object], field_name: str) -> str:
-    """Read one required non-empty metadata string."""
+    """Read one required non-empty metadata string.
+
+    Args:
+        metadata: Metadata fields to read.
+        field_name: Name of the field.
+
+    Returns:
+        One required non-empty metadata string.
+
+    Raises:
+        TypeError: Quantization metadata field `field_name` must be a string.
+
+    """
     value = metadata.get(field_name)
     if not isinstance(value, str) or not value:
         message = f"Quantization metadata field {field_name} must be a string"
@@ -34,7 +58,15 @@ def read_metadata_text(metadata: Mapping[str, object], field_name: str) -> str:
 
 
 def format_metadata_items(items: object) -> str:
-    """Format a metadata sequence for human-readable cards."""
+    """Format a metadata sequence for human-readable cards.
+
+    Args:
+        items: Items to process.
+
+    Returns:
+        A metadata sequence for human-readable cards.
+
+    """
     if isinstance(items, list | tuple):
         metadata_items: Sequence[object] = cast("Sequence[object]", items)
         formatted_items = ", ".join(str(item) for item in metadata_items)
@@ -48,7 +80,17 @@ def build_provenance_fields(
     *,
     hf_token: str | None,
 ) -> dict[str, object]:
-    """Build source, license, and provenance fields shared by both cards."""
+    """Build source, license, and provenance fields shared by both cards.
+
+    Args:
+        metadata: Metadata fields to read.
+        repo_id: ID of the repo.
+        hf_token: Hugging Face token.
+
+    Returns:
+        Source, license, and provenance fields shared by both cards.
+
+    """
     source = read_metadata_section(metadata, "source")
     source_model = read_metadata_text(source, "model")
     source_kind = read_metadata_text(source, "kind")
@@ -80,7 +122,16 @@ def build_provenance_fields(
 
 
 def format_model_card(template_name: str, card_fields: Mapping[str, object]) -> str:
-    """Format one checked-in model-card template."""
+    """Format one checked-in model-card template.
+
+    Args:
+        template_name: Name of the template.
+        card_fields: Card fields.
+
+    Returns:
+        One checked-in model-card template.
+
+    """
     template_path = Path(__file__).with_name(MODEL_CARD_TEMPLATE_FOLDER) / template_name
     template = Template(template_path.read_text(encoding="utf-8"))
     return template.substitute(card_fields)

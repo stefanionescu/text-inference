@@ -31,7 +31,15 @@ _MESSAGE_ADAPTER: TypeAdapter[_ClientMessageModelType] = TypeAdapter(_ClientMess
 
 
 def _format_validation_error(exception: ValidationError) -> str:
-    """Convert a Pydantic validation error into a concise parser error."""
+    """Convert a Pydantic validation error into a concise parser error.
+
+    Args:
+        exception: Exception to inspect.
+
+    Returns:
+        The updated text.
+
+    """
     errors = exception.errors()
     if not errors:
         return "Message payload failed validation."
@@ -42,7 +50,15 @@ def _format_validation_error(exception: ValidationError) -> str:
 
 
 def _json_mapping(value: object) -> dict[str, object]:
-    """Return a string-keyed JSON object from unknown parsed JSON."""
+    """Return a string-keyed JSON object from unknown parsed JSON.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        A string-keyed JSON object from unknown parsed JSON.
+
+    """
     if not isinstance(value, dict):
         return {}
     raw = cast("dict[object, object]", value)
@@ -50,7 +66,20 @@ def _json_mapping(value: object) -> dict[str, object]:
 
 
 def _decode_json_mapping(raw: str, websocket_settings: WebSocketSettings) -> dict[str, object]:
-    """Decode a raw WebSocket message into a JSON object."""
+    """Decode a raw WebSocket message into a JSON object.
+
+    Args:
+        raw: Text exactly as received.
+        websocket_settings: Settings for websocket.
+
+    Returns:
+        A JSON object.
+
+    Raises:
+        TypeError: Message must be a JSON object.
+        ValueError: Message exceeds max size (`maximum_message_bytes` bytes).
+
+    """
     raw_text = raw or ""
     raw_size = len(raw_text.encode("utf-8"))
     if raw_size > websocket_settings.maximum_message_bytes:
@@ -75,7 +104,18 @@ def _decode_json_mapping(raw: str, websocket_settings: WebSocketSettings) -> dic
 
 
 def _message_type(payload: dict[str, object]) -> str:
-    """Return the normalized client message type."""
+    """Return the normalized client message type.
+
+    Args:
+        payload: Decoded message fields.
+
+    Returns:
+        The normalized client message type.
+
+    Raises:
+        ValueError: Missing 'type' in message.
+
+    """
     message_type = payload.get("type")
     if not message_type:
         message = "Missing 'type' in message."
@@ -84,7 +124,17 @@ def _message_type(payload: dict[str, object]) -> str:
 
 
 def _validate_protocol_version(payload: dict[str, object], websocket_settings: WebSocketSettings) -> None:
-    """Validate the client protocol version when present."""
+    """Validate the client protocol version when present.
+
+    Args:
+        payload: Decoded message fields.
+        websocket_settings: Settings for websocket.
+
+    Raises:
+        ValueError: Invalid payload field 'v': Value error, unsupported protocol version: `get` (expected
+            `protocol_version`).
+
+    """
     if "v" in payload and payload.get("v") != websocket_settings.protocol_version:
         message = (
             f"Invalid payload field 'v': Value error, unsupported protocol version: {payload.get('v')} "
@@ -108,7 +158,6 @@ def parse_client_message(
         Normalized message dict with 'type' lowercased.
 
     Raises:
-        TypeError: If the decoded JSON payload is not an object.
         ValueError: If message is empty, invalid JSON, or missing type.
 
     """

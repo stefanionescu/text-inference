@@ -77,7 +77,15 @@ FOODIE_SUFFIX = ("people who say they're not really into food", "empty fridges."
 
 
 def dislike_text(*items: str) -> str:
-    """Return comma-separated dislike text."""
+    """Return comma-separated dislike text.
+
+    Args:
+        *items: Items to process.
+
+    Returns:
+        Comma-separated dislike text.
+
+    """
     filtered = [item for item in items if item]
     if not filtered:
         return ""

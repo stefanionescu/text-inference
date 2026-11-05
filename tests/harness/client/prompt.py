@@ -7,14 +7,34 @@ from config.tests.prompts.detailed import PROMPT_PROFILES
 
 
 def normalize_gender(value: str | None) -> str:
-    """Normalize an assistant gender to its protocol token."""
+    """Normalize an assistant gender to its protocol token.
+
+    Args:
+        value: Value to check or convert.
+
+    Returns:
+        The updated text.
+
+    """
     if not value:
         return ""
     return value.strip().lower()
 
 
 def select_prompt(gender: str | None, personality: str | None) -> str:
-    """Select the exact prompt for a gender and personality pair."""
+    """Select the exact prompt for a gender and personality pair.
+
+    Args:
+        gender: Name of the gender profile.
+        personality: Name of the personality profile.
+
+    Returns:
+        The exact prompt for a gender and personality pair.
+
+    Raises:
+        PromptSelectionError: Gender is required for prompt selection.
+
+    """
     normalized_gender = normalize_gender(gender)
     normalized_personality = (personality or "").strip().lower()
     if not normalized_gender:
