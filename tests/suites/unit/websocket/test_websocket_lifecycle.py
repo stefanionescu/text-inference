@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
 import asyncio
 
 import pytest
 
 from src.websocket.lifecycle import WebSocketLifecycle
 from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_REASON
-
-if TYPE_CHECKING:
-    from fastapi import WebSocket
+from tests.suites.unit.builders import typed_websocket
 
 
 class _FakeWebSocket:
@@ -29,7 +26,7 @@ def test_lifecycle_idle_close() -> None:
     async def _run() -> None:
         websocket = _FakeWebSocket()
         lifecycle = WebSocketLifecycle(
-            cast("WebSocket", websocket),
+            typed_websocket(websocket),
             idle_timeout_seconds=0.02,
             watchdog_tick_seconds=0.005,
             idle_close_code=4444,
@@ -50,7 +47,7 @@ def test_lifecycle_stop_early() -> None:
     async def _run() -> None:
         websocket = _FakeWebSocket()
         lifecycle = WebSocketLifecycle(
-            cast("WebSocket", websocket),
+            typed_websocket(websocket),
             idle_timeout_seconds=1.0,
             watchdog_tick_seconds=0.05,
         )

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 import asyncio
 from dataclasses import dataclass
 
-from websockets.exceptions import ConnectionClosed, WebSocketException
+from websockets.exceptions import WebSocketException
 
 from tests.state import (
     StreamState,
@@ -24,11 +24,8 @@ from tests.state import (
     RecoveryPhaseResult,
 )
 from tests.harness.client.websocket import (
-    iter_messages,
     open_websocket,
     send_end_frame,
-    dispatch_message,
-    finalize_metrics,
     connect_websocket,
     build_start_payload,
     send_initial_user_turn,
@@ -39,11 +36,14 @@ from tests.harness.environment.settings import (
     DEFAULT_PING_INTERVAL_SECONDS,
 )
 
-from .phases import run_drain_phase, run_cancel_phase, run_recovery_phase
-from .callbacks import build_recovery_callbacks
+from .phases import run_drain_phase, run_cancel_phase, run_recovery_phase, consume_recovery_stream
 
 if TYPE_CHECKING:
+    from contextlib import AbstractAsyncContextManager
+
     from websockets import WebSocketClientProtocol
+
+_CONNECTION_FAILURES = (OSError, TimeoutError, RuntimeError, ValueError, WebSocketException)
 
 
 @dataclass(frozen=True)
@@ -74,39 +74,19 @@ class CancelingClientRequest:
     recovery_done: asyncio.Event
 
 
-async def _consume_recovery_stream(
-    websocket: WebSocketClientProtocol,
-    *,
-    receive_timeout_seconds: float,
-) -> tuple[str, dict[str, Any], str | None, bool]:
-    state = StreamState()
-    callbacks = build_recovery_callbacks(state)
-    is_cancelled = False
-    error: str | None = None
-    metrics: dict[str, Any] = {}
-
-    try:
-        async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
-            result = await dispatch_message(
-                message,
-                callbacks,
-                default=lambda _message: True,
-            )
-
-            if isinstance(result, dict) and result.get("is_done"):
-                is_cancelled = result.get("cancelled", False)
-                error = result.get("error")
-                metrics = result.get("metrics", {})
-                break
-
-    except TimeoutError:
-        error = f"timeout after {receive_timeout_seconds:.1f}s"
-        metrics = finalize_metrics(state, is_cancelled=True)
-    except ConnectionClosed as exception:
-        error = f"connection closed: {exception.code}"
-        metrics = finalize_metrics(state, is_cancelled=True)
-
-    return state.completion_text, metrics, error, is_cancelled
+def _open_client_websocket(
+    request: NormalClientRequest | CancelingClientRequest,
+) -> AbstractAsyncContextManager[WebSocketClientProtocol]:
+    """Connect with the keepalive settings from the environment, retrying a failed connect."""
+    return open_websocket(
+        lambda: connect_websocket(
+            request.server_url,
+            headers=request.authentication_headers,
+            max_queue=None,
+            ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+            ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
+        ),
+    )
 
 
 def _normal_result(
@@ -138,10 +118,13 @@ async def _run_normal_session(websocket: WebSocketClientProtocol, request: Norma
         )
     write_line(dim(f"  [{label}] bootstrapped session and sent first message..."))
 
-    response_text, metrics, error, is_cancelled = await _consume_recovery_stream(
+    state = StreamState()
+    metrics, error, is_cancelled = await consume_recovery_stream(
         websocket,
+        state,
         receive_timeout_seconds=request.receive_timeout_seconds,
     )
+    response_text = state.completion_text
     has_passed = not is_cancelled and bool(response_text) and error is None
 
     if has_passed:
@@ -218,18 +201,10 @@ async def run_normal_client(request: NormalClientRequest) -> NormalClientResult:
 
     """
     try:
-        async with open_websocket(
-            lambda: connect_websocket(
-                request.server_url,
-                headers=request.authentication_headers,
-                max_queue=None,
-                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
-                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
-            ),
-        ) as websocket:
+        async with _open_client_websocket(request) as websocket:
             return await _run_normal_session(websocket, request)
 
-    except (OSError, TimeoutError, RuntimeError, ValueError, WebSocketException) as exception:
+    except _CONNECTION_FAILURES as exception:
         return _normal_result(
             request,
             has_passed=False,
@@ -260,18 +235,10 @@ async def run_canceling_client(request: CancelingClientRequest) -> CancelClientR
     recovery_result = _skipped_recovery("skipped")
 
     try:
-        async with open_websocket(
-            lambda: connect_websocket(
-                request.server_url,
-                headers=request.authentication_headers,
-                max_queue=None,
-                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
-                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
-            ),
-        ) as websocket:
+        async with _open_client_websocket(request) as websocket:
             return await _run_canceling_session(websocket, request)
 
-    except (OSError, TimeoutError, RuntimeError, ValueError, WebSocketException) as exception:
+    except _CONNECTION_FAILURES as exception:
         cancel_result = CancelPhaseResult(
             has_passed=False,
             is_cancelled=False,

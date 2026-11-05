@@ -2,61 +2,26 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from config.tests.prompts.blocks import dislikes
 from config.tests.prompts.blocks.shared import ANNA_IDENTITY_BLOCK
-from config.tests.prompts.personalities import (
-    ex,
-    kpop,
-    warm,
-    boomer,
-    delulu,
-    flirty,
-    foodie,
-    honest,
-    savage,
-    zoomer,
-    epersona,
-    religious,
-    spiritual,
-    shopaholic,
-)
 
-from .builder import personality_blocks, build_character_prompt
+from .builder import build_character_prompts
 
-if TYPE_CHECKING:
-    from types import ModuleType
+_PROMPTS = build_character_prompts("ANNA", ANNA_IDENTITY_BLOCK, epersona_voiceprint="EGIRL")
 
-
-def _prompt(module: ModuleType, prefix: str, dislikes_text: str, *, voiceprint_prefix: str | None = None) -> str:
-    """Build one Anna prompt profile."""
-    return build_character_prompt(
-        ANNA_IDENTITY_BLOCK,
-        personality_blocks(module, prefix, voiceprint_prefix=voiceprint_prefix),
-        dislikes_text,
-    )
-
-
-ANNA_FLIRTY = _prompt(flirty, "FLIRTY", dislikes.ANNA_FLIRTY_DISLIKES)
-ANNA_SAVAGE = _prompt(savage, "SAVAGE", dislikes.ANNA_SAVAGE_DISLIKES)
-ANNA_RELIGIOUS = _prompt(religious, "RELIGIOUS", dislikes.ANNA_RELIGIOUS_DISLIKES)
-ANNA_DELULU = _prompt(delulu, "DELULU", dislikes.ANNA_DELULU_DISLIKES)
-ANNA_SPIRITUAL = _prompt(spiritual, "SPIRITUAL", dislikes.ANNA_SPIRITUAL_DISLIKES)
-ANNA_FOODIE = _prompt(foodie, "FOODIE", dislikes.ANNA_FOODIE_DISLIKES)
-ANNA_WARM = _prompt(warm, "WARM", dislikes.ANNA_WARM_DISLIKES)
-ANNA_HONEST = _prompt(honest, "HONEST", dislikes.ANNA_HONEST_DISLIKES)
-ANNA_BOOMER = _prompt(boomer, "BOOMER", dislikes.ANNA_BOOMER_DISLIKES)
-ANNA_ZOOMER = _prompt(zoomer, "ZOOMER", dislikes.ANNA_ZOOMER_DISLIKES)
-ANNA_EX = _prompt(ex, "EX", dislikes.ANNA_EX_DISLIKES)
-ANNA_KPOP = _prompt(kpop, "KPOP", dislikes.ANNA_KPOP_DISLIKES)
-ANNA_SHOPAHOLIC = _prompt(shopaholic, "SHOPAHOLIC", dislikes.ANNA_SHOPAHOLIC_DISLIKES)
-ANNA_EPERSONA = _prompt(
-    epersona,
-    "EPERSONA",
-    dislikes.ANNA_EPERSONA_DISLIKES,
-    voiceprint_prefix="EGIRL",
-)
+ANNA_FLIRTY = _PROMPTS["FLIRTY"]
+ANNA_SAVAGE = _PROMPTS["SAVAGE"]
+ANNA_RELIGIOUS = _PROMPTS["RELIGIOUS"]
+ANNA_DELULU = _PROMPTS["DELULU"]
+ANNA_SPIRITUAL = _PROMPTS["SPIRITUAL"]
+ANNA_FOODIE = _PROMPTS["FOODIE"]
+ANNA_WARM = _PROMPTS["WARM"]
+ANNA_HONEST = _PROMPTS["HONEST"]
+ANNA_BOOMER = _PROMPTS["BOOMER"]
+ANNA_ZOOMER = _PROMPTS["ZOOMER"]
+ANNA_EX = _PROMPTS["EX"]
+ANNA_KPOP = _PROMPTS["KPOP"]
+ANNA_SHOPAHOLIC = _PROMPTS["SHOPAHOLIC"]
+ANNA_EPERSONA = _PROMPTS["EPERSONA"]
 
 
 __all__ = [

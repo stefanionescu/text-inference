@@ -3,62 +3,16 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, cast
 import asyncio
-from dataclasses import replace
-from unittest.mock import AsyncMock
 
 import pytest
 
 from src.session.state import SessionState, HistoryMessage
 from src.messages.start import bootstrap_start_turn
-from src.runtime.config import HistorySettings
-from src.session.runtime import SessionRuntime
 from src.messages.message import plan_message_turn
+from tests.suites.unit.builders import RecordingWebSocket, typed_websocket, build_session_state, build_session_runtime
 from tests.harness.messages.unit import MESSAGES, HISTORY_PAYLOAD, ASSISTANT_FIRST_PAYLOAD, ASSISTANT_FIRST_MESSAGES
-from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.environment.tokenizer import use_local_tokenizers, build_local_tokenizer
-
-if TYPE_CHECKING:
-    from fastapi import WebSocket
-
-    from src.tokens.tokenizer import ThreadSafeTokenizer
-
-
-class _NoopWebSocket:
-    def __init__(self) -> None:
-        self.sent: list[str] = []
-        self.is_closed = False
-        self.close_code: int | None = None
-
-    async def send_text(self, text: str) -> None:
-        """Test send text."""
-        sent = self.sent
-        payload = text
-        sent.append(payload)
-
-    async def close(self, code: int = 1008) -> None:
-        """Test close."""
-        close_code = code
-        self.is_closed = True
-        self.close_code = close_code
-
-
-def _build_session(
-    *,
-    trigger_tokens: int = 1000,
-    target_tokens: int = 800,
-    tokenizer: ThreadSafeTokenizer,
-) -> SessionRuntime:
-    AsyncMock()
-    history_config = HistorySettings(
-        trigger_tokens=trigger_tokens,
-        target_tokens=target_tokens,
-    )
-    return SessionRuntime(
-        tokenizer=tokenizer,
-        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
-    )
 
 
 def _start_payload(history: list[dict[str, str]]) -> dict[str, object]:
@@ -71,78 +25,58 @@ def _start_payload(history: list[dict[str, str]]) -> dict[str, object]:
     return payload
 
 
-def test_history_user_bootstrap() -> None:
-    """Test bootstrap start imports user-first history."""
+def _run_bootstrap(start_payload: dict[str, object]) -> tuple[bool, SessionState, RecordingWebSocket]:
+    """Run start bootstrap on a new session and return what it reported, stored, and sent."""
+    state = SessionState(meta={})
+    websocket = RecordingWebSocket()
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = SessionState(meta={})
-        websocket = _NoopWebSocket()
-
         is_successful = asyncio.run(
             bootstrap_start_turn(
-                cast("WebSocket", websocket),
-                _start_payload(HISTORY_PAYLOAD[:2]),
+                typed_websocket(websocket),
+                start_payload,
                 state,
-                session_runtime=session_runtime,
+                session_runtime=build_session_runtime(tokenizer),
             ),
         )
+    return is_successful, state, websocket
 
-        if is_successful is not True:
-            pytest.fail("Assertion failed")
-        if state.active_request_task is not None:
-            pytest.fail("Assertion failed")
-        assert state.history_messages == [MESSAGES[0], MESSAGES[1]]
-        assert json.loads(websocket.sent[-1]) == {"type": "done", "status": 200}
+
+def test_history_user_bootstrap() -> None:
+    """Test bootstrap start imports user-first history."""
+    is_successful, state, websocket = _run_bootstrap(_start_payload(HISTORY_PAYLOAD[:2]))
+
+    if is_successful is not True:
+        pytest.fail("Assertion failed")
+    if state.active_request_task is not None:
+        pytest.fail("Assertion failed")
+    assert state.history_messages == [MESSAGES[0], MESSAGES[1]]
+    assert json.loads(websocket.sent[-1]) == {"type": "done", "status": 200}
 
 
 def test_history_assistant_bootstrap() -> None:
     """Test bootstrap start imports assistant-first history."""
-    with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = SessionState(meta={})
-        websocket = _NoopWebSocket()
+    is_successful, state, websocket = _run_bootstrap(_start_payload(ASSISTANT_FIRST_PAYLOAD[:4]))
 
-        is_successful = asyncio.run(
-            bootstrap_start_turn(
-                cast("WebSocket", websocket),
-                _start_payload(ASSISTANT_FIRST_PAYLOAD[:4]),
-                state,
-                session_runtime=session_runtime,
-            ),
-        )
-
-        if is_successful is not True:
-            pytest.fail("Assertion failed")
-        assert state.history_messages == ASSISTANT_FIRST_MESSAGES[:4]
-        assert json.loads(websocket.sent[-1]) == {"type": "done", "status": 200}
+    if is_successful is not True:
+        pytest.fail("Assertion failed")
+    assert state.history_messages == ASSISTANT_FIRST_MESSAGES[:4]
+    assert json.loads(websocket.sent[-1]) == {"type": "done", "status": 200}
 
 
 def test_history_payload_rejection() -> None:
     """Test bootstrap start rejects invalid history payload."""
-    with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = SessionState(meta={})
-        websocket = _NoopWebSocket()
+    is_successful, _, websocket = _run_bootstrap({"history": HISTORY_PAYLOAD[:2]})
 
-        is_successful = asyncio.run(
-            bootstrap_start_turn(
-                cast("WebSocket", websocket),
-                {"history": HISTORY_PAYLOAD[:2]},
-                state,
-                session_runtime=session_runtime,
-            ),
-        )
-
-        if is_successful is not False:
-            pytest.fail("Assertion failed")
-        if websocket.is_closed is not True:
-            pytest.fail("Assertion failed")
-        assert any("invalid_payload" in payload for payload in websocket.sent)
+    if is_successful is not False:
+        pytest.fail("Assertion failed")
+    if websocket.is_closed is not True:
+        pytest.fail("Assertion failed")
+    assert any("invalid_payload" in payload for payload in websocket.sent)
 
 
 def test_plan_committed_history() -> None:
     """Test message planning uses the session's committed history."""
-    session_runtime = _build_session(tokenizer=build_local_tokenizer())
+    session_runtime = build_session_runtime(build_local_tokenizer())
     state = SessionState(meta={"prompt": "Stay concise."})
     session_runtime.initialize_session(state)
     state.meta["prompt"] = "Stay concise."
@@ -153,7 +87,7 @@ def test_plan_committed_history() -> None:
 
     plan = asyncio.run(
         plan_message_turn(
-            cast("WebSocket", _NoopWebSocket()),
+            typed_websocket(RecordingWebSocket()),
             {"user_utterance": "three"},
             state,
             session_runtime=session_runtime,
@@ -175,14 +109,13 @@ def test_plan_committed_history() -> None:
 
 def test_plan_rejects_empty() -> None:
     """Test plan message turn rejects empty user utterance."""
-    session_runtime = _build_session(tokenizer=build_local_tokenizer())
-    state = SessionState(meta={})
-    session_runtime.initialize_session(state)
-    websocket = _NoopWebSocket()
+    session_runtime = build_session_runtime(build_local_tokenizer())
+    state = build_session_state(session_runtime)
+    websocket = RecordingWebSocket()
 
     plan = asyncio.run(
         plan_message_turn(
-            cast("WebSocket", websocket),
+            typed_websocket(websocket),
             {"user_utterance": "  "},
             state,
             session_runtime=session_runtime,

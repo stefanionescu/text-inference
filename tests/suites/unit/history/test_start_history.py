@@ -2,50 +2,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from dataclasses import replace
-from unittest.mock import AsyncMock
-
 import pytest
 
 from src.session.state import SessionState, HistoryMessage
 from src.messages.start import history_messages
-from src.runtime.config import HistorySettings
-from src.session.runtime import SessionRuntime
+from tests.suites.unit.builders import build_session_state, build_session_runtime
 from tests.harness.messages.unit import MESSAGES, HISTORY_PAYLOAD, ASSISTANT_FIRST_PAYLOAD, ASSISTANT_FIRST_MESSAGES
-from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.environment.tokenizer import use_local_tokenizers
-
-if TYPE_CHECKING:
-    from src.tokens.tokenizer import ThreadSafeTokenizer
 
 TRIM_TRIGGER_TOKENS = 6
 TRIM_TARGET_TOKENS = 4
 FRESH_HISTORY_TURNS = 2
 ASSISTANT_FIRST_TURNS = 4
-
-
-def _build_session(
-    *,
-    trigger_tokens: int = 1000,
-    target_tokens: int = 800,
-    tokenizer: ThreadSafeTokenizer,
-) -> SessionRuntime:
-    AsyncMock()
-    history_config = HistorySettings(
-        trigger_tokens=trigger_tokens,
-        target_tokens=target_tokens,
-    )
-    return SessionRuntime(
-        tokenizer=tokenizer,
-        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
-    )
-
-
-def _make_state(session_runtime: SessionRuntime) -> SessionState:
-    state = SessionState(meta={})
-    session_runtime.initialize_session(state)
-    return state
 
 
 def _history_turn_count(state: SessionState) -> int:
@@ -58,8 +26,8 @@ def _history_turn_count(state: SessionState) -> int:
 def test_history_seed_flows() -> None:
     """Test history import, trimming, and fresh-session seeding."""
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
         message = {"history": HISTORY_PAYLOAD[:4]}
 
         messages = history_messages(session_runtime, state, message)
@@ -67,12 +35,12 @@ def test_history_seed_flows() -> None:
         assert messages == MESSAGES[:4]
         assert state.history_messages == MESSAGES[:4]
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(
+        session_runtime = build_session_runtime(
+            tokenizer,
             trigger_tokens=TRIM_TRIGGER_TOKENS,
             target_tokens=TRIM_TARGET_TOKENS,
-            tokenizer=tokenizer,
         )
-        state = _make_state(session_runtime)
+        state = build_session_state(session_runtime)
         message = {
             "history": [
                 {"role": "user", "content": "u1"},
@@ -90,8 +58,8 @@ def test_history_seed_flows() -> None:
         assert len(state.history_messages) < TRIM_TRIGGER_TOKENS
         assert messages == state.history_messages
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         assert _history_turn_count(state) == 0
 
@@ -112,8 +80,8 @@ def test_history_seed_flows() -> None:
         ]
         assert _history_turn_count(state) == FRESH_HISTORY_TURNS
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         messages = history_messages(session_runtime, state, {"history": ASSISTANT_FIRST_PAYLOAD[:4]})
 
@@ -125,8 +93,8 @@ def test_history_seed_flows() -> None:
 def test_history_merge_flows() -> None:
     """Test late history handling, group trimming, and user merges."""
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         first_messages = history_messages(
             session_runtime,
@@ -158,16 +126,16 @@ def test_history_merge_flows() -> None:
             pytest.fail("Assertion failed")
         assert any(message.content == "first hello" for message in second_messages)
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(trigger_tokens=60, target_tokens=40, tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer, trigger_tokens=60, target_tokens=40)
+        state = build_session_state(session_runtime)
 
         messages = history_messages(session_runtime, state, {"history": ASSISTANT_FIRST_PAYLOAD})
 
         assert messages == ASSISTANT_FIRST_MESSAGES[-2:]
         assert state.history_messages == ASSISTANT_FIRST_MESSAGES[-2:]
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         messages = history_messages(
             session_runtime,

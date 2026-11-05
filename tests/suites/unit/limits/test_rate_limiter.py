@@ -15,16 +15,7 @@ RETRY_TOLERANCE = 0.1
 
 def test_consume_under_limit() -> None:
     """Test consume under limit succeeds."""
-    fixed_time = 0.0
-
-    def clock() -> float:
-        """Return the fixed test time."""
-        current_time = fixed_time
-        if current_time < 0:
-            raise ValueError
-        return current_time
-
-    limiter = SlidingWindowRateLimiter(limit=3, window_seconds=10.0, clock=clock)
+    limiter = SlidingWindowRateLimiter(limit=3, window_seconds=10.0, clock=lambda: 0.0)
     limiter.consume()
     limiter.consume()
     # Two consumes under limit of 3 — no error
@@ -32,16 +23,7 @@ def test_consume_under_limit() -> None:
 
 def test_consume_at_limit() -> None:
     """Test consume at limit raises."""
-    fixed_time = 0.0
-
-    def clock() -> float:
-        """Return the fixed test time."""
-        current_time = fixed_time
-        if current_time < 0:
-            raise ValueError
-        return current_time
-
-    limiter = SlidingWindowRateLimiter(limit=RATE_LIMIT, window_seconds=WINDOW_SECONDS, clock=clock)
+    limiter = SlidingWindowRateLimiter(limit=RATE_LIMIT, window_seconds=WINDOW_SECONDS, clock=lambda: 0.0)
     limiter.consume()
     limiter.consume()
     with pytest.raises(RateLimitError) as exception_info:
@@ -54,15 +36,7 @@ def test_consume_at_limit() -> None:
 def test_rate_limit_metadata() -> None:
     """Test rate limit error has correct metadata."""
     clock_values = [0.0]
-
-    def clock() -> float:
-        """Return the mutable test time."""
-        current_time = clock_values[0]
-        if current_time < 0:
-            raise ValueError
-        return current_time
-
-    limiter = SlidingWindowRateLimiter(limit=1, window_seconds=SHORT_WINDOW_SECONDS, clock=clock)
+    limiter = SlidingWindowRateLimiter(limit=1, window_seconds=SHORT_WINDOW_SECONDS, clock=lambda: clock_values[0])
     limiter.consume()
     clock_values[0] = 1.0
     with pytest.raises(RateLimitError) as exception_info:
@@ -76,15 +50,7 @@ def test_rate_limit_metadata() -> None:
 def test_consume_after_window() -> None:
     """Test consume after window expires."""
     clock_values = [0.0]
-
-    def clock() -> float:
-        """Return the mutable test time."""
-        current_time = clock_values[0]
-        if current_time < 0:
-            raise ValueError
-        return current_time
-
-    limiter = SlidingWindowRateLimiter(limit=1, window_seconds=5.0, clock=clock)
+    limiter = SlidingWindowRateLimiter(limit=1, window_seconds=5.0, clock=lambda: clock_values[0])
     limiter.consume()
     # Advance past window
     clock_values[0] = 6.0

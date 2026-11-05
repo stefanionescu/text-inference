@@ -24,32 +24,26 @@ see how many sessions were rejected by the guardrail.
 
 from __future__ import annotations
 
-import os
 import sys
+from typing import TYPE_CHECKING
 import asyncio
-import argparse
 
 from config.tests.defaults import (
     BENCHMARK_DEFAULT_REQUESTS,
     BENCHMARK_DEFAULT_CONCURRENCY,
 )
-from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
+from tests.harness.client.cli import build_client_parser, add_profile_arguments, parse_client_arguments
 from tests.harness.logic.benchmark.runner import run_benchmark
+
+if TYPE_CHECKING:
+    import argparse
 
 
 def _parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Benchmark Text Inference WS server", allow_abbrev=False)
-    add_connection_arguments(
-        parser,
-        server_help=f"WebSocket URL (default environment SERVER_URL or {DEFAULT_SERVER_URL})",
-    )
-    add_sampling_arguments(parser)
+    parser = build_client_parser("Benchmark Text Inference WS server")
     parser.add_argument("message", nargs="*", help="optional user message for all requests")
     _add_benchmark_arguments(parser)
-    arguments = parser.parse_args()
-    arguments.sampling = build_sampling_payload(arguments)
-    return arguments
+    return parse_client_arguments(parser)
 
 
 def _add_benchmark_arguments(parser: argparse.ArgumentParser) -> None:
@@ -68,19 +62,7 @@ def _add_benchmark_arguments(parser: argparse.ArgumentParser) -> None:
         default=BENCHMARK_DEFAULT_CONCURRENCY,
         help="max in-flight requests",
     )
-    parser.add_argument(
-        "--gender",
-        dest="gender",
-        choices=["female", "male"],
-        default=os.getenv("GENDER", DEFAULT_GENDER),
-        help="gender",
-    )
-    parser.add_argument(
-        "--personality",
-        dest="personality",
-        default=os.getenv("PERSONALITY", DEFAULT_PERSONALITY),
-        help="personality (e.g., flirty, savage, warm)",
-    )
+    add_profile_arguments(parser)
     parser.add_argument(
         "--double-ttfb",
         dest="is_double_ttfb_enabled",

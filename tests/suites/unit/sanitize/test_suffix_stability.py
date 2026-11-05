@@ -20,7 +20,7 @@ MAXIMUM_TAIL_LENGTH = 10
 
 
 def test_unstable_suffix_detection() -> None:
-    """Test unstable suffix detection."""
+    """Trailing spaces, tabs, and dots stay unstable, while text ending in a letter has no unstable suffix."""
     assert unstable_suffix_length("hello   ") > 0
     assert unstable_suffix_length("hello\t\t") > 0
     assert unstable_suffix_length("hello...") == TRAILING_DOTS_LENGTH
@@ -52,7 +52,7 @@ def test_html_tag_suffix() -> None:
 
 
 def test_email_suffix_detection() -> None:
-    """Test email suffix detection."""
+    """A trailing address or partial domain stays unstable, while address-free and empty text report zero."""
     result = email_suffix_length("contact me@you.com")
     assert result > 0
     result = email_suffix_length("contact user@domain")
@@ -65,7 +65,7 @@ def test_email_suffix_detection() -> None:
 
 
 def test_phone_suffix_detection() -> None:
-    """Test phone suffix detection."""
+    """A trailing international number stays unstable, while digit-free and empty text report zero."""
     assert phone_suffix_length("call me +1 234") > 0
     assert phone_suffix_length("no phone here!") == 0
     assert phone_suffix_length("") == 0
@@ -75,7 +75,7 @@ def test_phone_suffix_detection() -> None:
 
 
 def test_emoticon_suffix_detection() -> None:
-    """Test emoticon suffix detection."""
+    """An unfinished emoticon such as ``:-``, ``<``, ``X``, or ``^_`` stays unstable; empty text reports zero."""
     assert emoticon_suffix_length("hello :") > 0
     assert emoticon_suffix_length("hello :-") > 0
     assert emoticon_suffix_length("I love you <") > 0

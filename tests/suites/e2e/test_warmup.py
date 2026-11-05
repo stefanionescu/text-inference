@@ -28,13 +28,15 @@ Note: API key authentication is required. The client sends it in the
 
 from __future__ import annotations
 
-import sys
-import asyncio
 import logging
 import argparse
 
-from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
-from tests.harness.client.errors import ServerError
+from tests.harness.client.cli import (
+    run_client,
+    add_sampling_arguments,
+    parse_client_arguments,
+    add_connection_arguments,
+)
 from tests.harness.logic.warmup.runner import run_warmup
 
 
@@ -62,21 +64,14 @@ def _parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="send two sequential start messages over one connection and log metrics per transaction",
     )
-    arguments = parser.parse_args()
-    arguments.sampling = build_sampling_payload(arguments)
-    return arguments
+    return parse_client_arguments(parser)
 
 
 def main() -> None:
     """Run the warmup E2E client."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     arguments = _parse_arguments()
-    try:
-        asyncio.run(run_warmup(arguments))
-    except ServerError:
-        sys.exit(1)
-    except KeyboardInterrupt:
-        pass
+    run_client(run_warmup(arguments))
 
 
 if __name__ == "__main__":

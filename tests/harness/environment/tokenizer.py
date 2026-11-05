@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 from functools import lru_cache
 from contextlib import contextmanager
 from dataclasses import field, dataclass
@@ -57,35 +57,10 @@ class _FakeTransformersTokenizer:
         return separator.join(tokens)
 
 
-@dataclass
-class _StaticTokenizer(ThreadSafeTokenizer):
-    _tokenizer: _FakeTransformersTokenizer
+class _ChatTemplateTokenizer(ThreadSafeTokenizer):
+    """Tokenizer base that renders chat messages in ChatML without a model's template."""
 
-    def count(self, text: str, *, are_special_tokens_added: bool = False) -> int:
-        has_text = bool(text)
-        if not has_text and not are_special_tokens_added:
-            return 0
-        return len(self.encode_ids(text))
-
-    def trim(self, text: str, maximum_tokens: int, retained_side: str = "end") -> str:
-        if maximum_tokens <= 0 or not text:
-            return ""
-        token_ids = self.encode_ids(text)
-        if len(token_ids) <= maximum_tokens:
-            return text
-        retained_token_ids = token_ids[:maximum_tokens] if retained_side == "start" else token_ids[-maximum_tokens:]
-        return self._tokenizer.decode(
-            retained_token_ids,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
-        )
-
-    def encode_ids(self, text: str) -> list[int]:
-        if not text:
-            return []
-        are_special_tokens_added = False
-        return self._tokenizer.encode(text, add_special_tokens=are_special_tokens_added)
-
+    @override
     def apply_chat_template(
         self,
         messages: list[dict[str, str]],
@@ -93,6 +68,7 @@ class _StaticTokenizer(ThreadSafeTokenizer):
         is_generation_prompt_added: bool = True,
         **_template_options: object,
     ) -> str:
+        """Join role-tagged messages, ending with an open assistant turn on request."""
         lines: list[str] = []
         for message in messages:
             lines.extend([f"<|im_start|>{message['role']}", message["content"], "<|im_end|>"])
@@ -101,13 +77,46 @@ class _StaticTokenizer(ThreadSafeTokenizer):
         return "\n".join(lines)
 
 
+@dataclass
+class _StaticTokenizer(_ChatTemplateTokenizer):
+    _vocabulary_tokenizer: _FakeTransformersTokenizer
+
+    @override
+    def count(self, text: str, *, are_special_tokens_added: bool = False) -> int:
+        has_text = bool(text)
+        if not has_text and not are_special_tokens_added:
+            return 0
+        return len(self.encode_ids(text))
+
+    @override
+    def trim(self, text: str, maximum_tokens: int, retained_side: str = "end") -> str:
+        if maximum_tokens <= 0 or not text:
+            return ""
+        token_ids = self.encode_ids(text)
+        if len(token_ids) <= maximum_tokens:
+            return text
+        retained_token_ids = token_ids[:maximum_tokens] if retained_side == "start" else token_ids[-maximum_tokens:]
+        return self._vocabulary_tokenizer.decode(
+            retained_token_ids,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False,
+        )
+
+    @override
+    def encode_ids(self, text: str) -> list[int]:
+        if not text:
+            return []
+        are_special_tokens_added = False
+        return self._vocabulary_tokenizer.encode(text, add_special_tokens=are_special_tokens_added)
+
+
 _PUNCT_TOKEN_PATTERN = re.compile(r"[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?|[^\w\s]", re.UNICODE)
 _ATTACHED_PUNCT = {".", ",", "!", "?", ";", ":", "%", ")", "]", "}"}
 _OPENING_PUNCT = {"(", "[", "{", "/", "$", "#"}
 
 
 @dataclass
-class _PunctuationAwareTokenizer(ThreadSafeTokenizer):
+class _PunctuationAwareTokenizer(_ChatTemplateTokenizer):
     _vocab: dict[str, int] = field(init=False)
     _reverse_vocab: dict[int, str] = field(init=False)
     _next_id: int = field(init=False)
@@ -144,12 +153,14 @@ class _PunctuationAwareTokenizer(ThreadSafeTokenizer):
                 output_text += f" {token}"
         return output_text
 
+    @override
     def count(self, text: str, *, are_special_tokens_added: bool = False) -> int:
         token_count = len(self._tokenize(text))
         if are_special_tokens_added:
             return token_count + 2
         return token_count
 
+    @override
     def trim(self, text: str, maximum_tokens: int, retained_side: str = "end") -> str:
         if maximum_tokens <= 0 or not text:
             return ""
@@ -159,23 +170,10 @@ class _PunctuationAwareTokenizer(ThreadSafeTokenizer):
         retained_tokens = tokens[:maximum_tokens] if retained_side == "start" else tokens[-maximum_tokens:]
         return self._decode_tokens(retained_tokens)
 
+    @override
     def encode_ids(self, text: str) -> list[int]:
         tokens = self._tokenize(text)
         return [self._token_id(token) for token in tokens]
-
-    def apply_chat_template(
-        self,
-        messages: list[dict[str, str]],
-        *,
-        is_generation_prompt_added: bool = True,
-        **_template_options: object,
-    ) -> str:
-        lines: list[str] = []
-        for message in messages:
-            lines.extend([f"<|im_start|>{message['role']}", message["content"], "<|im_end|>"])
-        if is_generation_prompt_added:
-            lines.append("<|im_start|>assistant")
-        return "\n".join(lines)
 
 
 @lru_cache(maxsize=1)

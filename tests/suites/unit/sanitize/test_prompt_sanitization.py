@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
 
 from src.text.prompt import sanitize_prompt
@@ -14,7 +12,7 @@ def test_prompt_rejects_inputs() -> None:
     with pytest.raises(ValueError, match="prompt is required"):
         sanitize_prompt(None)
     with pytest.raises(TypeError, match="prompt must be a string"):
-        sanitize_prompt(cast("str", 123))
+        sanitize_prompt(123)
     with pytest.raises(ValueError, match="prompt is empty after sanitization"):
         sanitize_prompt("")
     with pytest.raises(ValueError, match="prompt is empty after sanitization"):

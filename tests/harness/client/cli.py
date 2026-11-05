@@ -8,7 +8,10 @@ override arguments (temperature, top_p, and related values).
 from __future__ import annotations
 
 import os
+import sys
 from typing import TYPE_CHECKING, Any
+import asyncio
+import argparse
 from collections.abc import Mapping
 
 from config.tests.defaults import TRANSACTION_TIMEOUT_SECONDS
@@ -20,10 +23,12 @@ from config.prompt.sampling import (
     FREQUENCY_PENALTY,
     REPETITION_PENALTY,
 )
-from tests.harness.environment.settings import DEFAULT_SERVER_URL
+from tests.harness.client.errors import ServerError
+from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
 
 if TYPE_CHECKING:
     from argparse import Namespace, ArgumentParser
+    from collections.abc import Coroutine
 
 
 def add_connection_arguments(
@@ -117,8 +122,57 @@ def build_sampling_payload(arguments: Mapping[str, Any] | Namespace) -> dict[str
     return payload
 
 
+def build_client_parser(description: str) -> ArgumentParser:
+    """Create a parser that already holds the connection and sampling flags, with abbreviations off."""
+    parser = argparse.ArgumentParser(description=description, allow_abbrev=False)
+    add_connection_arguments(
+        parser,
+        server_help=f"WebSocket URL (default environment SERVER_URL or {DEFAULT_SERVER_URL})",
+    )
+    add_sampling_arguments(parser)
+    return parser
+
+
+def add_profile_arguments(parser: ArgumentParser) -> None:
+    """Register gender and personality flags that default to the GENDER and PERSONALITY environment values."""
+    parser.add_argument(
+        "--gender",
+        dest="gender",
+        choices=["female", "male"],
+        default=os.getenv("GENDER", DEFAULT_GENDER),
+        help="gender",
+    )
+    parser.add_argument(
+        "--personality",
+        dest="personality",
+        default=os.getenv("PERSONALITY", DEFAULT_PERSONALITY),
+        help="personality (e.g., flirty, savage, warm)",
+    )
+
+
+def parse_client_arguments(parser: ArgumentParser) -> Namespace:
+    """Parse the command line and attach the sampling overrides a client sends to the server."""
+    arguments = parser.parse_args()
+    arguments.sampling = build_sampling_payload(arguments)
+    return arguments
+
+
+def run_client(session: Coroutine[Any, Any, object]) -> None:
+    """Run a client session to its end; a server error exits with status 1 and Ctrl-C exits quietly."""
+    try:
+        asyncio.run(session)
+    except ServerError:
+        sys.exit(1)
+    except KeyboardInterrupt:
+        pass
+
+
 __all__ = [
     "add_connection_arguments",
+    "add_profile_arguments",
     "add_sampling_arguments",
+    "build_client_parser",
     "build_sampling_payload",
+    "parse_client_arguments",
+    "run_client",
 ]

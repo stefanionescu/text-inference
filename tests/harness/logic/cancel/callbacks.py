@@ -77,24 +77,27 @@ def _handle_error(message: dict[str, object]) -> DispatchResult:
     return {"is_done": True, "error": str(error_message)}
 
 
-def build_cancel_callbacks(state: StreamState) -> dict[str, MessageCallback]:
-    """Build message callbacks for the cancel phase.
+def build_phase_callbacks(state: StreamState, *, is_recovery: bool) -> dict[str, MessageCallback]:
+    """Build message callbacks for one phase of the cancel suite.
 
-    These callbacks track basic state without timing metrics since
-    the cancel phase is interrupted before completion.
+    The recovery phase runs to completion, so its callbacks track first-token
+    timing and report full metrics. The cancel phase is interrupted before
+    completion, so its callbacks track basic state only.
 
     Args:
         state: Mutable stream state to update as messages arrive.
+        is_recovery: Whether the callbacks serve the recovery phase.
 
     Returns:
         Dict mapping message types to handler functions.
 
     """
+    finish: Callable[..., DispatchResult] = partial(_recovery_done, state) if is_recovery else _cancel_done
     callbacks: dict[str, MessageCallback] = {
-        "token": partial(_record_token, state, is_first_tracked=False),
+        "token": partial(_record_token, state, is_first_tracked=is_recovery),
         "final": partial(_apply_result_text, state),
-        "done": partial(_cancel_done, is_cancelled=False),
-        "cancelled": partial(_cancel_done, is_cancelled=True),
+        "done": partial(finish, is_cancelled=False),
+        "cancelled": partial(finish, is_cancelled=True),
         "error": _handle_error,
     }
     if callbacks.keys() != EXPECTED_MESSAGE_TYPES:
@@ -102,29 +105,4 @@ def build_cancel_callbacks(state: StreamState) -> dict[str, MessageCallback]:
     return callbacks
 
 
-def build_recovery_callbacks(state: StreamState) -> dict[str, MessageCallback]:
-    """Build message callbacks for the recovery phase.
-
-    These callbacks track full timing metrics since the recovery
-    phase runs to completion.
-
-    Args:
-        state: Mutable stream state to update as messages arrive.
-
-    Returns:
-        Dict mapping message types to handler functions.
-
-    """
-    callbacks: dict[str, MessageCallback] = {
-        "token": partial(_record_token, state, is_first_tracked=True),
-        "final": partial(_apply_result_text, state),
-        "done": partial(_recovery_done, state, is_cancelled=False),
-        "cancelled": partial(_recovery_done, state, is_cancelled=True),
-        "error": _handle_error,
-    }
-    if callbacks.keys() != EXPECTED_MESSAGE_TYPES:
-        raise AssertionError
-    return callbacks
-
-
-__all__ = ["build_cancel_callbacks", "build_recovery_callbacks"]
+__all__ = ["DispatchResult", "MessageCallback", "build_phase_callbacks"]

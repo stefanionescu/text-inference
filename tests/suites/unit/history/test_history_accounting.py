@@ -2,67 +2,27 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
-from unittest.mock import AsyncMock
+from typing import override
 
 import pytest
 
 from src.session.state import SessionState, HistoryMessage
 from src.runtime.config import HistorySettings
-from src.session.runtime import SessionRuntime
 from src.tokens.tokenizer import ThreadSafeTokenizer
+from tests.suites.unit.builders import build_session_state, build_session_runtime
 from tests.harness.messages.unit import MESSAGES, ASSISTANT_FIRST_MESSAGES
 import src.session.history.transcript as history_transcript
-from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 from tests.harness.environment.tokenizer import use_local_tokenizers
 
 EXPECTED_MESSAGE_COUNT = 4
 TURN_MESSAGE_COUNT = 2
 
 
-def _history_config(
-    *,
-    trigger_tokens: int = 1000,
-    target_tokens: int = 800,
-) -> HistorySettings:
-    trigger = int(trigger_tokens)
-    target = int(target_tokens)
-    if trigger < 0 or target < 0:
-        raise ValueError
-    return HistorySettings(
-        trigger_tokens=trigger,
-        target_tokens=target,
-    )
-
-
-def _make_state(session_runtime: SessionRuntime) -> SessionState:
-    state = SessionState(meta={})
-    session_runtime.initialize_session(state)
-    return state
-
-
-def _build_session(
-    *,
-    trigger_tokens: int = 1000,
-    target_tokens: int = 800,
-    tokenizer: ThreadSafeTokenizer,
-) -> SessionRuntime:
-    AsyncMock()
-    history_config = _history_config(
-        trigger_tokens=trigger_tokens,
-        target_tokens=target_tokens,
-    )
-    return SessionRuntime(
-        tokenizer=tokenizer,
-        settings=replace(DEFAULT_APPLICATION_SETTINGS, history=history_config),
-    )
-
-
 def test_history_ingest_flows() -> None:
     """Test history append, import, and merge flows."""
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         rendered = session_runtime.history.append_response(state, "hello", "world")
 
@@ -76,8 +36,8 @@ def test_history_ingest_flows() -> None:
         if "Assistant: world" not in rendered:
             pytest.fail("Assertion failed")
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
 
         messages = [*MESSAGES[:3], HistoryMessage(role="assistant", content="reply")]
 
@@ -90,8 +50,8 @@ def test_history_ingest_flows() -> None:
         assert state.history_messages is not None
         assert len(state.history_messages) == EXPECTED_MESSAGE_COUNT
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer)
+        state = build_session_state(session_runtime)
         state.history_messages = [HistoryMessage(role="user", content="seed")]
 
         session_runtime.history.append_response(state, "follow up", "reply")
@@ -106,8 +66,8 @@ def test_history_ingest_flows() -> None:
 def test_history_trimming_flows() -> None:
     """Test eager trimming and assistant-first grouping."""
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(trigger_tokens=10, target_tokens=6, tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer, trigger_tokens=10, target_tokens=6)
+        state = build_session_state(session_runtime)
 
         turns = [
             ("hello how are you", "great"),
@@ -123,8 +83,8 @@ def test_history_trimming_flows() -> None:
         assert state.history_messages[0].role == "user"
         assert len(state.history_messages) % 2 == 0
     with use_local_tokenizers() as tokenizer:
-        session_runtime = _build_session(trigger_tokens=8, target_tokens=4, tokenizer=tokenizer)
-        state = _make_state(session_runtime)
+        session_runtime = build_session_runtime(tokenizer, trigger_tokens=8, target_tokens=4)
+        state = build_session_state(session_runtime)
 
         session_runtime.history.append_response(state, "hello how are you", "great")
         session_runtime.history.append_response(state, "alpha bravo charlie", "one two three")
@@ -140,10 +100,7 @@ def test_history_trimming_flows() -> None:
 
         history_transcript.trim_history(
             state,
-            config=_history_config(
-                trigger_tokens=60,
-                target_tokens=40,
-            ),
+            config=HistorySettings(trigger_tokens=60, target_tokens=40),
             tokenizer=tokenizer,
         )
 
@@ -154,6 +111,7 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
     def __init__(self) -> None:
         """Skip external tokenizer initialization for this test double."""
 
+    @override
     def count(self, text: str, *, are_special_tokens_added: bool = False) -> int:
         """Test count."""
         if not text.strip():
@@ -163,6 +121,7 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
             total += 2
         return total
 
+    @override
     def trim(self, text: str, maximum_tokens: int, retained_side: str = "end") -> str:
         """Test trim."""
         tokens = text.split()
@@ -173,6 +132,7 @@ class _SpecialAwareTokenizer(ThreadSafeTokenizer):
         retained_tokens = tokens[:maximum_tokens] if retained_side == "start" else tokens[-maximum_tokens:]
         return " ".join(retained_tokens)
 
+    @override
     def encode_ids(self, text: str) -> list[int]:
         """Test encode ids."""
         tokens = text.split()

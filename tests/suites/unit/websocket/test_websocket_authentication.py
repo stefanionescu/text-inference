@@ -4,58 +4,25 @@ from __future__ import annotations
 
 import time
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 import asyncio
+from functools import partial
 
 import pytest
 
 from src.runtime.config import WebSocketSettings, AuthenticationSettings
+from tests.suites.unit.builders import typed_websocket
 import src.websocket.authentication as authentication_module
 
 if TYPE_CHECKING:
     from collections import deque
     from collections.abc import Callable
 
-    from fastapi import WebSocket
-
 
 class _FakeWebSocket:
     def __init__(self, *, headers: dict[str, str], host: str = "127.0.0.1") -> None:
         self.headers = headers
         self.client = SimpleNamespace(host=host)
-
-
-def _run_authentication(
-    headers: dict[str, str],
-    *,
-    authentication_settings: AuthenticationSettings,
-    websocket_settings: WebSocketSettings,
-    authentication_failures: dict[str, deque[float]],
-    clock: Callable[[], float] = time.monotonic,
-) -> bool:
-    websocket = _FakeWebSocket(headers=headers)
-    policy = authentication_module.build_authentication_policy(
-        authentication_settings=authentication_settings,
-        websocket_settings=websocket_settings,
-        authentication_failures=authentication_failures,
-        clock=clock,
-    )
-    return asyncio.run(
-        authentication_module.authenticate_websocket(
-            cast("WebSocket", websocket),
-            policy=policy,
-        ),
-    )
-
-
-def _authentication_settings(
-    *,
-    key: str = "secret",
-) -> AuthenticationSettings:
-    normalized_key = key.strip()
-    if not normalized_key:
-        raise ValueError
-    return AuthenticationSettings(api_key=normalized_key)
 
 
 def _websocket_settings(
@@ -77,95 +44,55 @@ def _websocket_settings(
     )
 
 
-def test_authentication_outcomes() -> None:
+def _run_authentication(
+    headers: dict[str, str],
+    *,
+    websocket_settings: WebSocketSettings | None = None,
+    authentication_failures: dict[str, deque[float]] | None = None,
+    clock: Callable[[], float] = time.monotonic,
+) -> bool:
+    """Authenticate one connection against the API key "secret", by default with no earlier failures."""
+    websocket = _FakeWebSocket(headers=headers)
+    policy = authentication_module.build_authentication_policy(
+        authentication_settings=AuthenticationSettings(api_key="secret"),
+        websocket_settings=websocket_settings or _websocket_settings(),
+        authentication_failures={} if authentication_failures is None else authentication_failures,
+        clock=clock,
+    )
+    return asyncio.run(
+        authentication_module.authenticate_websocket(
+            typed_websocket(websocket),
+            policy=policy,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("headers", "is_authenticated"),
+    [
+        ({"x-api-key": "secret"}, True),
+        ({"authorization": "Bearer secret"}, True),
+        ({}, False),
+        ({"x-api-key": "secret", "origin": "https://denied.example"}, True),
+    ],
+)
+def test_authentication_outcomes(headers: dict[str, str], *, is_authenticated: bool) -> None:
     """Test websocket authentication accepts valid headers and rejects invalid inputs."""
-    if (
-        _run_authentication(
-            {"x-api-key": "secret"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=_websocket_settings(),
-            authentication_failures={},
-        )
-        is not True
-    ):
-        pytest.fail("Assertion failed")
-    if (
-        _run_authentication(
-            {"authorization": "Bearer secret"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=_websocket_settings(),
-            authentication_failures={},
-        )
-        is not True
-    ):
-        pytest.fail("Assertion failed")
-    if (
-        _run_authentication(
-            {},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=_websocket_settings(),
-            authentication_failures={},
-        )
-        is not False
-    ):
-        pytest.fail("Assertion failed")
-    websocket_settings = _websocket_settings()
-    if (
-        _run_authentication(
-            {"x-api-key": "secret", "origin": "https://denied.example"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=websocket_settings,
-            authentication_failures={},
-        )
-        is not True
-    ):
-        pytest.fail("Assertion failed")
+    assert _run_authentication(headers) is is_authenticated
 
 
 def test_authentication_throttling() -> None:
     """Test authentication throttles repeated failures."""
-    websocket_settings = _websocket_settings(maximum_failures=2, window_seconds=60.0)
     authentication_failures: dict[str, deque[float]] = {}
+    attempt = partial(
+        _run_authentication,
+        websocket_settings=_websocket_settings(maximum_failures=2, window_seconds=60.0),
+        authentication_failures=authentication_failures,
+        clock=lambda: 100.0,
+    )
 
-    def fixed_clock() -> float:
-        """Return a fixed test clock value."""
-        current_time = 100.0
-        if current_time < 0:
-            raise ValueError
-        return current_time
-
-    if (
-        _run_authentication(
-            {"x-api-key": "bad"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=websocket_settings,
-            authentication_failures=authentication_failures,
-            clock=fixed_clock,
-        )
-        is not False
-    ):
-        pytest.fail("Assertion failed")
-    if (
-        _run_authentication(
-            {"x-api-key": "bad"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=websocket_settings,
-            authentication_failures=authentication_failures,
-            clock=fixed_clock,
-        )
-        is not False
-    ):
-        pytest.fail("Assertion failed")
+    assert attempt({"x-api-key": "bad"}) is False
+    assert attempt({"x-api-key": "bad"}) is False
 
     # Third attempt is throttled even with a valid key.
-    if (
-        _run_authentication(
-            {"x-api-key": "secret"},
-            authentication_settings=_authentication_settings(),
-            websocket_settings=websocket_settings,
-            authentication_failures=authentication_failures,
-            clock=fixed_clock,
-        )
-        is not False
-    ):
-        pytest.fail("Assertion failed")
+    assert attempt({"x-api-key": "secret"}) is False

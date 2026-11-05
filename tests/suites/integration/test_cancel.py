@@ -5,40 +5,25 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 import asyncio
-from contextlib import AbstractContextManager, contextmanager
+from contextlib import contextmanager
 from dataclasses import replace
-from unittest.mock import AsyncMock, patch
-
-from fastapi.testclient import TestClient
+from unittest.mock import patch
 
 from tests.state import SessionContext
 from src.execution.turn import StreamResponseRequest, stream_response
 from src.runtime.config import HistorySettings
-from src.session.runtime import SessionRuntime
-from src.server.applications import create_public_application
-from src.runtime.dependencies import RuntimeDependencies
-from src.websocket.connections import ConnectionRegistry
 from tests.harness.client.websocket import build_start_payload, build_cancel_payload, build_message_payload
-from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
-from tests.harness.environment.tokenizer import use_local_tokenizers
+from tests.suites.integration.builders import TEST_API_KEY, AUTHENTICATED_SETTINGS, open_test_client
 
 if TYPE_CHECKING:
     from collections.abc import Generator, AsyncIterator
 
     from fastapi import WebSocket
+    from fastapi.testclient import TestClient
     from starlette.testclient import WebSocketTestSession
 
     from src.execution.turn import TurnRequest
-    from src.runtime.config import ApplicationSettings
-
-TEST_API_KEY = "integration-test-key"
-
-
-def _test_settings() -> ApplicationSettings:
-    return replace(
-        DEFAULT_APPLICATION_SETTINGS,
-        authentication=replace(DEFAULT_APPLICATION_SETTINGS.authentication, api_key=TEST_API_KEY),
-    )
+    from src.runtime.dependencies import RuntimeDependencies
 
 
 async def _stream_test_turn(websocket: WebSocket, plan: TurnRequest, runtime_dependencies: RuntimeDependencies) -> None:
@@ -65,42 +50,14 @@ async def _stream_test_turn(websocket: WebSocket, plan: TurnRequest, runtime_dep
     )
 
 
-def _build_runtime_dependencies(
-    settings: ApplicationSettings,
-) -> tuple[RuntimeDependencies, AbstractContextManager[object]]:
-    tokenizer_cm = use_local_tokenizers()
-    tokenizer = tokenizer_cm.__enter__()
-    engine = AsyncMock()
-    engine.can_reset_cache = False
-    session_runtime = SessionRuntime(
-        tokenizer=tokenizer,
-        settings=replace(settings, history=HistorySettings(trigger_tokens=1000, target_tokens=800)),
-    )
-    runtime_dependencies = RuntimeDependencies(
-        connections=ConnectionRegistry(
-            maximum_connections=4, acquire_timeout_seconds=settings.websocket.handshake_acquire_timeout_seconds
-        ),
-        session_runtime=session_runtime,
-        engine=engine,
-        cache_reset_coordinator=None,
-        tokenizer=tokenizer,
-        settings=settings,
-    )
-    return runtime_dependencies, tokenizer_cm
-
-
 @contextmanager
 def _test_client() -> Generator[TestClient, None, None]:
-    settings = _test_settings()
-    runtime_dependencies, tokenizer_cm = _build_runtime_dependencies(settings)
-    application = create_public_application(settings, AsyncMock(), is_lifecycle_enabled=False)
-    application.state.runtime_dependencies = runtime_dependencies
-
-    try:
-        with patch("src.messages.turn.run_turn_execution", _stream_test_turn), TestClient(application) as client:
-            yield client
-    finally:
-        tokenizer_cm.__exit__(None, None, None)
+    session_settings = replace(AUTHENTICATED_SETTINGS, history=HistorySettings(trigger_tokens=1000, target_tokens=800))
+    with (
+        patch("src.messages.turn.run_turn_execution", _stream_test_turn),
+        open_test_client(AUTHENTICATED_SETTINGS, session_settings=session_settings) as client,
+    ):
+        yield client
 
 
 def _receive_json(websocket: WebSocketTestSession) -> dict[str, object]:

@@ -2,22 +2,20 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 import asyncio
 import logging
-import argparse
 
-from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
+from tests.harness.client.cli import build_client_parser, parse_client_arguments
 from tests.harness.logic.live.runner import LiveRunRequest, run_live_session
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
+from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_PERSONALITY
+
+if TYPE_CHECKING:
+    import argparse
 
 
 def _parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Interactive live WebSocket test", allow_abbrev=False)
-    add_connection_arguments(
-        parser,
-        server_help=f"WebSocket URL (default environment SERVER_URL or {DEFAULT_SERVER_URL})",
-    )
-    add_sampling_arguments(parser)
+    parser = build_client_parser("Interactive live WebSocket test")
     parser.add_argument(
         "message",
         nargs="*",
@@ -34,9 +32,7 @@ def _parse_arguments() -> argparse.Namespace:
         default=DEFAULT_PERSONALITY,
         help=f"Prompt personality (default: {DEFAULT_PERSONALITY})",
     )
-    arguments = parser.parse_args()
-    arguments.sampling = build_sampling_payload(arguments)
-    return arguments
+    return parse_client_arguments(parser)
 
 
 def main() -> None:

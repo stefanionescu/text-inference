@@ -83,7 +83,7 @@ def test_stats_command_toggle() -> None:
     """Test stats toggles without arguments and rejects command arguments."""
 
     async def scenario() -> bool:
-        client = cast("LiveClient", SimpleNamespace(is_stats_logging_enabled=False))
+        client = cast("LiveClient", cast("object", SimpleNamespace(is_stats_logging_enabled=False)))
         registry = PromptProfileRegistry()
         assert not await dispatch_command("stats", client, registry)
         assert not await dispatch_command("stats on", client, registry)

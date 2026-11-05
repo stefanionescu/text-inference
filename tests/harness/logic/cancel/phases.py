@@ -13,6 +13,7 @@ import time
 from typing import TYPE_CHECKING, Any
 import asyncio
 import logging
+from functools import partial
 from dataclasses import dataclass
 
 from websockets.exceptions import ConnectionClosed
@@ -29,10 +30,14 @@ from tests.harness.client.websocket import (
 )
 from tests.harness.reporting.terminal import dim, write_line
 
-from .callbacks import build_cancel_callbacks, build_recovery_callbacks
+from .callbacks import build_phase_callbacks
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Awaitable
+
     from websockets import WebSocketClientProtocol
+
+    from .callbacks import DispatchResult, MessageCallback
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +69,28 @@ async def _send_cancel_if_due(
     write_line(dim(f"  [cancel] sent cancel after {elapsed:.1f}s"))
 
 
+async def _dispatch_until_done(
+    websocket: WebSocketClientProtocol,
+    callbacks: dict[str, MessageCallback],
+    *,
+    receive_timeout_seconds: float,
+    after_message: Callable[[], Awaitable[None]] | None = None,
+) -> DispatchResult:
+    """Feed frames to the callbacks until one reports completion; a stream that just ends reports nothing."""
+    async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
+        result = await dispatch_message(
+            message,
+            callbacks,
+            default=lambda _message: True,
+        )
+        if after_message is not None:
+            await after_message()
+
+        if isinstance(result, dict) and result.get("is_done"):
+            return result
+    return {}
+
+
 async def _consume_cancel_messages(
     websocket: WebSocketClientProtocol,
     state: StreamState,
@@ -71,35 +98,60 @@ async def _consume_cancel_messages(
     receive_timeout_seconds: float,
     cancel_delay_seconds: float,
 ) -> CancelLoop:
-    callbacks = build_cancel_callbacks(state)
+    callbacks = build_phase_callbacks(state, is_recovery=False)
     loop = CancelLoop()
     start_time = time.perf_counter()
 
     try:
-        async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
-            result = await dispatch_message(
-                message,
-                callbacks,
-                default=lambda _message: True,
-            )
-            await _send_cancel_if_due(
+        result = await _dispatch_until_done(
+            websocket,
+            callbacks,
+            receive_timeout_seconds=receive_timeout_seconds,
+            after_message=partial(
+                _send_cancel_if_due,
                 websocket,
                 loop,
                 start_time=start_time,
                 cancel_delay_seconds=cancel_delay_seconds,
-            )
-
-            if isinstance(result, dict) and result.get("is_done"):
-                loop.is_cancelled = result.get("cancelled", False)
-                loop.error = result.get("error")
-                break
-
+            ),
+        )
     except TimeoutError:
         loop.error = f"timeout after {receive_timeout_seconds:.1f}s"
     except ConnectionClosed as exception:
         loop.error = f"connection closed: {exception.code}"
+    else:
+        loop.is_cancelled = result.get("cancelled", False)
+        loop.error = result.get("error")
 
     return loop
+
+
+async def consume_recovery_stream(
+    websocket: WebSocketClientProtocol,
+    state: StreamState,
+    *,
+    receive_timeout_seconds: float,
+) -> tuple[dict[str, Any], str | None, bool]:
+    """Stream one full response into state; a timeout or closed socket comes back as an error string."""
+    callbacks = build_phase_callbacks(state, is_recovery=True)
+    is_cancelled = False
+    error: str | None = None
+    metrics: dict[str, Any] = {}
+
+    try:
+        result = await _dispatch_until_done(websocket, callbacks, receive_timeout_seconds=receive_timeout_seconds)
+    except TimeoutError:
+        error = f"timeout after {receive_timeout_seconds:.1f}s"
+        metrics = finalize_metrics(state, is_cancelled=True)
+    except ConnectionClosed as exception:
+        error = f"connection closed: {exception.code}"
+        metrics = finalize_metrics(state, is_cancelled=True)
+    else:
+        is_cancelled = result.get("cancelled", False)
+        error = result.get("error")
+        metrics = result.get("metrics", {})
+
+    return metrics, error, is_cancelled
 
 
 async def run_cancel_phase(
@@ -233,36 +285,16 @@ async def run_recovery_phase(
     await asyncio.sleep(post_cancel_wait_seconds)
 
     state = StreamState()
-    callbacks = build_recovery_callbacks(state)
 
     recovery_payload = build_message_payload(user_message, sampling=context.sampling)
     await websocket.send(json.dumps(recovery_payload))
     write_line(dim("  [recovery] sent message..."))
 
-    is_cancelled = False
-    error: str | None = None
-    metrics: dict[str, Any] = {}
-
-    try:
-        async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
-            result = await dispatch_message(
-                message,
-                callbacks,
-                default=lambda _message: True,
-            )
-
-            if isinstance(result, dict) and result.get("is_done"):
-                is_cancelled = result.get("cancelled", False)
-                error = result.get("error")
-                metrics = result.get("metrics", {})
-                break
-
-    except TimeoutError:
-        error = f"timeout after {receive_timeout_seconds:.1f}s"
-        metrics = finalize_metrics(state, is_cancelled=True)
-    except ConnectionClosed as exception:
-        error = f"connection closed: {exception.code}"
-        metrics = finalize_metrics(state, is_cancelled=True)
+    metrics, error, is_cancelled = await consume_recovery_stream(
+        websocket,
+        state,
+        receive_timeout_seconds=receive_timeout_seconds,
+    )
 
     has_response = len(state.completion_text) > 0
     has_passed = not is_cancelled and has_response and error is None
@@ -275,4 +307,4 @@ async def run_recovery_phase(
     )
 
 
-__all__ = ["run_cancel_phase", "run_drain_phase", "run_recovery_phase"]
+__all__ = ["consume_recovery_stream", "run_cancel_phase", "run_drain_phase", "run_recovery_phase"]

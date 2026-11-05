@@ -149,7 +149,7 @@ def test_disconnect_client_counts() -> None:
 
     async def scenario() -> int:
         reset = AsyncMock()
-        runtime = cast("RuntimeDependencies", SimpleNamespace(clear_caches_on_disconnect=reset))
+        runtime = cast("RuntimeDependencies", cast("object", SimpleNamespace(clear_caches_on_disconnect=reset)))
         finalization = ConnectionFinalization(
             websocket=cast("WebSocket", object()),
             runtime_dependencies=runtime,
@@ -174,8 +174,8 @@ def test_shutdown_order() -> None:
         runtime = RuntimeDependencies(
             connections=cast("ConnectionRegistryProtocol", object()),
             session_runtime=cast("SessionRuntime", object()),
-            engine=cast("Engine", engine),
-            cache_reset_coordinator=cast("CacheResetCoordinator", coordinator),
+            engine=cast("Engine", cast("object", engine)),
+            cache_reset_coordinator=cast("CacheResetCoordinator", cast("object", coordinator)),
             tokenizer=cast("ThreadSafeTokenizer", object()),
             settings=cast("ApplicationSettings", object()),
         )

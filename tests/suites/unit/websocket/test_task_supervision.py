@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 import asyncio
 from unittest.mock import AsyncMock
 
@@ -14,6 +14,7 @@ from src.session.state import SessionState
 from src.session.requests import spawn_session_task, abort_session_requests
 from config.runtime.websocket import WEBSOCKET_ERROR_INTERNAL
 from src.websocket.supervision import supervise_turn
+from tests.suites.unit.builders import RecordingWebSocket, typed_websocket
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Awaitable
@@ -36,15 +37,20 @@ async def _spawn_task(
     )
 
 
-class _NoopWebSocket:
-    def __init__(self) -> None:
-        self.sent: list[str] = []
+async def _run_tracked_task(request_id: str, operation: Callable[[], Awaitable[None]]) -> RecordingWebSocket:
+    """Await a supervised task, check it released its tracking slots, and return the socket it wrote to."""
+    websocket = RecordingWebSocket()
+    state = SessionState(meta={})
 
-    async def send_text(self, text: str) -> None:
-        """Test send text."""
-        sent = self.sent
-        payload = text
-        sent.append(payload)
+    task = await _spawn_task(typed_websocket(websocket), state, request_id=request_id, operation=operation)
+
+    assert task is not None
+    await task
+    if state.active_request_id is not None:
+        pytest.fail("Assertion failed")
+    if state.active_request_task is not None:
+        pytest.fail("Assertion failed")
+    return websocket
 
 
 async def _success_operation() -> None:
@@ -64,76 +70,20 @@ async def _disconnect_operation() -> None:
 
 def test_task_supervision_outcomes() -> None:
     """Test spawn session task cleanup and internal error handling."""
+    websocket = asyncio.run(_run_tracked_task("req-success", _success_operation))
+    assert websocket.sent == []
 
-    async def scenario() -> None:
-        """Test scenario."""
-        websocket = _NoopWebSocket()
-        state = SessionState(meta={})
-
-        task = await _spawn_task(
-            cast("WebSocket", websocket),
-            state,
-            request_id="req-success",
-            operation=_success_operation,
-        )
-
-        assert task is not None
-        await task
-        if state.active_request_id is not None:
-            pytest.fail("Assertion failed")
-        if state.active_request_task is not None:
-            pytest.fail("Assertion failed")
-        assert websocket.sent == []
-        websocket = _NoopWebSocket()
-        state = SessionState(meta={})
-
-        task = await _spawn_task(
-            cast("WebSocket", websocket),
-            state,
-            request_id="req-fail",
-            operation=_failing_operation,
-        )
-
-        assert task is not None
-        await task
-        if state.active_request_id is not None:
-            pytest.fail("Assertion failed")
-        if state.active_request_task is not None:
-            pytest.fail("Assertion failed")
-        assert len(websocket.sent) == 1
-        payload = json.loads(websocket.sent[0])
-        assert payload["type"] == "error"
-        assert payload["code"] == WEBSOCKET_ERROR_INTERNAL
-
-    scenario_coro = scenario()
-    asyncio.run(scenario_coro)
+    websocket = asyncio.run(_run_tracked_task("req-fail", _failing_operation))
+    assert len(websocket.sent) == 1
+    payload = json.loads(websocket.sent[0])
+    assert payload["type"] == "error"
+    assert payload["code"] == WEBSOCKET_ERROR_INTERNAL
 
 
 def test_task_disconnect_ignored() -> None:
     """Test spawn session task swallows expected disconnect errors."""
-
-    async def scenario() -> None:
-        """Test scenario."""
-        websocket = _NoopWebSocket()
-        state = SessionState(meta={})
-
-        task = await _spawn_task(
-            cast("WebSocket", websocket),
-            state,
-            request_id="req-disconnect",
-            operation=_disconnect_operation,
-        )
-
-        assert task is not None
-        await task
-        if state.active_request_id is not None:
-            pytest.fail("Assertion failed")
-        if state.active_request_task is not None:
-            pytest.fail("Assertion failed")
-        assert websocket.sent == []
-
-    scenario_coro = scenario()
-    asyncio.run(scenario_coro)
+    websocket = asyncio.run(_run_tracked_task("req-disconnect", _disconnect_operation))
+    assert websocket.sent == []
 
 
 def test_closed_session_rejection() -> None:
@@ -141,7 +91,7 @@ def test_closed_session_rejection() -> None:
     operation = AsyncMock()
     state = SessionState(meta={}, lifecycle_state="closed")
     task = asyncio.run(
-        _spawn_task(cast("WebSocket", _NoopWebSocket()), state, request_id="closed", operation=operation),
+        _spawn_task(typed_websocket(RecordingWebSocket()), state, request_id="closed", operation=operation),
     )
     assert task is None
     operation.assert_not_called()
@@ -156,7 +106,7 @@ def test_immediate_cancellation() -> None:
         engine = AsyncMock()
         state = SessionState(meta={})
         task = await _spawn_task(
-            cast("WebSocket", _NoopWebSocket()),
+            typed_websocket(RecordingWebSocket()),
             state,
             request_id="cancel",
             operation=operation,

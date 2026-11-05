@@ -4,11 +4,8 @@ Connects to the WebSocket server with a pre-built conversation history, then
 sends follow-up messages to test the assistant's recall of earlier exchanges.
 Tracks TTFB for each response and prints summary statistics (p50, p90, p95).
 
-Environment Variables:
-- SERVER_URL: WebSocket URL (default: ws://127.0.0.1:8000/ws)
-- API_KEY: API key for authentication (required, no default)
-- GENDER: female|male (default: female)
-- PERSONALITY: personality (default: flirty)
+Its flags default to the SERVER_URL, GENDER, and PERSONALITY environment
+variables. API_KEY has no default and is required.
 
 Usage:
   mise run test:e2e:history
@@ -18,67 +15,33 @@ Usage:
 
 from __future__ import annotations
 
-import os
-import sys
-import asyncio
-import argparse
+from typing import TYPE_CHECKING
 
-from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
-from tests.harness.client.errors import ServerError
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
+from tests.harness.client.cli import run_client, build_client_parser, add_profile_arguments, parse_client_arguments
 from tests.harness.logic.history.runner import HistoryRunRequest, run_history_replay
+
+if TYPE_CHECKING:
+    import argparse
 
 
 def _parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="History recall test", allow_abbrev=False)
-    add_connection_arguments(
-        parser,
-        server_help=f"WebSocket URL (default environment SERVER_URL or {DEFAULT_SERVER_URL})",
-    )
-    add_sampling_arguments(parser)
-    parser.add_argument(
-        "--gender",
-        dest="gender",
-        choices=["female", "male"],
-        default=os.getenv("GENDER", DEFAULT_GENDER),
-        help="gender",
-    )
-    parser.add_argument(
-        "--personality",
-        dest="personality",
-        default=os.getenv("PERSONALITY", DEFAULT_PERSONALITY),
-        help="personality (e.g., flirty, savage, warm)",
-    )
-    arguments = parser.parse_args()
-    arguments.sampling = build_sampling_payload(arguments)
-    return arguments
-
-
-def _run_history_replay(arguments: argparse.Namespace) -> None:
-    """Run the finite history recall test."""
-    try:
-        asyncio.run(
-            run_history_replay(
-                HistoryRunRequest(
-                    server_url=arguments.server,
-                    api_key=arguments.api_key,
-                    gender=arguments.gender,
-                    personality=arguments.personality,
-                    timeout_seconds=arguments.timeout,
-                    sampling=arguments.sampling or None,
-                ),
-            ),
-        )
-    except ServerError:
-        sys.exit(1)
-    except KeyboardInterrupt:
-        pass
+    parser = build_client_parser("History recall test")
+    add_profile_arguments(parser)
+    return parse_client_arguments(parser)
 
 
 def main() -> None:
-    """Parse CLI arguments and run history replay."""
+    """Parse CLI arguments and run the finite history recall test."""
     arguments = _parse_arguments()
-    _run_history_replay(arguments)
+    request = HistoryRunRequest(
+        server_url=arguments.server,
+        api_key=arguments.api_key,
+        gender=arguments.gender,
+        personality=arguments.personality,
+        timeout_seconds=arguments.timeout,
+        sampling=arguments.sampling or None,
+    )
+    run_client(run_history_replay(request))
 
 
 if __name__ == "__main__":

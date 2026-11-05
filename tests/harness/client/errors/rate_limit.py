@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import override
+
 from .server import ServerError, _register_error_code
 
 
@@ -11,6 +13,7 @@ class RateLimitError(ServerError):
 
     _is_recoverable = True
 
+    @override
     def format_for_user(self) -> str:
         """Format the rate limit failure for terminal output."""
         if self.friendly_message:

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 import asyncio
-from dataclasses import field, dataclass
-from unittest.mock import Mock
+from unittest.mock import Mock, AsyncMock
 
 import pytest
 
@@ -16,9 +15,6 @@ from src.session.requests import (
     cancel_session_requests,
     cleanup_session_requests,
 )
-
-if TYPE_CHECKING:
-    from src.engines.protocol import Engine
 
 
 def _make_state(
@@ -91,24 +87,13 @@ def test_cancel_stops_task() -> None:
     task.cancel.assert_called_once_with()
 
 
-@dataclass
-class _RecordingEngine:
-    aborted_request_ids: list[str] = field(default_factory=list)
-
-    async def abort(self, request_id: str) -> None:
-        """Test abort."""
-        if not request_id:
-            return
-        self.aborted_request_ids.append(request_id)
-
-
 def test_abort_active_request() -> None:
     """Test abort session requests aborts engine with active id."""
-    engine = _RecordingEngine()
+    engine = AsyncMock()
     state = _make_state(active_request_id="req-123")
 
-    asyncio.run(abort_session_requests(state, cast("Engine", engine)))
+    asyncio.run(abort_session_requests(state, engine))
 
-    assert engine.aborted_request_ids == ["req-123"]
+    engine.abort.assert_awaited_once_with("req-123")
     if state.active_request_id is not None:
         pytest.fail("Assertion failed")
