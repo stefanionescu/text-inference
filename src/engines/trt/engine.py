@@ -175,10 +175,7 @@ class TRTEngine:
         )
 
     async def generate_stream(
-        self,
-        prompt: str,
-        sampling_parameters: object,
-        request_id: str,
+        self, prompt: str, sampling_parameters: object, request_id: str
     ) -> AsyncGenerator[EngineOutput, None]:
         """Stream results and abort unfinished work when its consumer exits.
 

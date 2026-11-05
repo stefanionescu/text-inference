@@ -17,6 +17,7 @@ from tests.harness.environment.settings import (
     DEFAULT_PING_TIMEOUT_SECONDS,
     DEFAULT_PING_INTERVAL_SECONDS,
 )
+from tests.harness.client.session_request import SessionRequest
 
 from .cli import run_interactive_loop
 from .client import LiveClient
@@ -27,25 +28,15 @@ logger = logging.getLogger("live")
 
 
 @dataclass(frozen=True)
-class LiveRunRequest:
+class LiveRunRequest(SessionRequest):
     """Inputs for an interactive live session.
 
     Attributes:
-        server_url: Server address shown in the banner and used for the connection.
-        api_key: Explicit API key for this session; None reads the `API_KEY` environment variable.
-        gender: Gender that selects the starting prompt profile.
-        personality: Personality that selects the starting prompt profile.
-        timeout_seconds: Time limit in seconds for each message exchange.
         sampling: Overrides sent with each live message.
         message: Words of the first message; None or empty sends the default greeting.
 
     """
 
-    server_url: str
-    api_key: str | None
-    gender: str
-    personality: str
-    timeout_seconds: float
     sampling: dict[str, float | int | bool] | None
     message: list[str] | None
 

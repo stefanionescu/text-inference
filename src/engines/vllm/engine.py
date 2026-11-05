@@ -181,10 +181,7 @@ class VLLMEngine:
         )
 
     async def generate_stream(
-        self,
-        prompt: str,
-        sampling_parameters: object,
-        request_id: str,
+        self, prompt: str, sampling_parameters: object, request_id: str
     ) -> AsyncGenerator[EngineOutput, None]:
         """Stream generation using vLLM's generate API.
 

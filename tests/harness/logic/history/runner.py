@@ -43,6 +43,7 @@ from tests.harness.environment.settings import (
     DEFAULT_PING_TIMEOUT_SECONDS,
     DEFAULT_PING_INTERVAL_SECONDS,
 )
+from tests.harness.client.session_request import SessionRequest
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol
@@ -75,24 +76,14 @@ class HistorySequence:
 
 
 @dataclass(frozen=True)
-class HistoryRunRequest:
+class HistoryRunRequest(SessionRequest):
     """Connection and prompt inputs for one history replay.
 
     Attributes:
-        server_url: WebSocket server address for the replay.
-        api_key: Explicit API key for the replay; None reads the `API_KEY` environment variable.
-        gender: Gender that selects the prompt profile.
-        personality: Personality that selects the prompt profile.
-        timeout_seconds: Per-exchange time limit in seconds.
         sampling: Overrides for every exchange in the replay.
 
     """
 
-    server_url: str
-    api_key: str | None
-    gender: str
-    personality: str
-    timeout_seconds: float
     sampling: dict[str, float | int] | None
 
 
