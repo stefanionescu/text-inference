@@ -1,0 +1,10 @@
+# >>> gspot managed >>>
+* text=auto eol=lf
+.gspot/** linguist-generated
+/.editorconfig linguist-generated
+/.markdownlint.jsonc linguist-generated
+/.prettierignore linguist-generated
+/prettier.config.mjs linguist-generated
+/pyrightconfig.json linguist-generated
+/ruff.toml linguist-generated
+# <<< gspot managed <<<

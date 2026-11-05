@@ -1,0 +1,5 @@
+#!/bin/sh
+command -v bunx >/dev/null 2>&1 || { printf 'bunx is not on the PATH that this Git client gives hooks (%s). Start the client from a terminal, or add bunx'"'"'s folder to its PATH.
+' "$PATH" >&2; exit 2; }
+test -f node_modules/@gspothq/cli/package.json || { printf '%s\n' 'gspot is not installed in this worktree. Run bun install, then gspot install.' >&2; exit 2; }
+exec bunx --no-install gspot check --staged --stage commit

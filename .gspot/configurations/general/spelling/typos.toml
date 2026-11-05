@@ -1,0 +1,80 @@
+[default]
+locale = "en"
+extend-ignore-re = ["\\b[0-9a-f]{7,40}\\b", "\\b[A-Za-z0-9+/]{40,}={0,2}\\b"]
+
+[default.extend-words]
+
+[files]
+extend-exclude = [
+  # Build output
+  "**/build/**",
+  # Files that gspot generates
+  ".gspot/**",
+  ".gspot-copies/**",
+  "**/gspot.baseline.json",
+  ".editorconfig",
+  ".markdownlint.jsonc",
+  ".prettierignore",
+  "prettier.config.mjs",
+  "pyrightconfig.json",
+  "ruff.toml",
+  # Generator outputs
+  "**/*.pbxproj",
+  "**/*.xcstrings",
+  "**/*.svg",
+  "**/*.min.js",
+  "**/*.min.css",
+  # Paths that configurations leave out
+  "**/.venv/**",
+  "**/venv/**",
+  "**/__pycache__/**",
+  "**/.pytest_cache/**",
+  "**/.ruff_cache/**",
+  "**/.mypy_cache/**",
+  "**/coverage/**",
+  "**/.env",
+  "**/.env.*",
+  "**/.dev.vars",
+  "**/.dev.vars.*",
+  # Lockfiles
+  "**/*.lock",
+  "**/bun.lockb",
+  "**/pnpm-lock.yaml",
+  "**/package-lock.json",
+  "**/npm-shrinkwrap.json",
+  "**/go.sum",
+  "**/Package.resolved",
+  # Paths that the tracked .gitignore files leave out
+  "venv/**",
+  "**/.artifacts",
+  "**/cache/**",
+  "**/*.py[cod]",
+  "**/*$py.class",
+  "**/*.so",
+  "**/.Python",
+  "**/.venv",
+  "**/.venv-quant",
+  "**/.nox",
+  "**/.cache/**",
+  "**/.pytest_cache",
+  "**/.ruff_cache",
+  "**/.mypi_cache",
+  "**/.mypy_cache",
+  "**/node_modules/**",
+  "**/pytest.xml",
+  "**/reports/**",
+  "**/logs/**",
+  "**/*.log",
+  "**/*.zip",
+  "tests/results/**",
+  "**/.DS_Store",
+  "**/.DS_Store?",
+  "**/.idea/**",
+  "**/.claude/**",
+  "**/.vscode/**",
+  "**/*.swp",
+  "**/*.swo",
+  "**/.cursor/**",
+  "tool/models",
+  "**/.venv_tool",
+]

@@ -1,0 +1,9 @@
+timeout: 600s
+severity:
+  - HIGH
+  - CRITICAL
+scan:
+  skip-dirs:
+    - node_modules
+    - .gspot
+    - .git

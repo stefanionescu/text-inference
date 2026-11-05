@@ -1,0 +1,10 @@
+# Change these settings with `gspot set`, `unset`, or `unignore`, and the configurations with `gspot add` or `remove`.
+# Write the [[scope]], [[command_check]], [[import_rule]], [[format.override]], [[naming.exception]], [[coverage.swift_target]], [[licenses.allowed_package]], [[tools.eslint.override]], and [[data_files.schemas]] records by hand.
+level = "all"
+configurations = ["bash", "docker", "fastapi", "markdown", "pytest", "python"]
+
+[format]
+indent_width = 2
+print_width = 80
+quotes = "double"
+override = [{ paths = ["**/*.py"], indent_width = 4, print_width = 120 }]

@@ -1,0 +1,44 @@
+rules:
+    - id: gspot.fastapi.cors-wildcard-with-credentials
+      patterns:
+          - pattern: $APP.add_middleware(CORSMiddleware, ..., allow_origins=["*"], ...,
+                allow_credentials=True, ...)
+      message: Every origin is allowed together with credentials, so any site reads an
+          authenticated response. List the origins.
+      languages:
+          - python
+      severity: ERROR
+      metadata:
+          cwe:
+              - CWE-942
+          category: security
+    - id: gspot.fastapi.debug-enabled
+      pattern: FastAPI(..., debug=True, ...)
+      message: Debug mode returns tracebacks to the client. Read the flag from
+          configuration, off by default.
+      languages:
+          - python
+      severity: ERROR
+      metadata:
+          cwe:
+              - CWE-489
+          category: security
+    - id: gspot.fastapi.exception-text-in-response
+      patterns:
+          - pattern-either:
+                - pattern: HTTPException(..., detail=str($ERROR), ...)
+                - pattern: HTTPException(..., detail=f"...{$ERROR}...", ...)
+          - pattern-inside: |-
+                try:
+                    ...
+                except $TYPE as $ERROR:
+                    ...
+      message: The text of an internal exception goes to the client. Log it, and
+          return a stable message.
+      languages:
+          - python
+      severity: ERROR
+      metadata:
+          cwe:
+              - CWE-209
+          category: security
