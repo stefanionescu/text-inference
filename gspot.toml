@@ -1350,6 +1350,11 @@ check = "dependencies/osv-scanner"
 rule = "PYSEC-2026-4362"
 reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
 
+[[ignore]]
+check = "prose/vale"
+paths = ["README.md"]
+reason = "The owner keeps this README in their own wording."
+
 [[naming.exception]]
 languages = ["bash"]
 allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]
