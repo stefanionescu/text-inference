@@ -44,11 +44,6 @@ class CancelClientResult:
     drain_phase: DrainPhaseResult
     recovery_phase: RecoveryPhaseResult
 
-    @property
-    def has_all_passed(self) -> bool:
-        """Check if all phases passed."""
-        return self.cancel_phase.has_passed and self.drain_phase.has_passed and self.recovery_phase.has_passed
-
 
 @dataclass
 class NormalClientResult:

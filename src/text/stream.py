@@ -143,11 +143,6 @@ class StreamingSanitizer:
         self._has_trimmed_stream_start = False
         return tail
 
-    @property
-    def full_text(self) -> str:
-        """Return the fully sanitized text accumulated so far."""
-        return "".join(self._emitted_parts) + self._sanitized_tail
-
 
 def _apply_leading_capital_stream(text: str, *, is_capital_pending: bool) -> tuple[str, bool]:
     """Streaming-friendly leading capital enforcement.

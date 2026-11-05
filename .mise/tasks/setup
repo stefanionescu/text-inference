@@ -5,5 +5,7 @@ REPO_ROOT="${MISE_PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "${REPO_ROOT}"
 
 mise install
-mise run deps
+bun install --frozen-lockfile
 bunx --no-install gspot install
+# gspot install syncs .venv without extras, so restore the local extra afterwards.
+mise run deps

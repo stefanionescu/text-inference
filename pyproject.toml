@@ -201,3 +201,43 @@ ini_options.testpaths = [
   "tests",
 ]
 ini_options.addopts = "-q"
+
+[tool.deptry.per_rule_ignores]
+DEP001 = [
+  "cuda",
+  "mpi4py",
+]
+DEP002 = [
+  "accelerate",
+  "compressed-tensors",
+  "cuda-python",
+  "datasets",
+  "fla-core",
+  "hf-transfer",
+  "httpx2",
+  "loguru",
+  "mistral-common",
+  "ninja",
+  "numpy",
+  "nvidia-ml-py",
+  "orjson",
+  "packaging",
+  "protobuf",
+  "python-dotenv",
+  "pyyaml",
+  "rich",
+  "safetensors",
+  "sentencepiece",
+  "setuptools",
+  "snac",
+  "soundfile",
+  "starlette",
+  "tensorrt-cu13",
+  "tensorrt-cu13-bindings",
+  "tensorrt-cu13-libs",
+  "tokenizers",
+  "tqdm",
+  "triton",
+  "uvloop",
+  "wheel",
+]

@@ -379,14 +379,7 @@ Run the repository checks:
 
 ```shell
 mise run deps:verify
-mise run format:check
-mise run lint:mise
-mise run lint:hooks
-mise run lint:quality
-mise run lint:policy -- --scope all
-mise run lint:shell
-mise run lint:docker
-mise run lint:python
+bunx --no-install gspot check
 mise run test
 mise run test:unit
 mise run test:integration

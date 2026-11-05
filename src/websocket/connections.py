@@ -128,20 +128,5 @@ class ConnectionRegistry:
         if is_release_needed:
             self._semaphore.release()
 
-    def get_capacity_snapshot(self) -> dict[str, int | bool]:
-        """Get capacity information.
-
-        Returns:
-            Dict with active, max, and available connection counts
-
-        """
-        active = len(self.active_connections)
-        return {
-            "active": active,
-            "max": self.maximum_connections,
-            "available": self.maximum_connections - active,
-            "at_capacity": active >= self.maximum_connections,
-        }
-
 
 __all__ = ["ConnectionRegistry"]

@@ -64,9 +64,11 @@ async def _empty_stream() -> AsyncIterator[str]:
 
 
 async def _error_stream() -> AsyncIterator[str]:
+    chunks: tuple[str, ...] = ()
+    for chunk in chunks:
+        yield chunk
     message = "boom"
     raise RuntimeError(message)
-    yield ""
 
 
 async def _two_chunk_stream() -> AsyncIterator[str]:

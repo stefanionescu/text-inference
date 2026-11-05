@@ -5,5 +5,5 @@ REPO_ROOT="${MISE_PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "${REPO_ROOT}"
 
 # shellcheck disable=SC2154 # reason: UV_PYTHON is provided by mise from mise.toml.
-uv sync --python "${UV_PYTHON}" --all-groups --frozen
+uv sync --python "${UV_PYTHON}" --extra local --frozen
 bun install --frozen-lockfile

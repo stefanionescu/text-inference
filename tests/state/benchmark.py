@@ -29,16 +29,6 @@ class TransactionMetrics:
     first_sentence_ms: float | None = None
     first_3_words_ms: float | None = None
 
-    def to_result(self, *, is_successful: bool, phase: int) -> dict[str, Any]:
-        """Convert metrics to a result dict."""
-        return {
-            "ok": is_successful,
-            "phase": phase,
-            "ttfb_ms": self.ttfb_ms,
-            "first_sentence_ms": self.first_sentence_ms,
-            "first_3_words_ms": self.first_3_words_ms,
-        }
-
 
 __all__ = [
     "BenchmarkConfig",

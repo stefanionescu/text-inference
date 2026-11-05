@@ -245,3 +245,48 @@ reason = "flashinfer ships from its own wheel index for each CUDA and Torch pair
 check = "python/pip-installs"
 paths = ["scripts/lib/deps/uv/environment.sh"]
 reason = "This helper installs flashinfer from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
+
+[[ignore]]
+check = "prose/vale"
+paths = ["src/hf/templates/**"]
+reason = "These are string.Template model cards; the ${...} fields and published wording render into Hugging Face model pages."
+
+[[ignore]]
+check = "markdown/fences"
+paths = ["src/hf/templates/**"]
+reason = "The JSON fences hold a ${quantization_summary} field that becomes valid JSON only when the template renders."
+
+[[ignore]]
+check = "docs/required-files"
+rule = "missing-license"
+reason = "The repository owner has not chosen a license yet, and agents should not choose one for them."
+
+[[ignore]]
+check = "structure/shared-prefixes"
+paths = ["tests/suites/**"]
+reason = "pytest discovers test modules by the test_ prefix, so the prefix must stay."
+
+[[ignore]]
+check = "python/vulture"
+paths = ["src/server/listeners.py"]
+reason = "uvicorn calls these Server overrides and reads should_exit by name."
+
+[[ignore]]
+check = "python/vulture"
+paths = ["src/websocket/schemas.py"]
+reason = "Pydantic calls the field validators by decorator, not by name."
+
+[[ignore]]
+check = "python/vulture"
+paths = ["tests/harness/logic/live/client.py"]
+reason = "The _close_task attribute keeps a strong reference so the close task is not garbage collected."
+
+[[ignore]]
+check = "python/vulture"
+paths = ["tests/suites/unit/session/test_request_tracking.py"]
+reason = "The test sets return_value on a Mock, which vulture reads as an unused attribute."
+
+[[ignore]]
+check = "secrets/environment-examples"
+paths = ["tests/suites/unit/dependency_logging/test_dependency_output.py"]
+reason = "The test asserts a variable the code sets for a dependency; nobody configures it."

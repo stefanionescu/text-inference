@@ -184,11 +184,6 @@ class LiveClient:
             write_text(f"{cyan('USER')} ", is_flush_requested=True)
         return StreamResult(text=context.state.completion_text, is_successful=True, is_cancelled=True)
 
-    def _handle_connection_closed(self, message: dict[str, object], state: StreamState) -> StreamResult:
-        reason = message.get("reason") or "server_request"
-        logger.info("Server signaled session_end reason=%s", reason)
-        return StreamResult(text=state.completion_text, is_successful=True)
-
     def _handle_error_frame(self, message: dict[str, object], context: _StreamContext) -> StreamResult:
         """Handle an error message frame."""
         context.printer.finish()

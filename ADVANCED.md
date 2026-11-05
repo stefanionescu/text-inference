@@ -526,7 +526,7 @@ The server then starts the new turn. This is the implicit barge-in path.
 
 Normal generation:
 
-```json
+```text
 { "type": "token", "text": "partial " }
 { "type": "token", "text": "text" }
 { "type": "final", "status": 200, "text": "partial text" }
@@ -1201,12 +1201,13 @@ does not expose FastAPI documentation, ReDoc, or OpenAPI routes.
 mise run setup
 ```
 
-The setup task installs tool versions, synchronizes dependencies, and
-configures the repository hooks:
+The setup task installs tool versions, dependencies, the linters, and the Git
+hooks:
 
 - `mise install`
+- `bun install --frozen-lockfile`
+- `bunx --no-install gspot install`
 - `mise run deps`
-- `git config core.hooksPath .githooks`
 
 ### Dependency commands
 
@@ -1215,103 +1216,31 @@ mise run deps
 mise run deps:verify
 ```
 
-`mise run deps` synchronizes the Python dependency groups with `uv`. It also
-installs Bun dependencies from the frozen lockfile.
+`mise run deps` synchronizes the Python dependencies with `uv`, including the
+`local` extra that the type checker and the tests read. It also installs Bun
+dependencies from the frozen lockfile. Run it again after `gspot install`,
+which synchronizes `.venv` without extras.
 
 `mise run deps:verify` checks:
 
 - `uv.lock` is current.
 - Frozen `uv sync` succeeds.
 - The Bun lockfile installation is stable.
-- The repository dependency policy passes.
 
-### Format
+### Lint and format
 
-```shell
-mise run format
-mise run format:check
-```
-
-Formatters:
-
-- `ruff format` for Python.
-- Prettier for supported text assets.
-
-### Python quality
+gspot runs the linters, formatters, type checker, and security scanners from
+one settings file, `gspot.toml`:
 
 ```shell
-mise run lint:python
+bunx --no-install gspot check --fix
+bunx --no-install gspot check
 ```
 
-This runs:
+The Git hooks run the same checks before each commit and push.
 
-- `ruff format --check .`
-- `ruff check .`
-- `basedpyright`
-- `lint-imports`
-- `pydoclint`
-- `interrogate --fail-under 100`
-- Custom Python quality rules
-- `deptry`
-- `vulture`
-
-### Shell quality
-
-```shell
-mise run lint:shell
-```
-
-This runs:
-
-- Shell syntax checks
-- ShellCheck
-- shfmt
-- Shell project rules
-
-### Docker quality
-
-```shell
-mise run lint:docker
-```
-
-This runs:
-
-- Hadolint
-- Repository architecture checks
-
-### Repository quality
-
-```shell
-mise run lint:quality
-mise run lint:policy -- --scope all
-mise run lint:policy -- --scope staged
-```
-
-Policy scope defaults to `all`; pre-commit uses the explicit `staged` scope.
-
-This runs:
-
-- Markdown lint
-- Prettier check
-- Typos
-- Repository dependency policy
-- `pyproject.toml` validation and formatting checks
-- Architecture and folder policy checks
-- CodeQL path validation
-- Repository-wide inline suppression validation
-- Naming and function policy checks for quality code
-- Ruff checks for `quality/`
-- Duplicate detection for Python and Bash
-
-### Hooks
-
-```shell
-mise run lint:hooks
-mise run lint:mise
-```
-
-`mise run setup` installs the Git hooks. The pre-commit and pre-push hooks call
-the same task surfaces used by the local quality workflow.
+`gspot.toml` also holds the import rules. Each `[[import_rule]]` record names one
+layer of the code and lists exactly the layers it may import.
 
 ### Tests
 
@@ -1326,42 +1255,6 @@ mise run test:integration:sanitizer
 
 `test` runs the unit and in-process integration suites. Task arguments pass
 through after `--`.
-
-### Security
-
-```shell
-mise run security
-```
-
-This runs:
-
-- Gitleaks
-- Bearer
-- pip-audit
-- OSV Scanner
-- Bandit
-- Semgrep
-- CodeQL scan
-- CodeQL path and SARIF result validation
-
-Semgrep runs only the repository-vendored rule snapshots. A normal security
-run does not contact the Semgrep registry; snapshot source, version, digest,
-and license attribution live beside the local rule files.
-
-CodeQL validation rejects missing configured scan paths, malformed SARIF runs,
-and every reported result. Repository policy also validates inline suppression
-directives across the full source tree. Each directive must identify the
-applicable diagnostic. Directives use same-line reasons where their syntax
-allows it; Bearer block disables require an immediately preceding `reason:`
-comment.
-
-### Licenses
-
-```shell
-mise run licenses
-```
-
-The license task checks dependency license policy.
 
 ## Test clients
 

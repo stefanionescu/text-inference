@@ -6,5 +6,5 @@ cd "${REPO_ROOT}"
 
 uv lock --check
 # shellcheck disable=SC2154 # reason: UV_PYTHON is provided by mise from mise.toml.
-uv sync --python "${UV_PYTHON}" --all-groups --frozen
+uv sync --python "${UV_PYTHON}" --extra local --frozen
 CI=1 bun install --frozen-lockfile --dry-run
