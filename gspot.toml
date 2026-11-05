@@ -360,6 +360,1001 @@ check = "structure/trivial-functions"
 paths = ["scripts/lib/runtime/cleanup/artifacts.sh"]
 reason = "runtime_clear_model_transition keeps the destructive path list inside the library that owns cleanup."
 
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-22hg-r758-rrw9"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-24rc-8hj2-v98c"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-254f-3936-288h"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-27h8-gf7j-v5hc"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-27vj-qcqg-25rc"
+reason = "fsspec 2024.9.0 is held by the datasets pins, which cap fsspec, which needs validation on GPU hardware before it moves; fixed in 2026.6.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-2823-qmq8-rwvj"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-2phq-3phc-84px"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-332p-7hrc-92wf"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-379c-qx7v-6h59"
+reason = "datasets 3.1.0 is held by the datasets pin in the vllm extra and its dependents, which needs validation on GPU hardware before it moves; fixed in 5.0.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-3j72-p6qg-6xp7"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4558-3h8r-v8xp"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-45hq-cxwh-f6vc"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-462x-pgg6-55fp"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-48jh-3gj7-fg8v"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4hhp-h66f-j5j7"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4j2p-28q2-5m79"
+reason = "accelerate 1.12.0 is held by the accelerate==1.12 pin in the vllm extra, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4rm8-3hmm-39fg"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4rr5-89j8-mwwm"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-4x4j-2g7c-83w6"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-542m-9234-8gvf"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-58r4-6rv3-gfh8"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-58v5-2m8f-94pr"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-5h93-6whr-6q8j"
+reason = "mcp 1.28.1 is held by the mcp==1.28.1 constraint in tool.uv, which needs validation on GPU hardware before it moves; fixed in 1.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-5p39-cfhj-2xmp"
+reason = "anyio 4.13.0 is held by the anyio==4.13 pin in the local, trt, and vllm extras, which needs validation on GPU hardware before it moves; fixed in 4.14.2. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-5x8w-8jj5-q52h"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-5x94-69rx-g8h2"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-5xm2-6676-qcp9"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-62p4-gmf7-7g93"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-654x-cwwv-5j9c"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-65qm-jvmh-6pqg"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-6757-hggm-hp2w"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-6r8x-57c9-28j4"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-74r2-7ff9-mjj2"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-78g4-xqwv-q3g8"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-7m6h-x95x-82q5"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.27.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-7mj9-2mp8-4m2p"
+reason = "httpcore2 2.5.0 is held by the httpx2==2.5 pin, which requires this exact version, which needs validation on GPU hardware before it moves; fixed in 2.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-7mwm-ghpf-9vrm"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-82r6-8w77-94w6"
+reason = "anyio 4.13.0 is held by the anyio==4.13 pin in the local, trt, and vllm extras, which needs validation on GPU hardware before it moves; fixed in 4.14.2. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-82w8-qh3p-5jfq"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.3.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8397-8qf6-f2gm"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-84m7-p3x7-pcfv"
+reason = "mcp 1.28.1 is held by the mcp==1.28.1 constraint in tool.uv, which needs validation on GPU hardware before it moves; fixed in 1.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-85xf-c7hm-whqw"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-86qp-5c8j-p5mr"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.0.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8737-qx52-hjff"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-87x5-vmc3-756j"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8g5g-8vmr-9782"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8pw2-6jv3-mj5j"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8v84-f9pq-wr9x"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-8xx6-hgc6-gc2m"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.12.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-935w-9g4m-p28p"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-9hw9-ch79-4vh6"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-9v9v-9qvf-h2hj"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-c6hw-5grf-ff96"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-cp9v-662q-vvx9"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-f2fp-rgf2-35cp"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-f2g6-542v-9j58"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-fc9g-5qg7-mf45"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-fj7v-r99m-22gq"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-frvg-qw88-hww9"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-g4qv-2jxx-769h"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-g7cr-3p24-7wf7"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-g842-9rc4-69pw"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-gg2r-wvfm-q9rx"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-gq5q-89c7-vhvx"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-gx7p-2j49-hfq4"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-h35f-9h28-mq5c"
+reason = "setuptools 79.0.1 is held by the setuptools pin in the trt extra and its dependents, which needs validation on GPU hardware before it moves; fixed in 83.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-h3rc-6mm3-gc2m"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-h3rc-j82p-2c3h"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-h4x7-gw46-3wm6"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.11.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-hwrm-c4cx-rf4j"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-j4m9-6w36-pw47"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-jg86-v3jv-hrpm"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-jjj6-mw9f-p565"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-jp82-jpqv-5vv3"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-mrfp-p49p-3hf2"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-p4wg-p73j-c528"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-p8hx-v2p6-rp84"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-p92p-rxj5-7p2x"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-pchr-8j38-3x4p"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-pf96-p4fj-6566"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.11.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-pg7v-jwj7-p798"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-ph3r-5jfg-f84f"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-ph72-cqr5-qpp7"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-phj9-mv4w-65pm"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-pr7f-p5mw-fc87"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-q45j-58j2-45rg"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-q97c-p368-75c4"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-rfgq-q3w2-pmv2"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-rrmf-rvhw-rf47"
+reason = "torch 2.10.0+cu130 is held by the torch pins, which must match the CUDA wheels, which needs validation on GPU hardware before it moves; fixed in 2.13.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-rwrf-2pqf-9j8j"
+reason = "mcp 1.28.1 is held by the mcp==1.28.1 constraint in tool.uv, which needs validation on GPU hardware before it moves; fixed in 1.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-v9pv-5gc8-w2m6"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-vjc4-5qp5-m44j"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-vvpg-rrww-wpmh"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-vx6w-vv9f-6gvg"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-w4fh-qvv9-3v23"
+reason = "mcp 1.28.1 is held by the mcp==1.28.1 constraint in tool.uv, which needs validation on GPU hardware before it moves; fixed in 1.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-w889-685w-c8fh"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-w8v5-vhqr-4h9v"
+reason = "diskcache 5.6.3 is held by the engine dependencies that require it, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-wqp7-x3pw-xc5r"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.1.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-x567-49g5-p4cf"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-x6mc-67gf-chw4"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-x746-7m8f-x49c"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.1.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-x9r9-c232-4q39"
+reason = "transformers 5.5.4 is held by the transformers pins in each engine extra, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xcq7-p3pf-p88h"
+reason = "opentelemetry-api 1.43.0 is held by the opentelemetry-api==1.43 pin in the local, trt, and vllm extras, which needs validation on GPU hardware before it moves; fixed in 1.45.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xgh8-jp6q-p5x8"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xj96-63gp-2gmr"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xmj3-9gf7-h52w"
+reason = "setuptools 79.0.1 is held by the setuptools pin in the trt extra and its dependents, which needs validation on GPU hardware before it moves; fixed in 84.1.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xrqw-3rrv-vx5w"
+reason = "transformers 5.5.4 is held by the transformers pins in each engine extra, which needs validation on GPU hardware before it moves; fixed in 5.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "GHSA-xvh5-g6gv-559v"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-161"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.0.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2253"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2254"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2255"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2256"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2257"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2280"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.1.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2281"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.1.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-2447"
+reason = "diskcache 5.6.3 is held by the engine dependencies that require it, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-248"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-249"
+reason = "starlette 0.50.0 is held by the fastapi and starlette pins in the trt extra, which needs validation on GPU hardware before it moves; fixed in 1.3.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3447"
+reason = "setuptools 79.0.1 is held by the setuptools pin in the trt extra and its dependents, which needs validation on GPU hardware before it moves; fixed in 83.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3451"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3452"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3453"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3454"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3493"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3494"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3495"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3496"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 12.3.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3704"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3716"
+reason = "datasets 3.1.0 is held by the datasets pin in the vllm extra and its dependents, which needs validation on GPU hardware before it moves; fixed in 5.0.1. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3804"
+reason = "accelerate 1.12.0 is held by the accelerate==1.12 pin in the vllm extra, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3844"
+reason = "httpcore2 2.5.0 is held by the httpx2==2.5 pin, which requires this exact version, which needs validation on GPU hardware before it moves; fixed in 2.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3846"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.12.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3847"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3848"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.11.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3849"
+reason = "httpx2 2.5.0 is held by the httpx2==2.5 pin in the local and vllm extras, which needs validation on GPU hardware before it moves; fixed in 2.11.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3929"
+reason = "transformers 5.5.4 is held by the transformers pins in each engine extra, which needs validation on GPU hardware before it moves; fixed in 5.10.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3933"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3934"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3935"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.27.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3936"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3937"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3938"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.26.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3985"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3996"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3997"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3998"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.29.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-3999"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4000"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4003"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.27.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4004"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4005"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4006"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4007"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4008"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4024"
+reason = "anyio 4.13.0 is held by the anyio==4.13 pin in the local, trt, and vllm extras, which needs validation on GPU hardware before it moves; fixed in 4.14.2. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4025"
+reason = "anyio 4.13.0 is held by the anyio==4.13 pin in the local, trt, and vllm extras, which needs validation on GPU hardware before it moves; fixed in 4.14.2. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4174"
+reason = "transformers 5.5.4 is held by the transformers pins in each engine extra, which needs validation on GPU hardware before it moves; no fixed release exists yet. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4178"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4184"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4186"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.27.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4197"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4198"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4199"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4217"
+reason = "fsspec 2024.9.0 is held by the datasets pins, which cap fsspec, which needs validation on GPU hardware before it moves; fixed in 2026.6.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4306"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4307"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4308"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4309"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4310"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4319"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4324"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.28.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4325"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4326"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4327"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4328"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4329"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4330"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4331"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4332"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4333"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4334"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4335"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4336"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4337"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4338"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4339"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4340"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4341"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4342"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4343"
+reason = "pillow 12.2.0 is held by the llmcompressor==0.12 pin, which caps pillow, which needs validation on GPU hardware before it moves; fixed in 13.0.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4344"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4345"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4347"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4348"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4349"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.32.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4353"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.30.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4361"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
+
+[[ignore]]
+check = "dependencies/osv-scanner"
+rule = "PYSEC-2026-4362"
+reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
+
 [[naming.exception]]
 languages = ["bash"]
 allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]
