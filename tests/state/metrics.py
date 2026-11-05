@@ -11,11 +11,11 @@ class SessionContext:
     """Immutable context for building session payloads.
 
     Attributes:
-        session_id: ID of the session.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        prompt: Prompt text.
-        sampling: Sampling overrides of the request.
+        session_id: Client-side session label; `build_start_payload` does not send it.
+        gender: Gender for the start payload; None omits the field.
+        personality: Personality for the start payload; None omits the field.
+        prompt: Prompt text for the start payload; None omits the field.
+        sampling: Sampling overrides for the start payload; None omits the field.
 
     """
 
@@ -31,11 +31,11 @@ class StreamState:
     """Mutable state for stream metric tracking.
 
     Attributes:
-        sent_timestamp: Time of the sent.
-        completion_text: Text of the completion.
-        first_token_timestamp: Time of the first token.
-        first_sentence_timestamp: Time of the first sentence.
-        first_three_words_timestamp: Time of the first three words.
+        sent_timestamp: `time.perf_counter` reading when the request was sent.
+        completion_text: Text accumulated from the stream; a `final` frame can replace it.
+        first_token_timestamp: Reading at the first token, or None before it arrives.
+        first_sentence_timestamp: Reading at the first complete sentence, or None before it arrives.
+        first_three_words_timestamp: Reading at the first three words, or None before they arrive.
         chunks: Number of chunks that arrived.
 
     """
@@ -53,9 +53,9 @@ class TTFBSamples:
     """Accumulated TTFB and latency samples.
 
     Attributes:
-        samples: Latency samples.
-        first_three_words_samples: Samples of first three words.
-        first_sentence_samples: Samples of first sentence.
+        samples: First-byte latencies across exchanges.
+        first_three_words_samples: Latencies to the first three words across exchanges.
+        first_sentence_samples: Latencies to the first complete sentence across exchanges.
 
     """
 

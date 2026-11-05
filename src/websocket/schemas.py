@@ -11,7 +11,7 @@ class VersionedMessage(BaseModel):
     """Base client message that enforces protocol version and strict fields.
 
     Attributes:
-        model_config: Model config.
+        model_config: Pydantic configuration that rejects unknown frame fields.
         v: Protocol version of the frame.
 
     """
@@ -24,8 +24,8 @@ class HistoryItem(BaseModel):
     """One history message item in start payloads.
 
     Attributes:
-        model_config: Model config.
-        role: Chat role of the message.
+        model_config: Pydantic configuration that rejects unknown item fields.
+        role: Chat role, either `user` or `assistant`.
         content: Text content of the message.
 
     """
@@ -40,10 +40,10 @@ class HistoryItem(BaseModel):
         """Normalize history role values before validation.
 
         Args:
-            value: Value to check or convert.
+            value: Raw role value.
 
         Returns:
-            The updated text.
+            The role as stripped lowercase text.
 
         """
         return str(value).strip().lower()
@@ -54,13 +54,13 @@ class HistoryItem(BaseModel):
         """Reject unsupported history roles.
 
         Args:
-            value: Value to check or convert.
+            value: Normalized role.
 
         Returns:
-            The resulting text.
+            The role unchanged.
 
         Raises:
-            ValueError: History role must be 'user' or 'assistant'.
+            ValueError: The role is not `user` or `assistant`.
 
         """
         if value not in {"user", "assistant"}:
@@ -76,14 +76,14 @@ class _SamplingOverrideMessage(VersionedMessage):
     Pydantic can reject and the parser reports the first failing field in order.
 
     Attributes:
-        temperature: Sampling temperature.
-        top_p: Top-P sampling value.
-        top_k: Top-K sampling value.
-        min_p: Minimum-probability sampling value.
-        repetition_penalty: Repetition penalty.
-        presence_penalty: Presence penalty.
-        frequency_penalty: Frequency penalty.
-        sanitize_output: Sanitize output.
+        temperature: Client override for temperature.
+        top_p: Client override for top-P.
+        top_k: Client override for top-K.
+        min_p: Client override for minimum token probability.
+        repetition_penalty: Client override for the repetition penalty.
+        presence_penalty: Client override for the presence penalty.
+        frequency_penalty: Client override for the frequency penalty.
+        sanitize_output: Client choice to sanitize streamed text, which must be a bool.
 
     """
 
@@ -101,12 +101,12 @@ class StartMessage(_SamplingOverrideMessage):
     """Strict schema for start messages.
 
     Attributes:
-        type: Message type.
+        type: Frame tag, always `start`.
         gender: Name of the gender profile.
         personality: Name of the personality profile.
-        history: Conversation history to use.
-        prompt: Prompt text.
-        sampling: Sampling overrides of the request.
+        history: Seed conversation history; an explicit null becomes an empty list.
+        prompt: Start prompt text.
+        sampling: Nested sampling overrides, which win over the top-level fields.
 
     """
 
@@ -123,10 +123,10 @@ class StartMessage(_SamplingOverrideMessage):
         """Treat omitted history and explicit null as empty history.
 
         Args:
-            value: Value to check or convert.
+            value: Raw `history` field.
 
         Returns:
-            The object.
+            An empty list for None, otherwise the value unchanged.
 
         """
         if value is None:
@@ -138,9 +138,9 @@ class TurnMessage(_SamplingOverrideMessage):
     """Strict schema for message turn payloads.
 
     Attributes:
-        type: Message type.
-        user_utterance: User utterance.
-        sampling: Sampling overrides of the request.
+        type: Frame tag, always `message`.
+        user_utterance: Text of the follow-up user turn.
+        sampling: Nested overrides for this turn, which win over the top-level fields.
 
     """
 
@@ -153,7 +153,7 @@ class CancelMessage(VersionedMessage):
     """Strict schema for cancel payloads.
 
     Attributes:
-        type: Message type.
+        type: Frame tag, always `cancel`.
 
     """
 
@@ -164,7 +164,7 @@ class EndMessage(VersionedMessage):
     """Strict schema for end payloads.
 
     Attributes:
-        type: Message type.
+        type: Frame tag, always `end`.
 
     """
 
@@ -175,7 +175,7 @@ class PingMessage(VersionedMessage):
     """Strict schema for ping payloads.
 
     Attributes:
-        type: Message type.
+        type: Frame tag, always `ping`.
 
     """
 
@@ -186,7 +186,7 @@ class PongMessage(VersionedMessage):
     """Strict schema for pong payloads.
 
     Attributes:
-        type: Message type.
+        type: Frame tag, always `pong`.
 
     """
 

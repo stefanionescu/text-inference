@@ -10,7 +10,7 @@ remain stable under bounded-history constraints. Each exchange logs:
 
 Usage:
     mise run test:e2e:conversation
-    mise run test:e2e:conversation -- --server ws://127.0.0.1:8000/ws
+    `mise run test:e2e:conversation -- --server ws://127.0.0.1:8000/ws`
 """
 
 from __future__ import annotations

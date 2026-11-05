@@ -29,11 +29,11 @@ class InteractiveRunner:
     """Own the interactive CLI session lifecycle.
 
     Attributes:
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
-        is_banner_shown: Whether banner is shown.
-        standard_input_task: Task that runs the standard input.
-        close_task: Task that runs the close.
+        client: Live client that sends messages and owns the socket.
+        registry: Prompt registry that the slash commands read.
+        is_banner_shown: Whether the input loop prints the help banner first.
+        standard_input_task: Pending read of standard input, or None between reads.
+        close_task: Task that closes the client after Ctrl+C, or None.
 
     """
 
@@ -64,10 +64,10 @@ class InteractiveRunner:
         """Install a signal handler for graceful Ctrl+C handling.
 
         Args:
-            loop: Event loop or loop state to use.
+            loop: Running event loop that receives the handler.
 
         Returns:
-            Whether the check passes.
+            True when the handler is installed, False when the loop has no signal handler support.
 
         """
         is_installed = False
@@ -163,13 +163,13 @@ class InteractiveRunner:
                 break
 
     async def _read_loop_line(self) -> str | None:
-        """Read one input line, returning None when the loop should stop.
+        """Read one input line, or return None after standard input closes.
 
         Returns:
-            One input line, returning None when the loop should stop.
+            The stripped line, or None after standard input closes.
 
         Raises:
-            TestClientError: The operation fails with this error.
+            TestClientError: Reading the line failed with another client error, which is logged first.
 
         """
         line: str | None = None
@@ -187,13 +187,13 @@ class InteractiveRunner:
         return line
 
     async def _dispatch_line(self, line: str) -> bool:
-        """Dispatch one input line and return whether the loop should exit.
+        """Dispatch one input line and report whether the input loop exits.
 
         Args:
-            line: One line of text.
+            line: Stripped input line; a leading slash marks a command.
 
         Returns:
-            Whether the loop should exit.
+            True after a stopping command, a closed connection, or a fatal server error.
 
         """
         is_exit_requested = False
@@ -215,13 +215,13 @@ class InteractiveRunner:
         return is_exit_requested
 
     def _handle_stream_result(self, result: StreamResult) -> bool:
-        """Handle a sent message result and return whether the loop should exit.
+        """Print a failed send and report whether the input loop exits.
 
         Args:
-            result: Result of one test run.
+            result: Result of the sent message.
 
         Returns:
-            Whether the loop should exit.
+            True only for a fatal server error.
 
         """
         if result.is_successful:
@@ -279,7 +279,7 @@ class InteractiveRunner:
         write_text(f"{prompt_label} ", is_flush_requested=True)
 
     async def _watch_disconnect(self) -> None:
-        """Monitor for server disconnect and trigger shutdown if needed."""
+        """Wait for the socket to close, then log the close and exit the process unless the client is closing it."""
         try:
             await self.client.websocket.wait_closed()
         except asyncio.CancelledError:
@@ -333,9 +333,9 @@ async def run_interactive_loop(
     """Run the interactive command loop.
 
     Args:
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
-        is_banner_shown: Whether banner is shown.
+        client: Live client for this session.
+        registry: Prompt registry for the slash commands.
+        is_banner_shown: Whether to print the help banner before the first prompt.
 
     """
     runner = InteractiveRunner(client, registry, is_banner_shown=is_banner_shown)

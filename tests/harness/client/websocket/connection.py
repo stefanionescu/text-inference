@@ -223,7 +223,7 @@ async def open_websocket[ConnectionT](
         The next item from the stream.
 
     Raises:
-        Exception: The operation fails with this error.
+        Exception: Every connection attempt failed, or the caller's block raised after the connection opened.
 
     """
     attempt = 0

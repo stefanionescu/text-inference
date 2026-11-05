@@ -13,8 +13,8 @@ Metrics reported:
 
 Usage:
   mise run test:e2e:warmup
-  mise run test:e2e:warmup -- "your custom message"
-  mise run test:e2e:warmup -- --gender male --personality savage "hello there"
+  `mise run test:e2e:warmup -- "your custom message"`
+  `mise run test:e2e:warmup -- --gender male --personality savage "hello there"`
 
 Env:
   SERVER_URL=ws://127.0.0.1:8000/ws

@@ -33,13 +33,13 @@ def _string_key_mapping(value: object) -> dict[str, object]:
     """Return a string-keyed model configuration mapping.
 
     Args:
-        value: Value to check or convert.
+        value: Output of a configuration `to_dict` call.
 
     Returns:
-        A string-keyed model configuration mapping.
+        The same dictionary, typed with string keys.
 
     Raises:
-        TypeError: Model configuration must be a string-keyed mapping.
+        TypeError: The value is not a dictionary with string keys.
 
     """
     if not isinstance(value, dict) or not all(isinstance(key, str) for key in value):
@@ -60,13 +60,13 @@ class _LLMCompressorRuntime:
         self,
         source_path: Path,
     ) -> tuple[Mapping[str, object], Mapping[str, object]]:
-        """Read model and decoder configuration from a local snapshot.
+        """Load the snapshot configuration through `AutoConfig`, restricted to local files.
 
         Args:
-            source_path: Path of the source.
+            source_path: Verified snapshot folder passed to `AutoConfig.from_pretrained`.
 
         Returns:
-            Model and decoder configuration from a local snapshot.
+            The `to_dict` output of the configuration and of its decoder text configuration.
 
         """
         # reason: The snapshot path is verified and loading is restricted to local files.
@@ -90,10 +90,10 @@ class _LLMCompressorRuntime:
         """Create a compressed-tensors checkpoint with LLM Compressor.
 
         Args:
-            source: Source checkpoint to read.
-            checkpoint_folder: Folder of the checkpoint.
-            policy: Quantization policy to apply.
-            settings: Application settings.
+            source: Snapshot whose model and processor load from local files.
+            checkpoint_folder: Output folder that `oneshot` writes to.
+            policy: Policy that supplies the AWQ modifier, scheme, targets, and ignored modules.
+            settings: Dataset and calibration sizes passed to `oneshot`.
 
         """
         with load_context(AutoModelForCausalLM):
@@ -133,10 +133,10 @@ class _LLMCompressorRuntime:
         """Collect execution provenance that does not constrain cache reuse.
 
         Args:
-            environment: Environment variables to read.
+            environment: Variables that can supply `GPU_SM_ARCH`.
 
         Returns:
-            Execution provenance that does not constrain cache reuse.
+            GPU name, SM architecture, CUDA version, and Python version.
 
         """
         gpu_name = torch.cuda.get_device_name(_PRIMARY_GPU_INDEX) if torch.cuda.is_available() else "unavailable"
@@ -152,10 +152,10 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     """Quantize one model through the pinned LLM Compressor public API.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments with the model and output folder; None reads `sys.argv`.
 
     Returns:
-        The resulting number.
+        The exit code from `run_quantization`.
 
     """
     return run_quantization(argument_values, environment=os.environ, compressor=_LLMCompressorRuntime())

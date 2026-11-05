@@ -1,11 +1,10 @@
 """Simple sliding-window rate limiter helpers.
 
 This module provides a time-based rate limiter using the sliding window
-algorithm. It's used to prevent abuse by limiting:
+algorithm. It prevents abuse by limiting:
 
 - Messages per connection per time window
 - Cancel requests per time window
-- Profile updates per time window
 
 Sliding Window Algorithm:
     The limiter tracks timestamps of recent events in a deque. When a new
@@ -72,9 +71,9 @@ class SlidingWindowRateLimiter:
         """Initialize a sliding-window limiter.
 
         Args:
-            limit: Largest number to allow.
-            window_seconds: Window in seconds.
-            clock: Function that returns the current time.
+            limit: Events allowed per window; zero or less disables the limiter.
+            window_seconds: Window length in seconds; zero or less disables the limiter.
+            clock: Function that returns the current time; None selects `time.monotonic`.
 
         """
         self.limit = max(0, int(limit))
@@ -86,8 +85,8 @@ class SlidingWindowRateLimiter:
     def consume(self) -> None:
         """Record an event or raise RateLimitError if the window is saturated.
 
-        This method is thread-safe for single-threaded async code but should
-        not be called concurrently from multiple threads.
+        Call this method from one thread only, because it takes no lock around
+        the event deque.
 
         Raises:
             RateLimitError: If the rate limit has been exceeded.
@@ -104,7 +103,7 @@ class SlidingWindowRateLimiter:
         while events and events[0] <= cutoff:
             events.popleft()
 
-        # Check if we're at the limit
+        # Reject the event when the window is at the limit
         if len(events) >= self.limit:
             # Calculate when the oldest event will expire
             retry_after_seconds = (events[0] + self.window_seconds) - current_time

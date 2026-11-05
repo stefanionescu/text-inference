@@ -35,10 +35,10 @@ async def _send_turn_error(
     """Send a turn-planning error and optionally close the socket.
 
     Args:
-        websocket: WebSocket connection of the client.
-        code: Error or close code.
-        message: Message to send, check, or report.
-        is_close_requested: Whether close is requested.
+        websocket: Client socket that sent the follow-up turn.
+        code: Protocol error code such as `WEBSOCKET_ERROR_INVALID_PAYLOAD`.
+        message: Reason text that the client receives.
+        is_close_requested: Whether to close the socket afterward; only invalid sampling asks for this.
 
     """
     await send_error(websocket, code=code, message=message)
@@ -56,13 +56,13 @@ async def plan_message_turn(
     """Build a validated turn plan from a follow-up message payload.
 
     Args:
-        websocket: WebSocket connection of the client.
-        message: Message to send, check, or report.
-        state: State of the session or test run.
-        session_runtime: Session runtime.
+        websocket: Client socket that receives any validation error.
+        message: Decoded `message` frame with the user utterance and optional overrides.
+        state: Session whose metadata and history seed the turn.
+        session_runtime: Runtime that supplies sampling bounds and the history.
 
     Returns:
-        A validated turn plan from a follow-up message payload.
+        The turn request, or None after sending a validation error.
 
     """
     started_at = time.perf_counter()

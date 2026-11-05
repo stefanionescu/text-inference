@@ -23,10 +23,10 @@ class _TRTCompletion(CompletionText, Protocol):
 
     @property
     def token_ids(self) -> Sequence[int] | None:
-        """Cumulative completion token identifiers.
+        """Cumulative completion token IDs, or None when TensorRT omits them.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT completion object supplies the IDs.
 
         """
         raise NotImplementedError
@@ -37,20 +37,20 @@ class _TRTChunk(Protocol):
 
     @property
     def outputs(self) -> Sequence[_TRTCompletion]:
-        """Completion outputs in this chunk.
+        """Completions in this TensorRT chunk; the adapter reads the first one.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT chunk supplies the completions.
 
         """
         raise NotImplementedError
 
     @property
     def finished(self) -> bool:
-        """Whether generation is complete.
+        """Whether TensorRT marks this chunk as the last, so `generate_stream` skips its abort.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT chunk supplies the flag.
 
         """
         raise NotImplementedError
@@ -63,10 +63,10 @@ class _TRTGeneration(Protocol):
         """Iterate over cumulative generation chunks.
 
         Returns:
-            The async iterator.
+            Async iterator over chunks with cumulative text.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT generation supplies the iterator.
 
         """
         raise NotImplementedError
@@ -75,7 +75,7 @@ class _TRTGeneration(Protocol):
         """Abort the active generation.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT generation performs the abort.
 
         """
         raise NotImplementedError
@@ -94,24 +94,24 @@ class _TRTRuntime(Protocol):
         """Start one asynchronous generation.
 
         Args:
-            prompt: Prompt text.
-            sampling_params: Sampling params.
-            streaming: Whether the call streams its output.
+            prompt: Formatted prompt text that TensorRT completes.
+            sampling_params: TensorRT sampling object built by the adapter factory.
+            streaming: Whether TensorRT streams chunks; `generate_stream` always passes True.
 
         Returns:
-            The trtgeneration.
+            Generation handle that the adapter iterates and can abort.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT LLM object starts the generation.
 
         """
         raise NotImplementedError(prompt, sampling_params, streaming)
 
     def shutdown(self) -> None:
-        """Release runtime workers.
+        """Stop the TensorRT workers; `TRTEngine.shutdown` runs this in a worker thread.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the TensorRT LLM object performs the shutdown.
 
         """
         raise NotImplementedError
@@ -121,7 +121,7 @@ class TRTEngine:
     """TensorRT-LLM engine using its public PyTorch backend API.
 
     Attributes:
-        can_reset_cache: Whether it can reset cache.
+        can_reset_cache: Always False, because TensorRT-LLM manages its own cache.
 
     """
 
@@ -136,9 +136,9 @@ class TRTEngine:
         """Initialize the TensorRT-LLM adapter.
 
         Args:
-            llm: TensorRT-LLM runtime object.
-            sampling_parameters_factory: Sampling parameters factory.
-            vocab_size: Vocab size.
+            llm: TensorRT-LLM runtime that serves every call.
+            sampling_parameters_factory: Factory for the TensorRT sampling object.
+            vocab_size: Length of the `embedding_bias` list built from a logit bias.
 
         """
         self._llm = llm
@@ -150,10 +150,10 @@ class TRTEngine:
         """Create TensorRT-LLM 1.3 sampling parameters.
 
         Args:
-            request: Request to run.
+            request: Sampling values; a non-positive `top_k` becomes None and `logit_bias` becomes `embedding_bias`.
 
         Returns:
-            TensorRT-LLM 1.3 sampling parameters.
+            The object built by the TensorRT sampling factory.
 
         """
         embedding_bias = None
@@ -183,15 +183,15 @@ class TRTEngine:
         """Stream results and abort unfinished work when its consumer exits.
 
         Args:
-            prompt: Prompt text.
-            sampling_parameters: Sampling parameters.
-            request_id: ID of the request.
+            prompt: Formatted prompt to complete.
+            sampling_parameters: Object from `create_sampling_parameters`.
+            request_id: Key under which `abort` finds this generation.
 
         Returns:
-            Results and abort unfinished work when its consumer exits.
+            Async generator of EngineOutput items.
 
         Yields:
-            Results and abort unfinished work when its consumer exits.
+            One EngineOutput per TensorRT chunk, with cumulative text and any token IDs.
 
         """
         generation = self._llm.generate_async(prompt, sampling_parameters, streaming=True)
@@ -216,7 +216,7 @@ class TRTEngine:
         """Abort an in-flight request through its public result object.
 
         Args:
-            request_id: ID of the request.
+            request_id: Key of the in-flight generation; an unknown key does nothing.
 
         """
         pending = self._inflight.pop(request_id, None)
@@ -239,10 +239,10 @@ class TRTEngine:
         """Report that TensorRT-LLM manages its own cache lifecycle.
 
         Args:
-            reason: Reason text to report.
+            reason: Label written to the debug log line.
 
         Returns:
-            Whether the check passes.
+            Always False, because this adapter has no reset to run.
 
         """
         logger.debug("TRT-LLM: cache reset requested but unsupported (reason=%s)", reason)

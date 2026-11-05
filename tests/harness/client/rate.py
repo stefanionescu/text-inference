@@ -46,7 +46,7 @@ class SlidingWindowPacer:
             if sleep_seconds > 0:
                 await asyncio.sleep(sleep_seconds)
             else:
-                # Should be expired already; drop and loop.
+                # The oldest event has expired; drop it and loop.
                 self._events.popleft()
 
     def _trim(self, current_time: float) -> None:

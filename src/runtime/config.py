@@ -21,7 +21,7 @@ class AuthenticationSettings:
     `authenticate_websocket` compares each client's key against it.
 
     Attributes:
-        api_key: Key of the API.
+        api_key: Key that clients present, or None when unset.
 
     """
 
@@ -83,8 +83,8 @@ class HistorySettings:
     """Conversation history budget settings.
 
     Attributes:
-        trigger_tokens: Token count of the trigger.
-        target_tokens: Token count of the target.
+        trigger_tokens: History size in tokens that starts a trim.
+        target_tokens: History size in tokens that a trim reduces to.
 
     """
 
@@ -124,13 +124,13 @@ class SamplingSettings:
     """Sampling parameter defaults and bounds.
 
     Attributes:
-        temperature: Sampling temperature.
-        top_p: Top-P sampling value.
-        top_k: Top-K sampling value.
-        min_p: Minimum-probability sampling value.
-        repetition_penalty: Repetition penalty.
-        presence_penalty: Presence penalty.
-        frequency_penalty: Frequency penalty.
+        temperature: Server default temperature when a client sends no override.
+        top_p: Server default top-P cutoff.
+        top_k: Server default top-K cutoff.
+        min_p: Server default minimum token probability.
+        repetition_penalty: Server default penalty on repeated tokens.
+        presence_penalty: Server default penalty on tokens already present.
+        frequency_penalty: Server default penalty that grows with token frequency.
         minimum_temperature: Smallest allowed temperature.
         maximum_temperature: Largest allowed temperature.
         minimum_top_p: Smallest allowed top p.
@@ -145,8 +145,8 @@ class SamplingSettings:
         maximum_presence_penalty: Largest allowed presence penalty.
         minimum_frequency_penalty: Smallest allowed frequency penalty.
         maximum_frequency_penalty: Largest allowed frequency penalty.
-        inference_stop: Inference stop.
-        logit_bias: Logit bias.
+        inference_stop: Stop strings that end every generation.
+        logit_bias: Bias per token text; the generation runner maps each text to token IDs.
 
     """
 
@@ -222,15 +222,15 @@ class ApplicationSettings:
     """Complete application settings.
 
     Attributes:
-        authentication: Authentication settings.
-        model: Model name or local checkpoint path.
-        engine: Inference engine that serves the request.
-        gpu: GPU settings.
-        history: Conversation history to use.
-        session: Session to use.
-        sampling: Sampling overrides of the request.
-        timeouts: Timeout settings.
-        websocket: WebSocket connection of the client.
+        authentication: Server API key settings.
+        model: Model source and quantization settings.
+        engine: Inference engine selection and its options.
+        gpu: GPU memory and key-value cache settings.
+        history: Token budgets for trimming conversation history.
+        session: Size limits and streaming intervals for each session.
+        sampling: Server sampling defaults and the bounds for client overrides.
+        timeouts: Request timeout settings.
+        websocket: Connection limits, protocol version, and rate limits.
 
     """
 

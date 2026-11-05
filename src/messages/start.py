@@ -47,8 +47,8 @@ async def _close_validation_error(
     """Send a validation error and close the WebSocket.
 
     Args:
-        websocket: WebSocket connection of the client.
-        error: Error text or error object to report.
+        websocket: Client socket that receives the error and then closes.
+        error: Validation failure that selects the protocol error code and text.
 
     """
     settings_errors = {
@@ -74,10 +74,10 @@ async def _send_turn_error(
     """Send a start-turn error and optionally close the socket.
 
     Args:
-        websocket: WebSocket connection of the client.
-        code: Error or close code.
-        message: Message to send, check, or report.
-        is_close_requested: Whether close is requested.
+        websocket: Client socket that sent the start frame.
+        code: Protocol error code; `bootstrap_start_turn` passes `TEXT_LENGTH_ERROR_CODE`.
+        message: Error text from the failed history fit.
+        is_close_requested: Whether the socket also closes after the error.
 
     """
     await send_error(websocket, code=code, message=message)
@@ -94,12 +94,12 @@ def _extract_prompt(
     """Extract and sanitize the required start prompt.
 
     Args:
-        message: Message to send, check, or report.
-        count_tokens: Function that counts the tokens of a text.
-        maximum_prompt_tokens: Largest allowed prompt tokens.
+        message: Decoded start frame.
+        count_tokens: Function that counts the tokens of the sanitized prompt.
+        maximum_prompt_tokens: Largest allowed prompt size in tokens.
 
     Returns:
-        And sanitize the required start prompt.
+        The sanitized prompt.
 
     """
     raw_prompt = message.get("prompt")
@@ -129,12 +129,12 @@ def _start_inputs(
     """Resolve profile fields, prompt, and sampling overrides for start.
 
     Args:
-        message: Message to send, check, or report.
-        count_tokens: Function that counts the tokens of a text.
-        session_runtime: Session runtime.
+        message: Decoded start frame.
+        count_tokens: Function that counts prompt tokens.
+        session_runtime: Runtime that supplies the token limit and sampling bounds.
 
     Returns:
-        Profile fields, prompt, and sampling overrides for start.
+        Gender, personality, sanitized prompt, and sampling overrides.
 
     """
     gender = validate_required_gender(message.get("gender"))
@@ -160,12 +160,12 @@ async def _start_inputs_checked(
     """Resolve start inputs or reject the WebSocket payload.
 
     Args:
-        websocket: WebSocket connection of the client.
-        message: Message to send, check, or report.
-        session_runtime: Session runtime.
+        websocket: Client socket that closes when validation fails.
+        message: Decoded start frame.
+        session_runtime: Runtime that supplies the tokenizer and limits.
 
     Returns:
-        Start inputs or reject the WebSocket payload.
+        Gender, personality, sanitized prompt, and sampling overrides, or None after a rejected payload.
 
     """
     try:
@@ -190,12 +190,12 @@ def history_messages(
     """Import schema-validated start history through the history controller.
 
     Args:
-        session_runtime: Session runtime.
-        state: State of the session or test run.
-        message: Message to send, check, or report.
+        session_runtime: Runtime whose history controller stores and returns the messages.
+        state: Session that receives the imported history.
+        message: Decoded start frame with the schema-validated `history` list.
 
     Returns:
-        The resulting items.
+        The session history after any import.
 
     """
     if state.history_messages or not isinstance(message.get("history"), list):
@@ -218,13 +218,13 @@ async def bootstrap_start_turn(
     """Initialize a fresh session from a start payload.
 
     Args:
-        websocket: WebSocket connection of the client.
-        message: Message to send, check, or report.
-        state: State of the session or test run.
-        session_runtime: Session runtime.
+        websocket: Client socket that receives the `done` frame or the error.
+        message: Decoded start frame.
+        state: Session state to initialize.
+        session_runtime: Runtime that initializes the session and fits its history.
 
     Returns:
-        Whether the check passes.
+        True after the session starts; False after a validation error or an oversized history.
 
     """
     started_at = time.perf_counter()

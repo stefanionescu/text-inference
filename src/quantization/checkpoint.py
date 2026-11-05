@@ -28,10 +28,10 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
     """Parse checkpoint-validation arguments.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments to parse; None reads them from `sys.argv`.
 
     Returns:
-        Checkpoint-validation arguments.
+        Namespace with the checkpoint folder, engine, and format.
 
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -45,8 +45,8 @@ def copy_source_assets(source_folder: Path, checkpoint_folder: Path) -> None:
     """Copy tokenizer, processor, template, and custom-code assets.
 
     Args:
-        source_folder: Folder of the source.
-        checkpoint_folder: Folder of the checkpoint.
+        source_folder: Snapshot folder that holds the assets.
+        checkpoint_folder: Export folder that receives them; the copy is skipped when both folders match.
 
     """
     source_root = source_folder.resolve(strict=True)
@@ -67,10 +67,10 @@ def validate_tokenizer_assets(checkpoint_folder: Path) -> None:
     """Require a locally loadable tokenizer.
 
     Args:
-        checkpoint_folder: Folder of the checkpoint.
+        checkpoint_folder: Folder whose tokenizer must load from local files.
 
     Raises:
-        ValueError: The input is not valid.
+        ValueError: The checkpoint tokenizer fails `validate_tokenizer_exists`.
 
     """
     validation = validate_tokenizer_exists(str(checkpoint_folder))
@@ -88,16 +88,16 @@ def validate_checkpoint(checkpoint_folder: Path, engine: str, expected_format: s
     """Validate weights, tokenizer, and exact quantization metadata.
 
     Args:
-        checkpoint_folder: Folder of the checkpoint.
-        engine: Inference engine that serves the request.
-        expected_format: Format of the expected.
+        checkpoint_folder: Export folder to check.
+        engine: Engine whose supported formats apply.
+        expected_format: Format that the checkpoint must declare.
 
     Returns:
-        The path.
+        The resolved checkpoint folder.
 
     Raises:
-        FileNotFoundError: Checkpoint config.json is missing.
-        ValueError: Quantization format `expected_format` is not supported by `engine`.
+        FileNotFoundError: The `config.json` file or the safetensors weights are missing.
+        ValueError: The engine does not support `expected_format`, or the checkpoint declares another format.
 
     """
     validate_engine(engine)
@@ -124,10 +124,10 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     """Validate one checkpoint.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments that name the checkpoint, engine, and format.
 
     Returns:
-        The resulting number.
+        Exit code 0 after the checkpoint passes validation.
 
     """
     arguments = _parse_arguments(argument_values)

@@ -43,7 +43,7 @@ _DUAL_ENGINE_BASE_MODELS: list[str] = [
     "dphn/Dolphin-Mistral-24B-Venice-Edition",
     # Qwen 2 and QwQ
     "anthracite-org/magnum-v2-32b",  # a bit cheesy and yaps too much (good for general RP tho)
-    "djuna/magnum-v2-32b-chatml",  # yaps too much but might fix with prompting (good for general RP tho)
+    "djuna/magnum-v2-32b-chatml",  # yaps too much; prompt tuning is the fix to try (good for general RP tho)
     "anthracite-org/magnum-v4-72b",  # amazing on OpenRouter but too big
     "anthracite-org/magnum-v1-72b",  # amazing on OpenRouter but too big
     "ArliAI/Qwen2.5-32B-ArliAI-RPMax-v1.3",
@@ -124,7 +124,7 @@ ALLOWED_VLLM_QUANTIZED_MODELS: list[str] = [
     "TheBloke/mixtral-8x7b-v0.1-AWQ",
     "casperhansen/mistral-nemo-instruct-2407-awq",
     "cpatonn/Llama-3_3-Nemotron-Super-49B-v1_5-AWQ-4bit",
-    "jeffcookio/Mistral-Small-3.2-24B-Instruct-2506-awq-sym",  # BEST CHAT MODEL FOR NOW
+    "jeffcookio/Mistral-Small-3.2-24B-Instruct-2506-awq-sym",  # BEST CHAT MODEL
     # Compressed-tensors and FP8
     "mistralai/Ministral-3-14B-Instruct-2512",
     "RedHatAI/Mistral-Small-3.1-24B-Instruct-2503-quantized.w4a16",

@@ -151,15 +151,15 @@ class LiveClient:
         """Stream and process the server response.
 
         Args:
-            state: State of the session or test run.
-            is_user_prompt_printed: Whether user prompt is printed.
+            state: Metric tracker for this response.
+            is_user_prompt_printed: Whether to print the user prompt after a terminal frame.
 
         Returns:
-            The stream result.
+            The result of the first terminal frame, or a partial result after a remote close.
 
         Raises:
-            IdleTimeoutError: The operation fails with this error.
-            TestClientError: WebSocket closed before receiving 'done'.
+            IdleTimeoutError: The server closed the socket with the idle close code or reason.
+            TestClientError: The stream ended before a terminal frame.
 
         """
         context = _StreamContext(state)
@@ -190,12 +190,12 @@ class LiveClient:
         """Handle one server stream frame.
 
         Args:
-            message: Message to send, check, or report.
-            context: Session values that the prompt or request reads.
-            is_user_prompt_printed: Whether user prompt is printed.
+            message: One decoded server frame.
+            context: Stream context with the metric tracker and the printer.
+            is_user_prompt_printed: Whether a terminal frame prints the user prompt.
 
         Returns:
-            The stream result.
+            A result for a terminal frame, otherwise None.
 
         """
         message_type = message.get("type")
@@ -244,14 +244,14 @@ class LiveClient:
         """Handle an error message frame.
 
         Args:
-            message: Message to send, check, or report.
-            context: Session values that the prompt or request reads.
+            message: Server `error` frame.
+            context: Stream context whose printer this frame finishes.
 
         Returns:
-            The stream result.
+            A failed result that carries a recoverable error.
 
         Raises:
-            error: The operation fails with this error.
+            error: The decoded server error is not recoverable.
 
         """
         context.printer.finish()

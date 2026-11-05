@@ -56,7 +56,7 @@ def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:
     """Check if a request has been cancelled or superseded.
 
     A request is considered cancelled if:
-    - The session doesn't exist
+    - The session does not exist
     - The session has is_cancel_requested=True
     - The session's active_request_id differs from the given request_id
 

@@ -1,6 +1,6 @@
 """Suffix length detection for streaming stability.
 
-This module computes how much of a streaming text suffix should be
+This module computes how much of a streaming text suffix stays
 buffered to avoid emitting incomplete patterns:
 
 - Trailing unstable characters (partial words, ellipsis)
@@ -87,8 +87,8 @@ def html_tag_suffix_length(raw_text: str) -> int:
 def email_suffix_length(raw_text: str) -> int:
     """Compute length to retain for partial email detection.
 
-    Keeps trailing characters that could form a valid email
-    across chunk boundaries.
+    Keeps trailing characters that match a partial email address,
+    because a later chunk can complete the address.
 
     Args:
         raw_text: Unvalidated text as received.
@@ -114,7 +114,8 @@ def email_suffix_length(raw_text: str) -> int:
 def phone_suffix_length(raw_text: str) -> int:
     """Compute length to retain for partial phone number detection.
 
-    Keeps trailing digits/+/-/spaces that could form a phone number.
+    Keeps trailing digits, plus signs, hyphens, spaces, and parentheses,
+    because a later chunk can complete the phone number.
 
     Args:
         raw_text: Unvalidated text as received.
@@ -134,9 +135,9 @@ def phone_suffix_length(raw_text: str) -> int:
 def emoticon_suffix_length(text: str) -> int:
     """Compute length to retain for partial emoticon detection.
 
-    Keeps trailing characters that could form a complete emoticon
-    across chunk boundaries. This prevents emitting partial emoticons
-    like ':' or ':-' that should be stripped when completed as ':-)'
+    Keeps trailing characters that start an emoticon, because a later chunk
+    can complete it. The sanitizer strips a completed emoticon such as ':-)',
+    so a partial ':' or ':-' stays unsent until then.
 
     Args:
         text: Text to process.
@@ -150,7 +151,7 @@ def emoticon_suffix_length(text: str) -> int:
     # Match potential partial emoticons at end of text:
     # - Eyes only: : = ; 8
     # - Eyes + nose: :- ;- =- :^ ;^ =^
-    # - Eyes + space (could be followed by emoticon): " :"
+    # - Eyes after a space, which a later chunk can finish as an emoticon: " :"
     # - Potential heart: <
     # - Potential XD: X or x at end
     partial_match = re.search(

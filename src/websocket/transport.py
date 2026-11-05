@@ -40,7 +40,7 @@ async def safe_send_text(websocket: WebSocket, text: str) -> bool:
         text: Text to process.
 
     Returns:
-        Whether the check passes.
+        True after the send, False when the client has disconnected.
 
     """
     try:
@@ -62,7 +62,7 @@ async def safe_send_json(websocket: WebSocket, payload: dict[str, object]) -> bo
         payload: Decoded message fields.
 
     Returns:
-        Whether the check passes.
+        The `safe_send_text` result.
 
     """
     started_at = time.perf_counter()
@@ -83,10 +83,10 @@ async def safe_send_flat(
         websocket: WebSocket connection of the client.
         message_type: Type of the message.
         status: Status code to report.
-        **fields: Fields.
+        **fields: Extra message fields; None values are dropped.
 
     Returns:
-        Whether the check passes.
+        The `safe_send_json` result.
 
     """
     payload = build_flat_message(message_type, status=status, **fields)

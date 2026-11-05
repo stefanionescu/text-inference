@@ -120,16 +120,16 @@ async def _stream_exchange(
     """Consume a single exchange, returning assistant text and metrics.
 
     Args:
-        websocket: WebSocket connection of the client.
-        state: State of the session or test run.
-        api_key: Key of the API.
-        exchange_index: Exchange index.
+        websocket: Connection to read the response from.
+        state: Metric tracker for this exchange.
+        api_key: Key whose preview the error hint can show.
+        exchange_index: One-based exchange number.
 
     Returns:
-        The resulting items.
+        Assistant text and metrics; partial values after the server closes the connection.
 
     Raises:
-        ServerError: The operation fails with this error.
+        ServerError: The server sent an `error` frame; the error and any hint print first.
 
     """
     try:

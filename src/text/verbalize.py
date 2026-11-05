@@ -1,10 +1,10 @@
 """Email and phone number verbalization.
 
 This module converts emails and phone numbers to spoken form for
-TTS-friendly output:
+text-to-speech (TTS) output:
 
-- Emails: "me@example.com" → "me at example dot com"
-- Phones: "+1 234 567 8900" → "plus one two three four five six seven eight nine zero zero"
+- Emails: "me@example.com" becomes "me at example dot com"
+- Phones: "+1 234 567 8900" becomes "plus one two three four five six seven eight nine zero zero"
 
 Phone number detection uses libphonenumber to identify international
 format numbers (+XX country code required).
@@ -25,13 +25,13 @@ if TYPE_CHECKING:
 
 
 def verbalize_email(email: str) -> str:
-    """Convert email to spoken form: me@you.com → me at you dot com.
+    """Convert email to spoken form: me@example.com becomes me at example dot com.
 
     Args:
-        email: Email address text.
+        email: Matched email address.
 
     Returns:
-        The updated text.
+        The address with each `@` and `.` written as a word.
 
     """
     result = email.replace("@", " at ")
@@ -42,10 +42,10 @@ def verbalize_emails(text: str) -> str:
     """Find and verbalize all email addresses in text.
 
     Args:
-        text: Text to process.
+        text: Text that can contain email addresses.
 
     Returns:
-        And verbalize all email addresses in text.
+        The text with each address in spoken form.
 
     """
     if not text:
@@ -55,10 +55,10 @@ def verbalize_emails(text: str) -> str:
         """Verbalize one matched email address.
 
         Args:
-            match: Regular expression match to rewrite.
+            match: Match of `EMAIL_PATTERN`.
 
         Returns:
-            The updated text.
+            The matched address in spoken form.
 
         """
         return verbalize_email(match.group(0))
@@ -70,10 +70,10 @@ def verbalize_phone_digit(char: str) -> str:
     """Convert a single phone character to spoken form.
 
     Args:
-        char: One character of text.
+        char: One character of a phone number.
 
     Returns:
-        The updated text.
+        The spoken word for `+` or a digit, otherwise an empty string.
 
     """
     if char == "+":
@@ -84,13 +84,13 @@ def verbalize_phone_digit(char: str) -> str:
 
 
 def verbalize_phone_number(raw_number: str) -> str:
-    """Convert phone number to spoken form: +1 234 → plus one two three four.
+    """Convert phone number to spoken form: +1 234 becomes plus one two three four.
 
     Args:
-        raw_number: Unvalidated number as received.
+        raw_number: Phone number as matched in the text.
 
     Returns:
-        The updated text.
+        The spoken words joined by spaces.
 
     """
     words: list[str] = []
@@ -108,10 +108,10 @@ def verbalize_phone_numbers(text: str) -> str:
     format with explicit + country code (region=None).
 
     Args:
-        text: Text to process.
+        text: Text that can contain international phone numbers.
 
     Returns:
-        And verbalize phone numbers with international format (+XX...).
+        The text with each detected number in spoken form.
 
     """
     if not text:

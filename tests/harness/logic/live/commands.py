@@ -23,12 +23,12 @@ async def _handle_help_command(
     """Display the supported command list.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/help`, which this command ignores.
+        client: Live client that supplies the profile arguments for `print_help`.
+        registry: Prompt registry, which this command ignores.
 
     Returns:
-        Whether the check passes.
+        Always False, so the input loop keeps running.
 
     """
     del argument, registry
@@ -45,12 +45,12 @@ async def _handle_history_command(
     """Print accumulated conversation history.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/history`, which this command ignores.
+        client: Live client whose session history this command prints.
+        registry: Unused prompt registry that the callback signature requires.
 
     Returns:
-        Whether the check passes.
+        Always False, so the session continues after the listing.
 
     """
     del argument, registry
@@ -74,12 +74,12 @@ async def _handle_genders_command(
     """List unique genders available in the prompt registry.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/genders`, which this command ignores.
+        client: Unused client that the callback signature requires.
+        registry: Prompt registry whose genders this command lists.
 
     Returns:
-        Whether the check passes.
+        False, because listing genders leaves the loop running.
 
     """
     del argument, client
@@ -95,12 +95,12 @@ async def _handle_personalities_command(
     """List unique personalities available in the prompt registry.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/personalities`, which this command ignores.
+        client: Unused live client; the callback signature includes it.
+        registry: Prompt registry whose personalities this command lists.
 
     Returns:
-        Whether the check passes.
+        False, because listing personalities leaves the loop running.
 
     """
     del argument, client
@@ -116,12 +116,12 @@ async def _handle_stats_command(
     """Toggle response metrics when invoked without arguments.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/stats`; any text prints the usage line instead of toggling.
+        client: Live client whose metric logging flag this command flips.
+        registry: Prompt registry that `/stats` has no use for.
 
     Returns:
-        Whether the check passes.
+        False in both cases, so the input loop continues.
 
     """
     del registry
@@ -141,12 +141,12 @@ async def _handle_stop_command(
     """Stop and close the live session.
 
     Args:
-        argument: One command-line argument.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        argument: Text after `/stop`, which this command ignores.
+        client: Live client that this command closes.
+        registry: Prompt registry that `/stop` has no use for.
 
     Returns:
-        Whether the check passes.
+        Always True, so the input loop exits.
 
     """
     del argument, registry
@@ -160,9 +160,9 @@ def print_help(gender: str, personality: str, *, is_verbose: bool = False) -> No
     """Print the live profile banner or detailed command list.
 
     Args:
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        is_verbose: Whether it is verbose.
+        gender: Gender shown in the banner.
+        personality: Personality shown in the banner.
+        is_verbose: Whether to print the command list instead of the banner.
 
     """
     if is_verbose:
@@ -202,12 +202,12 @@ async def dispatch_command(
     """Dispatch one exact slash command without aliases.
 
     Args:
-        command_line: Command line.
-        client: Test client that owns the connection.
-        registry: Registry of prompt profiles.
+        command_line: Input line without its leading slash.
+        client: Live client passed to the command callback.
+        registry: Prompt registry passed to the command callback.
 
     Returns:
-        Whether the check passes.
+        The callback result, where True ends the input loop; an unknown command returns False.
 
     """
     command, *remaining_arguments = command_line.split(maxsplit=1)

@@ -31,13 +31,13 @@ class LiveRunRequest:
     """Inputs for an interactive live session.
 
     Attributes:
-        server_url: Server URL.
-        api_key: Key of the API.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        timeout_seconds: Timeout in seconds.
-        sampling: Sampling overrides of the request.
-        message: Message to send, check, or report.
+        server_url: Server address shown in the banner and used for the connection.
+        api_key: Explicit API key for this session; None reads the `API_KEY` environment variable.
+        gender: Gender that selects the starting prompt profile.
+        personality: Personality that selects the starting prompt profile.
+        timeout_seconds: Time limit in seconds for each message exchange.
+        sampling: Overrides sent with each live message.
+        message: Words of the first message; None or empty sends the default greeting.
 
     """
 
@@ -55,12 +55,12 @@ class LiveConnection:
     """Resolved WebSocket inputs for a live session.
 
     Attributes:
-        server_url: Server URL.
-        authentication_headers: Authentication headers.
-        session: Session to use.
-        timeout_seconds: Timeout in seconds.
-        registry: Registry of prompt profiles.
-        initial_message: Initial message.
+        server_url: Normalized WebSocket URL to open.
+        authentication_headers: Headers with the API key for the handshake.
+        session: Live session state for the client.
+        timeout_seconds: Time limit passed to `LiveClient`.
+        registry: Prompt registry for the interactive loop.
+        initial_message: First message sent after the connection opens.
 
     """
 
@@ -83,14 +83,14 @@ def _prepare_session(
     """Resolve the selected prompt profile and initial message.
 
     Args:
-        registry: Registry of prompt profiles.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        message: Message to send, check, or report.
-        sampling: Sampling overrides of the request.
+        registry: Registry that resolves the profile.
+        gender: Gender to look up.
+        personality: Personality to look up.
+        message: Words of the first message, or None for the default greeting.
+        sampling: Overrides stored on the new session.
 
     Returns:
-        The selected prompt profile and initial message.
+        The new session, its profile, and the first message text.
 
     """
     profile = registry.require_profile(gender, personality)
@@ -107,8 +107,8 @@ def _print_banner(server_url: str, profile: PromptProfile) -> None:
     """Print the selected connection and prompt profile.
 
     Args:
-        server_url: Server URL.
-        profile: Prompt profile to use.
+        server_url: Server address to show.
+        profile: Prompt profile to show.
 
     """
     write_line(f"\n{section_header('LIVE SESSION')}")
@@ -121,7 +121,7 @@ async def _run_session(connection: LiveConnection) -> None:
     """Connect and run the interactive input loop.
 
     Args:
-        connection: Open connection to the server.
+        connection: Resolved inputs for the socket and the client.
 
     """
     async with open_websocket(
@@ -145,7 +145,7 @@ def _log_websocket_close(exception: Exception) -> None:
     """Report an expected idle close or another remote close.
 
     Args:
-        exception: Exception to inspect.
+        exception: Close exception with optional `code` and `reason` attributes.
 
     """
     close_code = getattr(exception, "code", None)
@@ -160,10 +160,10 @@ def _raise_for_server_error(exception: ServerError) -> None:
     """Translate terminal server errors into live-client exits.
 
     Args:
-        exception: Exception to inspect.
+        exception: Server error to log.
 
     Raises:
-        SystemExit: The command stops because of an error.
+        SystemExit: Always raised with exit code 1 after the error is logged.
 
     """
     if exception.error_code == "authentication_failed":
@@ -180,10 +180,10 @@ async def run_live_session(request: LiveRunRequest) -> None:
     """Run the interactive live session.
 
     Args:
-        request: Request to run.
+        request: Server, profile, and first message for the session.
 
     Raises:
-        SystemExit: The command stops because of an error.
+        SystemExit: The profile lookup fails, an exchange times out, or the server returns an error.
 
     """
     registry = PromptProfileRegistry()

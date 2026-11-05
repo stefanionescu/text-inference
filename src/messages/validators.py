@@ -20,11 +20,11 @@ class PromptLimit:
     """Prompt validation policy for a single text field.
 
     Attributes:
-        field_label: Field label.
-        invalid_error_code: Code of the invalid error.
-        too_long_error_code: Code of the too long error.
-        maximum_tokens: Largest allowed tokens.
-        count_tokens: Function that counts the tokens of a text.
+        field_label: Field name used in the too-long error message.
+        invalid_error_code: Error code when sanitization rejects the prompt.
+        too_long_error_code: Error code when the prompt exceeds `maximum_tokens`.
+        maximum_tokens: Largest allowed prompt size in tokens.
+        count_tokens: Function that counts the tokens of the sanitized prompt.
 
     """
 
@@ -39,10 +39,10 @@ def normalize_gender(value: str | None) -> str | None:
     """Normalize gender input to standardized values ('female'|'male').
 
     Args:
-        value: Value to check or convert.
+        value: Raw gender text, or None when the client sent none.
 
     Returns:
-        The updated text.
+        The lowercase gender when `VALID_GENDERS` contains it, otherwise None.
 
     """
     if value is None:
@@ -55,10 +55,10 @@ def normalize_personality(value: str | None) -> str | None:
     """Normalize personality: letters-only, length-limited, lowercased.
 
     Args:
-        value: Value to check or convert.
+        value: Raw personality text, or None when the client sent none.
 
     Returns:
-        The updated text.
+        The lowercase personality, or None when the text is empty, too long, or not letters only.
 
     """
     if value is None:
@@ -78,13 +78,13 @@ def validate_required_gender(raw_gender: str | None) -> str:
     """Validate and normalize the required gender field.
 
     Args:
-        raw_gender: Unvalidated gender as received.
+        raw_gender: Gender text as received; None or blank counts as missing.
 
     Returns:
-        The resulting text.
+        The normalized gender.
 
     Raises:
-        ValidationError: Missing_gender.
+        ValidationError: The gender is missing or is not in `VALID_GENDERS`.
 
     """
     if raw_gender is None or not raw_gender.strip():
@@ -107,13 +107,13 @@ def validate_required_personality(raw_personality: str | None) -> str:
     """Validate and normalize the required personality field.
 
     Args:
-        raw_personality: Unvalidated personality as received.
+        raw_personality: Personality text as received; None or blank counts as missing.
 
     Returns:
-        The resulting text.
+        The normalized personality.
 
     Raises:
-        ValidationError: Missing_personality.
+        ValidationError: The personality is missing, too long, or not letters only.
 
     """
     if raw_personality is None or not raw_personality.strip():
@@ -141,15 +141,15 @@ def require_prompt(
     """Return a present prompt or raise a validation error.
 
     Args:
-        raw_prompt: Unvalidated prompt as received.
-        error_code: Code of the error.
-        message: Message to send, check, or report.
+        raw_prompt: Prompt as received.
+        error_code: Code for the raised error.
+        message: Text for the raised error.
 
     Returns:
-        A present prompt or raise a validation error.
+        The prompt unchanged.
 
     Raises:
-        ValidationError: The operation fails with this error.
+        ValidationError: The prompt is None or empty.
 
     """
     if not raw_prompt:
@@ -161,14 +161,14 @@ def sanitize_prompt_limit(raw_prompt: str, limit: PromptLimit) -> str:
     """Sanitize a prompt and enforce its token limit.
 
     Args:
-        raw_prompt: Unvalidated prompt as received.
-        limit: Largest number to allow.
+        raw_prompt: Prompt as received.
+        limit: Policy with the token limit, counter, and error codes.
 
     Returns:
-        The updated text.
+        The sanitized prompt.
 
     Raises:
-        ValidationError: The operation fails with this error.
+        ValidationError: Sanitization rejects the prompt, or the sanitized prompt exceeds the token limit.
 
     """
     try:

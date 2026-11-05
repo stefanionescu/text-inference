@@ -192,8 +192,8 @@ class StreamController:
             Text chunks (possibly buffered based on flush_milliseconds).
 
         Raises:
-            Exception: The operation fails with this error.
-            TimeoutError: The wait ran out of time.
+            Exception: Generation failed; the error is captured and counted before it propagates.
+            TimeoutError: Generation passed its time limit; the timeout is counted before it propagates.
 
         """
         metrics = get_metrics()
@@ -291,10 +291,10 @@ class StreamController:
         """Buffer or emit a generation delta according to flush settings.
 
         Args:
-            delta: Text added since the previous chunk.
+            delta: Text added after the previous chunk.
 
         Returns:
-            The resulting items.
+            The chunks to send now; empty while the text stays buffered.
 
         """
         config = self._config

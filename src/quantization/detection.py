@@ -21,10 +21,10 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
     """Parse internal local-checkpoint detection arguments.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments to parse; None reads them from `sys.argv`.
 
     Returns:
-        Internal local-checkpoint detection arguments.
+        Namespace with the `checkpoint` path.
 
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -42,13 +42,13 @@ def detect_format(
     """Read exact quantization metadata and ensure the engine accepts it.
 
     Args:
-        model: Model name or local checkpoint path.
-        engine: Inference engine that serves the request.
-        revision: Model revision to use.
-        hf_token: Hugging Face token.
+        model: Model repository name or local checkpoint path to inspect.
+        engine: Engine name that `validate_engine` checks first.
+        revision: Model revision to inspect.
+        hf_token: Hugging Face token passed to the metadata lookup.
 
     Returns:
-        Exact quantization metadata and ensure the engine accepts it.
+        The detected quantization format, or None for an unquantized model.
 
     """
     validate_engine(engine)
@@ -60,13 +60,13 @@ def detect_local_format(model_folder: Path) -> str | None:
     """Read quantization metadata from an already acquired local checkpoint.
 
     Args:
-        model_folder: Folder of the model.
+        model_folder: Folder of an acquired checkpoint.
 
     Returns:
-        Quantization metadata from an already acquired local checkpoint.
+        The format from the local configuration files, or None for an unquantized checkpoint.
 
     Raises:
-        FileNotFoundError: Model configuration was not found.
+        FileNotFoundError: The folder has none of the `QUANTIZATION_CONFIG_FILENAMES` files.
 
     """
     payloads = [
@@ -84,10 +84,10 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     """Print the detected format, or an empty line for an unquantized source.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments with the checkpoint path; None reads `sys.argv`.
 
     Returns:
-        The resulting number.
+        Exit code 0 after the detected format prints.
 
     """
     arguments = _parse_arguments(argument_values)

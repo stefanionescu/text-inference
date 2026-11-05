@@ -36,12 +36,12 @@ class SessionDispatch:
     """Inputs needed to dispatch one session message.
 
     Attributes:
-        websocket: WebSocket connection of the client.
-        message_type: Type of the message.
-        message: Message to send, check, or report.
-        state: State of the session or test run.
-        is_started: Whether it is started.
-        runtime_dependencies: Runtime dependencies.
+        websocket: Client socket that sent this frame.
+        message_type: Value of the frame `type` field.
+        message: Decoded frame.
+        state: Session state owned by this connection.
+        is_started: Whether this connection has a started session.
+        runtime_dependencies: Process-wide services for the turn.
 
     """
 
@@ -57,14 +57,14 @@ async def _handle_control_message(
     websocket: WebSocket,
     message_type: str,
 ) -> bool:
-    """Process ping/pong/end messages; return True if connection should close.
+    """Process a ping, pong, or end frame and report whether the receive loop stops.
 
     Args:
-        websocket: WebSocket connection of the client.
-        message_type: Type of the message.
+        websocket: Client socket that receives the reply.
+        message_type: `ping`, `pong`, or `end`.
 
     Returns:
-        Whether the check passes.
+        True after an `end` frame closes the socket, otherwise False.
 
     """
     if message_type == "ping":
@@ -85,11 +85,11 @@ async def _parse_incoming(websocket: WebSocket, raw_message: str) -> dict[str, A
     """Parse raw text into a flat message dict or None on error.
 
     Args:
-        websocket: WebSocket connection of the client.
-        raw_message: Unvalidated message as received.
+        websocket: Client socket that receives any parse error.
+        raw_message: Frame text as received.
 
     Returns:
-        A flat message dict or None on error.
+        The parsed message, or None after sending the parse error.
 
     """
     started_at = time.perf_counter()
@@ -115,13 +115,13 @@ async def _apply_rate_limit(
     """Apply the appropriate rate limiter for one message type.
 
     Args:
-        websocket: WebSocket connection of the client.
-        message_type: Type of the message.
-        message_limiter: Rate limiter for message.
-        cancel_limiter: Rate limiter for cancel.
+        websocket: Client socket that receives any rate-limit error.
+        message_type: Frame type that selects the limiter.
+        message_limiter: Limiter for regular frames on this connection.
+        cancel_limiter: Limiter for `cancel` frames on this connection.
 
     Returns:
-        The updated value.
+        True when the frame is exempt or within its limit.
 
     """
     limiter = select_rate_limiter(message_type, message_limiter, cancel_limiter)
@@ -134,10 +134,10 @@ async def _handle_start_command(dispatch: SessionDispatch) -> bool:
     """Process an initial start command and return session-start state.
 
     Args:
-        dispatch: Session callbacks that handle each frame.
+        dispatch: The `start` frame and its connection state.
 
     Returns:
-        Session-start state.
+        The new started flag: True for a repeated start, otherwise the bootstrap result.
 
     """
     if dispatch.is_started:
@@ -163,10 +163,10 @@ async def _handle_message_command(dispatch: SessionDispatch) -> bool:
     """Process a follow-up message command.
 
     Args:
-        dispatch: Session callbacks that handle each frame.
+        dispatch: The `message` frame and its connection state.
 
     Returns:
-        Whether the check passes.
+        False when no session has started, otherwise True.
 
     """
     if not dispatch.is_started:
@@ -195,10 +195,10 @@ async def _handle_turn_command(dispatch: SessionDispatch) -> bool:
     """Process start or message commands and return the updated started flag.
 
     Args:
-        dispatch: Session callbacks that handle each frame.
+        dispatch: A `start` or `message` frame and its connection state.
 
     Returns:
-        The updated started flag.
+        The new started flag.
 
     """
     if dispatch.message_type == "start":
@@ -209,13 +209,13 @@ async def _handle_turn_command(dispatch: SessionDispatch) -> bool:
 
 
 async def _dispatch_session_message(dispatch: SessionDispatch) -> bool:
-    """Dispatch a session message. Returns the new 'started' flag.
+    """Dispatch a session message and return the new started flag.
 
     Args:
-        dispatch: Session callbacks that handle each frame.
+        dispatch: A frame other than ping, pong, and end, with its connection state.
 
     Returns:
-        Whether the check passes.
+        The new started flag; a cancel or an unsupported type leaves it unchanged.
 
     """
     if dispatch.message_type in {"start", "message"}:
@@ -245,14 +245,14 @@ async def run_receiver(
     """Receive and dispatch messages using the connection-owned session state.
 
     Args:
-        websocket: WebSocket connection of the client.
-        lifecycle: Tracker for the WebSocket connection lifecycle.
-        rate_limiters: Rate limiters.
-        runtime_dependencies: Runtime dependencies.
-        state: State of the session or test run.
+        websocket: Client socket to read frames from.
+        lifecycle: Idle tracker that each parsed frame refreshes.
+        rate_limiters: Message limiter and cancel limiter for this connection.
+        runtime_dependencies: Process-wide services for each turn.
+        state: Session state owned by this connection.
 
     Raises:
-        Exception: The operation fails with this error.
+        Exception: Receiving a frame failed, and neither an idle timeout nor an expected disconnect explains it.
 
     """
     message_limiter, cancel_limiter = rate_limiters

@@ -21,7 +21,7 @@ class ConnectionRegistryProtocol(Protocol):
     """Connection registry behavior required by request runtime.
 
     Attributes:
-        active_connections: Active connections.
+        active_connections: Sockets that currently hold a connection slot.
 
     """
 
@@ -31,13 +31,13 @@ class ConnectionRegistryProtocol(Protocol):
         """Admit a WebSocket connection.
 
         Args:
-            websocket: WebSocket connection of the client.
+            websocket: Client socket that asks for a connection slot.
 
         Returns:
-            Whether the check passes.
+            True when the registry admits the socket, False when it is at capacity.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `ConnectionRegistry` implements admission.
 
         """
         raise NotImplementedError(websocket)
@@ -46,10 +46,10 @@ class ConnectionRegistryProtocol(Protocol):
         """Release a WebSocket connection.
 
         Args:
-            websocket: WebSocket connection of the client.
+            websocket: Client socket whose slot the registry frees.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `ConnectionRegistry` implements the release.
 
         """
         raise NotImplementedError(websocket)
@@ -61,9 +61,9 @@ class RuntimeDependencies:
 
     Attributes:
         connections: Registry of open connections.
-        session_runtime: Session runtime.
+        session_runtime: Helper for per-connection session state.
         engine: Inference engine that serves the request.
-        cache_reset_coordinator: Cache reset coordinator.
+        cache_reset_coordinator: Coordinator of engine cache resets, or None when the engine has no reset.
         tokenizer: Tokenizer to use.
         settings: Application settings.
 
@@ -94,11 +94,11 @@ class RuntimeDependencies:
         """Reset engine caches when the runtime supports it.
 
         Args:
-            reason: Reason text to report.
-            is_rate_limit_bypassed: Whether rate limit is bypassed.
+            reason: Trigger label for the coordinator logs and the reset metrics.
+            is_rate_limit_bypassed: Whether the coordinator skips its interval check.
 
         Returns:
-            Whether the check passes.
+            True after a reset; False when no coordinator exists or the attempt did not reset.
 
         """
         coordinator = self.cache_reset_coordinator

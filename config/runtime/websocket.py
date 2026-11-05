@@ -43,7 +43,7 @@ AUTHENTICATION_FAILURE_LIMIT = 10
 # ============================================================================
 # WebSocket Close Codes
 # ============================================================================
-# These follow RFC 6455 conventions where possible.
+# These codes come from the Request for Comments (RFC) 6455 close code registry; the idle code uses its private range.
 
 WEBSOCKET_CLOSE_UNAUTHORIZED_CODE = 1008  # Policy violation
 WEBSOCKET_CLOSE_BUSY_CODE = 1013  # Try again later

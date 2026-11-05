@@ -73,10 +73,10 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
     """Parse TRT artifact commands.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments for the `cache` or `finalize` subcommand; None reads `sys.argv`.
 
     Returns:
-        TRT artifact commands.
+        Namespace for the selected subcommand.
 
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -188,10 +188,10 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     """Run one TRT cache or finalization command.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments that select the `cache` or `finalize` subcommand.
 
     Returns:
-        The resulting number.
+        Exit code 0 after the subcommand finishes.
 
     """
     arguments = _parse_arguments(argument_values)

@@ -45,13 +45,13 @@ async def _run_phase(
     """Execute a single transaction phase with timeout handling.
 
     Args:
-        websocket: WebSocket connection of the client.
-        config: Settings for this run.
-        phase: Number of the test phase.
-        session_id: ID of the session.
+        websocket: Connection that stays open across phases.
+        config: Benchmark settings; `timeout_seconds` limits this phase.
+        phase: One-based phase number, copied into the result.
+        session_id: Session label passed to `_send_stream`.
 
     Returns:
-        The resulting mapping.
+        The `_send_stream` result, or an error result after a timeout or a transport failure.
 
     """
     try:
@@ -74,13 +74,13 @@ async def _send_stream(
     """Bootstrap the first phase or send a message turn, then stream the response.
 
     Args:
-        websocket: WebSocket connection of the client.
-        config: Settings for this run.
-        phase: Number of the test phase.
-        session_id: ID of the session.
+        websocket: Connection that receives the start frame or the message turn.
+        config: Settings that supply the profile, message text, and sampling.
+        phase: Phase number; phase 1 bootstraps the session and later phases send a message.
+        session_id: Session label for the phase 1 start payload.
 
     Returns:
-        The resulting mapping.
+        The `_consume_stream` result for this phase.
 
     """
     if phase == 1:
@@ -112,12 +112,12 @@ async def _consume_stream(
     """Consume the response stream and collect metrics.
 
     Args:
-        websocket: WebSocket connection of the client.
-        state: State of the session or test run.
-        phase: Number of the test phase.
+        websocket: Connection to read response frames from.
+        state: Empty metric tracker that collects this response.
+        phase: Phase number, copied into the result.
 
     Returns:
-        The resulting mapping.
+        The result of the first terminal frame, or an error result when the connection closes first.
 
     """
     result: dict[str, Any] | None = None
@@ -139,12 +139,12 @@ def _handle_stream_message(message: dict[str, Any], state: StreamState, phase: i
     """Handle one benchmark stream message.
 
     Args:
-        message: Message to send, check, or report.
-        state: State of the session or test run.
-        phase: Number of the test phase.
+        message: One decoded server frame.
+        state: Metric tracker that this frame updates.
+        phase: Phase number, copied into a terminal result.
 
     Returns:
-        The resulting mapping.
+        A result for a `done`, `cancelled`, or `error` frame, otherwise None.
 
     """
     message_type = message.get("type")
@@ -168,11 +168,11 @@ def _build_success_result(metrics: dict[str, Any], phase: int) -> dict[str, Any]
     """Build a success result from tracker metrics.
 
     Args:
-        metrics: Timing metrics of the request.
-        phase: Number of the test phase.
+        metrics: Output of `finalize_metrics` for this phase.
+        phase: Phase number, copied into the result.
 
     Returns:
-        A success result from tracker metrics.
+        Result fields with the success flag and the latency values.
 
     """
     return {
@@ -188,11 +188,11 @@ def _build_error_result(message: dict[str, Any], phase: int) -> dict[str, Any]:
     """Build an error result from a server error message.
 
     Args:
-        message: Message to send, check, or report.
-        phase: Number of the test phase.
+        message: Server `error` frame.
+        phase: Phase number, copied into the failed result.
 
     Returns:
-        An error result from a server error message.
+        Failed result with the decoded error fields.
 
     """
     error = ServerError.decode_message(message)
@@ -209,10 +209,10 @@ async def run_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
     """Execute one or two transactions over a single WebSocket connection.
 
     Args:
-        config: Settings for this run.
+        config: Settings with the server, the API key, and the double-phase switch.
 
     Returns:
-        The resulting items.
+        One result per phase that ran, or one connection error result.
 
     """
     phases = 2 if config.is_double_ttfb_enabled else 1

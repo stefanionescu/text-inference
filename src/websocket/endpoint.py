@@ -69,15 +69,15 @@ async def _prepare_connection(websocket: WebSocket, runtime_dependencies: Runtim
     """Authenticate and admit a WebSocket connection.
 
     Args:
-        websocket: WebSocket connection of the client.
-        runtime_dependencies: Runtime dependencies.
+        websocket: Client socket to authenticate and accept.
+        runtime_dependencies: Services that supply the settings and the connection registry.
 
     Returns:
-        Whether the check passes.
+        True after the socket is accepted; False after an authentication or capacity rejection.
 
     Raises:
-        RuntimeError: The operation cannot finish.
-        WebSocketDisconnect: The operation fails with this error.
+        RuntimeError: Accepting the socket failed; the connection slot is released first.
+        WebSocketDisconnect: The client left during accept; the connection slot is released first.
 
     """
     connections = runtime_dependencies.connections

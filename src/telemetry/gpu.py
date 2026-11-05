@@ -27,10 +27,10 @@ class GPUProvider(Protocol):
         """Return whether GPU telemetry is available.
 
         Returns:
-            Whether GPU telemetry is available.
+            True when the provider can read GPU metrics; otherwise the gauges report nothing.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; a provider answers whether GPUs are visible.
 
         """
         raise NotImplementedError
@@ -39,10 +39,10 @@ class GPUProvider(Protocol):
         """Return the number of visible GPU devices.
 
         Returns:
-            The number of visible GPU devices.
+            Number of devices that the gauges iterate.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; a provider counts the devices.
 
         """
         raise NotImplementedError
@@ -51,13 +51,13 @@ class GPUProvider(Protocol):
         """Return allocated bytes for one device.
 
         Args:
-            device_id: ID of the device.
+            device_id: Index of the GPU to read.
 
         Returns:
-            Allocated bytes for one device.
+            Bytes currently allocated on that GPU.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; a provider reads the allocation.
 
         """
         raise NotImplementedError(device_id)
@@ -66,13 +66,13 @@ class GPUProvider(Protocol):
         """Return total bytes for one device.
 
         Args:
-            device_id: ID of the device.
+            device_id: Index of the GPU whose capacity to read.
 
         Returns:
-            Total bytes for one device.
+            Memory capacity of that GPU in bytes.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; a provider reads the capacity.
 
         """
         raise NotImplementedError(device_id)
@@ -81,13 +81,13 @@ class GPUProvider(Protocol):
         """Return utilization percentage for one device.
 
         Args:
-            device_id: ID of the device.
+            device_id: Index of the GPU whose load to read.
 
         Returns:
-            Utilization percentage for one device.
+            Load of that GPU as a percentage.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; a provider reads the load.
 
         """
         raise NotImplementedError(device_id)
@@ -103,12 +103,12 @@ def _memory_observation(
 
     Args:
         provider: Source of GPU readings.
-        metric_kind: Metric kind.
-        device_id: ID of the device.
+        metric_kind: `memory_allocated`, `memory_free`, or `memory_total`.
+        device_id: GPU index to read.
         attributes: Telemetry attributes to attach.
 
     Returns:
-        A GPU memory observation for one device.
+        The observation, or None for any other metric kind.
 
     """
     memory_bytes: int | None = None
@@ -130,11 +130,11 @@ def _utilization_observation(
 
     Args:
         provider: Source of GPU readings.
-        device_id: ID of the device.
+        device_id: GPU index to read.
         attributes: Telemetry attributes to attach.
 
     Returns:
-        A GPU utilization observation for one device.
+        The observation, or None when the provider read fails.
 
     """
     try:
@@ -150,11 +150,11 @@ def _device_observation(provider: GPUProvider, metric_kind: str, device_id: int)
 
     Args:
         provider: Source of GPU readings.
-        metric_kind: Metric kind.
-        device_id: ID of the device.
+        metric_kind: `utilization` or a memory metric kind.
+        device_id: GPU index to read, recorded as the `gpu.device.id` attribute.
 
     Returns:
-        One GPU observation for a metric kind and device.
+        The observation, or None when no reading exists.
 
     """
     attributes = {"gpu.device.id": str(device_id)}
@@ -168,10 +168,10 @@ def _read_gpu_observations(provider: GPUProvider, metric_kind: str) -> list[Obse
 
     Args:
         provider: Source of GPU readings.
-        metric_kind: Metric kind.
+        metric_kind: Metric kind to read from every device.
 
     Returns:
-        All GPU observations for one metric kind.
+        One observation per device with a reading; empty when GPUs are unavailable.
 
     """
     if not provider.is_available():

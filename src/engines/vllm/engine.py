@@ -33,7 +33,7 @@ class _VLLMCompletion(CompletionText, Protocol):
         """Cumulative completion token identifiers.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the vLLM completion object supplies the IDs.
 
         """
         raise NotImplementedError
@@ -44,20 +44,20 @@ class _VLLMOutput(Protocol):
 
     @property
     def outputs(self) -> Sequence[_VLLMCompletion]:
-        """Completion outputs in this result.
+        """Completions in this vLLM result; the adapter reads the first one.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the vLLM result object supplies the completions.
 
         """
         raise NotImplementedError
 
     @property
     def finished(self) -> bool:
-        """Whether generation is complete.
+        """Whether vLLM marks this result as the last one for the request.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the vLLM result object supplies the flag.
 
         """
         raise NotImplementedError
@@ -76,15 +76,15 @@ class _VLLMRuntime(Protocol):
         """Start one asynchronous generation stream.
 
         Args:
-            prompt: Prompt text.
-            sampling_params: Sampling params.
-            request_id: ID of the request.
+            prompt: Formatted prompt text that vLLM completes.
+            sampling_params: Sampling object built by the adapter factory.
+            request_id: ID that vLLM tracks, which `abort` uses later.
 
         Returns:
-            The async iterator.
+            Async iterator of vLLM results for this request.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `AsyncLLM` supplies the stream.
 
         """
         raise NotImplementedError(prompt, sampling_params, request_id)
@@ -93,19 +93,19 @@ class _VLLMRuntime(Protocol):
         """Abort one generation request.
 
         Args:
-            request_id: ID of the request.
+            request_id: ID given to `generate` for the request to stop.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `AsyncLLM` performs the abort.
 
         """
         raise NotImplementedError(request_id)
 
     def shutdown(self) -> None:
-        """Release runtime workers.
+        """Stop the vLLM workers; `VLLMEngine.shutdown` calls this on the event loop.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `AsyncLLM` performs the shutdown.
 
         """
         raise NotImplementedError
@@ -119,14 +119,14 @@ class _VLLMRuntime(Protocol):
         """Reset the prefix cache.
 
         Args:
-            reset_running_requests: Reset running requests.
-            reset_connector: Reset connector.
+            reset_running_requests: Whether vLLM also resets running requests; `VLLMEngine` passes False.
+            reset_connector: Whether vLLM also resets its connector; `VLLMEngine` passes False.
 
         Returns:
-            Whether the check passes.
+            True when vLLM reset the prefix cache, False when it did not.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `AsyncLLM` performs the reset.
 
         """
         raise NotImplementedError(reset_running_requests, reset_connector)
@@ -136,7 +136,7 @@ class VLLMEngine:
     """vLLM-based inference engine with cache management.
 
     Attributes:
-        can_reset_cache: Whether it can reset cache.
+        can_reset_cache: Always True, because vLLM has a prefix-cache reset.
 
     """
 
@@ -150,8 +150,8 @@ class VLLMEngine:
         """Initialize the vLLM engine adapter.
 
         Args:
-            llm_engine: vLLM runtime engine.
-            sampling_parameters_factory: Sampling parameters factory.
+            llm_engine: vLLM runtime that serves every call.
+            sampling_parameters_factory: Factory that receives the keywords built by `create_sampling_parameters`.
 
         """
         self._engine = llm_engine
@@ -161,10 +161,10 @@ class VLLMEngine:
         """Create vLLM 0.25 sampling parameters.
 
         Args:
-            request: Request to run.
+            request: Sampling values, passed to the factory under vLLM keyword names.
 
         Returns:
-            VLLM 0.25 sampling parameters.
+            The object built by the vLLM sampling factory.
 
         """
         return self._sampling_parameters_factory(
@@ -194,10 +194,10 @@ class VLLMEngine:
             request_id: Unique identifier for tracking/abortion.
 
         Returns:
-            Generation using vLLM's generate API.
+            Async generator of EngineOutput items.
 
         Yields:
-            Generation using vLLM's generate API.
+            One EngineOutput per vLLM result, with the cumulative text and token IDs of its first completion.
 
         """
         engine = self._engine
@@ -218,7 +218,7 @@ class VLLMEngine:
         """Abort a vLLM generation request.
 
         Args:
-            request_id: ID of the request.
+            request_id: ID of the vLLM request to abort.
 
         """
         await self._engine.abort(request_id)
@@ -232,10 +232,10 @@ class VLLMEngine:
         """Attempt a prefix reset without preempting active requests.
 
         Args:
-            reason: Reason text to report.
+            reason: Label written to the reset log line.
 
         Returns:
-            Whether the check passes.
+            The vLLM answer: True after a reset, False when vLLM did not reset.
 
         """
         logger.info("resetting vLLM cache (reason=%s)", reason)

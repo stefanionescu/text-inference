@@ -1,4 +1,4 @@
-"""MetricInstruments registry — typed accessors for all OTel instruments."""
+"""MetricInstruments registry: typed accessors for all OpenTelemetry (OTel) instruments."""
 
 from __future__ import annotations
 

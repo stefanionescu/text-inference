@@ -53,14 +53,14 @@ class HistorySequence:
     """Inputs for one history recall sequence.
 
     Attributes:
-        websocket: WebSocket connection of the client.
-        session_id: ID of the session.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        prompt: Prompt text.
-        sampling: Sampling overrides of the request.
-        timeout_seconds: Timeout in seconds.
-        ttfb_samples: Samples of first-byte time.
+        websocket: Open connection that carries the replay.
+        session_id: Session label for the start payload context.
+        gender: Gender for the start payload and the printed header.
+        personality: Personality for the start payload and the printed header.
+        prompt: Prompt text for the start payload; None omits it.
+        sampling: Overrides sent with the start payload and each follow-up message.
+        timeout_seconds: Time limit for each exchange, in seconds.
+        ttfb_samples: Collector for first-byte times across the exchanges.
 
     """
 
@@ -79,12 +79,12 @@ class HistoryRunRequest:
     """Connection and prompt inputs for one history replay.
 
     Attributes:
-        server_url: Server URL.
-        api_key: Key of the API.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        timeout_seconds: Timeout in seconds.
-        sampling: Sampling overrides of the request.
+        server_url: WebSocket server address for the replay.
+        api_key: Explicit API key for the replay; None reads the `API_KEY` environment variable.
+        gender: Gender that selects the prompt profile.
+        personality: Personality that selects the prompt profile.
+        timeout_seconds: Per-exchange time limit in seconds.
+        sampling: Overrides for every exchange in the replay.
 
     """
 
@@ -105,14 +105,14 @@ async def _collect_response(websocket: WebSocketClientProtocol, state: StreamSta
     """Collect streaming response until done message, tracking metrics.
 
     Args:
-        websocket: WebSocket connection of the client.
-        state: State of the session or test run.
+        websocket: Connection to read the response from.
+        state: Metric tracker for this response.
 
     Returns:
-        Streaming response until done message, tracking metrics.
+        The completion text.
 
     Raises:
-        ServerError.decode_message: The operation fails with this error.
+        ServerError.decode_message: The server sent an `error` frame; this is its decoded error.
 
     """
     try:
@@ -130,10 +130,10 @@ def _print_exchange(
     """Print a formatted exchange.
 
     Args:
-        index: Zero-based position.
-        user_text: Text of the user.
-        reply: Reply text of the assistant.
-        metrics: Timing metrics of the request.
+        index: One-based exchange number.
+        user_text: User message of this exchange.
+        reply: Assistant reply of this exchange.
+        metrics: Output of `finalize_metrics` for this exchange.
 
     """
     write_line(exchange_header(index=index))
@@ -152,13 +152,13 @@ async def _send_message_request(
     """Send a message request and collect the response with metrics tracking.
 
     Args:
-        sequence: History sequence to update.
-        context: Session values that the prompt or request reads.
-        user_text: Text of the user.
-        index: Zero-based position.
+        sequence: Replay inputs with the connection and the time limit.
+        context: Session context that supplies the sampling overrides.
+        user_text: Follow-up message to send.
+        index: One-based exchange number for the printed output.
 
     Returns:
-        The resulting items.
+        The reply text and its metrics.
 
     """
     payload = build_message_payload(user_text, sampling=context.sampling)
@@ -181,8 +181,8 @@ def _print_header(
     """Print the test header.
 
     Args:
-        personality: Name of the personality profile.
-        gender: Name of the gender profile.
+        personality: Personality shown in the profile line.
+        gender: Gender shown in the profile line.
 
     """
     write_line(f"\n{section_header('HISTORY RECALL TEST')}")
@@ -195,7 +195,7 @@ async def _run_history_sequence(sequence: HistorySequence) -> None:
     """Run through all history recall messages.
 
     Args:
-        sequence: History sequence to update.
+        sequence: Replay inputs; the first recall message follows the warm history.
 
     """
     history: list[dict[str, str]] = list(WARM_HISTORY)
@@ -242,7 +242,7 @@ async def run_history_replay(request: HistoryRunRequest) -> None:
     """Run the history recall test.
 
     Args:
-        request: Request to run.
+        request: Server, profile, and limits for the replay.
 
     """
     authenticated_url = build_websocket_url(request.server_url, api_key=request.api_key)

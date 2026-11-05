@@ -21,7 +21,7 @@ async def run_worker(count: int, config: BenchmarkConfig) -> list[dict[str, Any]
     """Execute multiple sequential connections for a single worker.
 
     Args:
-        count: Number of connections this worker should make.
+        count: Number of sequential connections this worker opens.
         config: Benchmark configuration.
 
     Returns:

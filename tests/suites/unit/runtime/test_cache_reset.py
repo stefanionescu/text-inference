@@ -48,13 +48,13 @@ class _ResetEngine:
         """Return or raise the next configured reset outcome.
 
         Args:
-            reason: Reason text to report.
+            reason: Trigger label that this test double records.
 
         Returns:
-            Or raise the next configured reset outcome.
+            The next configured bool outcome.
 
         Raises:
-            outcome: The operation fails with this error.
+            outcome: The next configured outcome is an exception.
 
         """
         self.reasons.append(reason)
@@ -71,7 +71,7 @@ class _PrefixResetRuntime:
     """Record vLLM prefix-reset options.
 
     Attributes:
-        requests: Number of requests to send.
+        requests: Option pairs from each recorded reset.
 
     """
 
@@ -86,11 +86,11 @@ class _PrefixResetRuntime:
         """Record one prefix reset and reject preemptive requests.
 
         Args:
-            reset_running_requests: Reset running requests.
-            reset_connector: Reset connector.
+            reset_running_requests: Preemption flag; True fails the test.
+            reset_connector: Connector flag that the test records.
 
         Returns:
-            Whether the check passes.
+            Always True, because the recorded reset succeeds.
 
         Raises:
             AssertionError: Test received a preemptive reset.

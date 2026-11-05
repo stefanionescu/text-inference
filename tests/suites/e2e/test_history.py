@@ -9,8 +9,8 @@ variables. API_KEY has no default and is required.
 
 Usage:
   mise run test:e2e:history
-  mise run test:e2e:history -- --gender male
-  mise run test:e2e:history -- --temperature 0.8 --top-p 0.9
+  `mise run test:e2e:history -- --gender male`
+  `mise run test:e2e:history -- --temperature 0.8 --top-p 0.9`
 """
 
 from __future__ import annotations

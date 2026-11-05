@@ -51,5 +51,5 @@ def test_phone_number_cases() -> None:
     assert verbalize_phone_numbers("no numbers") == "no numbers"
     result = verbalize_phone_numbers("call +1 234 567 8900 now")
     assert "+" not in result or "plus" in result
-    # The original phone number should be replaced
+    # Verbalization replaces the original phone number.
     assert "234 567 8900" not in result

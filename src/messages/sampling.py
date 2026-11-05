@@ -21,11 +21,11 @@ def _parse_sampling_value(value: object, caster: SamplingCaster) -> NumericSampl
     """Coerce a raw value to the target sampling type.
 
     Args:
-        value: Value to check or convert.
-        caster: Function that converts the raw sampling value.
+        value: Raw override value.
+        caster: `int` selects integer parsing; any other caster selects float parsing.
 
     Returns:
-        The numeric sampling value.
+        The parsed number.
 
     """
     if caster is int:
@@ -37,14 +37,14 @@ def _parse_float(value: object) -> float:
     """Coerce a value to float, rejecting bools and invalid types.
 
     Args:
-        value: Value to check or convert.
+        value: Raw override: a number or a numeric string.
 
     Returns:
-        The resulting number.
+        The value as a float.
 
     Raises:
-        TypeError: Bool not allowed.
-        ValueError: Empty string.
+        TypeError: The value is a bool or has an unsupported type.
+        ValueError: The string is empty or does not parse as a float.
 
     """
     if isinstance(value, bool):
@@ -66,14 +66,14 @@ def _parse_int(value: object) -> int:
     """Coerce a value to int, rejecting bools and non-integer floats.
 
     Args:
-        value: Value to check or convert.
+        value: Raw override: an integer, a whole float, or a numeric string.
 
     Returns:
-        The resulting number.
+        The value as an int.
 
     Raises:
-        TypeError: Bool not allowed.
-        ValueError: Non-integer float.
+        TypeError: A bool or an unsupported type arrived instead of a number.
+        ValueError: The float has a fraction, or the string is empty or does not parse as an integer.
 
     """
     if isinstance(value, bool):
@@ -100,13 +100,13 @@ def _get_sampling_block(message: Mapping[str, object]) -> Mapping[str, object]:
     """Return nested sampling overrides from a message.
 
     Args:
-        message: Message to send, check, or report.
+        message: Decoded client frame.
 
     Returns:
-        Nested sampling overrides from a message.
+        The nested `sampling` mapping, or an empty mapping when the field is absent.
 
     Raises:
-        ValidationError: Invalid_sampling_payload.
+        ValidationError: The `sampling` field is present but is not an object.
 
     """
     sampling_block = message.get("sampling")
@@ -126,12 +126,12 @@ def _read_field_value(
     """Read a sampling field from nested or top-level payload.
 
     Args:
-        field: Name of the field.
-        message: Message to send, check, or report.
-        sampling_block: Sampling block.
+        field: Override name to look up.
+        message: Decoded client frame, read when the nested block has no value.
+        sampling_block: Nested overrides, read first.
 
     Returns:
-        A sampling field from nested or top-level payload.
+        The nested value, then the top-level value, or None when neither is set.
 
     """
     raw_value = sampling_block.get(field)
@@ -147,14 +147,14 @@ def _validate_numeric_field(
     """Validate and coerce one numeric sampling field.
 
     Args:
-        raw_value: Unvalidated value as received.
-        field: Name of the field.
+        raw_value: Override value as received.
+        field: Spec with the caster, bounds, and error codes.
 
     Returns:
-        The numeric sampling value.
+        The parsed number within the field bounds.
 
     Raises:
-        ValidationError: The operation fails with this error.
+        ValidationError: The value does not parse, or it falls outside the field bounds.
 
     """
     try:
@@ -179,12 +179,12 @@ def _extract_numeric_overrides(
     """Extract numeric sampling overrides from a message.
 
     Args:
-        message: Message to send, check, or report.
-        sampling_block: Sampling block.
-        sampling_settings: Settings for sampling.
+        message: Decoded client frame.
+        sampling_block: Nested overrides from the frame.
+        sampling_settings: Settings that supply each field's bounds.
 
     Returns:
-        Numeric sampling overrides from a message.
+        A validated value for each numeric field the client set.
 
     """
     overrides: dict[str, NumericSamplingValue] = {}
@@ -217,14 +217,14 @@ def _extract_sanitize_override(
     """Extract the optional sanitize_output override.
 
     Args:
-        message: Message to send, check, or report.
-        sampling_block: Sampling block.
+        message: Frame that can carry a top-level `sanitize_output`.
+        sampling_block: Nested overrides, read first.
 
     Returns:
-        The optional sanitize_output override.
+        The client's bool, or None when the client did not set it.
 
     Raises:
-        ValidationError: Invalid_sanitize_output.
+        ValidationError: The client sent a value that is not a bool.
 
     """
     sanitize_raw = _read_field_value("sanitize_output", message, sampling_block)

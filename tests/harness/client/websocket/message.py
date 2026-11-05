@@ -108,7 +108,7 @@ async def iter_messages(
         Parsed JSON messages from a websocket connection.
 
     Raises:
-        MessageParseError: The operation fails with this error.
+        MessageParseError: A frame is malformed and `is_invalid_ignored` is False.
 
     """
     while True:
@@ -128,12 +128,12 @@ async def bootstrap_session(
     """Send a bootstrap-only start payload and wait for the terminal done frame.
 
     Args:
-        websocket: WebSocket connection of the client.
-        start_payload: Start payload.
+        websocket: Connection that carries the bootstrap.
+        start_payload: Start message to send.
 
     Raises:
-        RuntimeError: Unexpected websocket frame during bootstrap: `message`.
-        StreamError: The operation fails with this error.
+        RuntimeError: The server sent an unexpected frame, or closed before the `done` frame.
+        StreamError: The server sent an `error` frame during bootstrap.
 
     """
     await _send_json_frame(websocket, start_payload)

@@ -19,7 +19,7 @@ class SessionRuntime:
     """Stateless helper for session metadata, request tracking, and lifecycle.
 
     Methods operate on a SessionState passed by the caller (per-connection).
-    No internal session dict or eviction logic — the connection IS the session.
+    It holds no session dict or eviction logic, because each connection owns its session.
     """
 
     def __init__(

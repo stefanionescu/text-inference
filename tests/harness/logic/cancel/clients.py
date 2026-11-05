@@ -2,8 +2,8 @@
 
 This module provides async functions that orchestrate the full lifecycle
 of each client type:
-- Canceling client: cancel phase -> drain phase -> recovery phase
-- Normal client: stream full response -> wait for coordination
+- Canceling client: cancel phase, then drain phase, then recovery phase
+- Normal client: stream the full response, then wait for coordination
 """
 
 from __future__ import annotations

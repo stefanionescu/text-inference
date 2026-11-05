@@ -18,7 +18,7 @@ def test_consume_under_limit() -> None:
     limiter = SlidingWindowRateLimiter(limit=3, window_seconds=10.0, clock=lambda: 0.0)
     limiter.consume()
     limiter.consume()
-    # Two consumes under limit of 3 — no error
+    # Two consumes stay under the limit of 3, so neither raises.
 
 
 def test_consume_at_limit() -> None:
@@ -54,7 +54,7 @@ def test_consume_after_window() -> None:
     limiter.consume()
     # Advance past window
     clock_values[0] = 6.0
-    limiter.consume()  # Should succeed
+    limiter.consume()  # Succeeds because the first event left the window
 
 
 def test_disabled_limiter_modes() -> None:

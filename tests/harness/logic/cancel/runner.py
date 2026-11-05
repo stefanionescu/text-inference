@@ -5,8 +5,8 @@ It orchestrates multiple concurrent clients where one cancels mid-request
 and the others complete normally.
 
 Test flow:
-- 1 client: start -> wait -> cancel -> drain (verify silence) -> recovery
-- N-1 clients: start -> stream full response -> wait for cancel recovery
+- 1 client: start, wait, cancel, drain to verify silence, then recover
+- N-1 clients: start, stream the full response, then wait for cancel recovery
 - All clients disconnect after coordination
 """
 

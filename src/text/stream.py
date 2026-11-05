@@ -35,7 +35,7 @@ class StreamingSanitizer:
         # Flags for one-shot behaviors
         self._is_prefix_pending = True
         self._is_capital_pending = True
-        # Whether we've dropped the true stream start from the raw tail window
+        # Whether the raw tail window has dropped the true stream start
         self._has_trimmed_stream_start = False
 
     def _sanitize_raw_tail(self) -> str:

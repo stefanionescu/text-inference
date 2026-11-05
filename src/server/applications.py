@@ -77,7 +77,7 @@ def _build_public_lifespan(
             application: FastAPI application to serve or test.
 
         Raises:
-            Exception: The operation fails with this error.
+            Exception: Building the runtime dependencies failed; the error is captured first.
 
         """
         start_time = time.monotonic()

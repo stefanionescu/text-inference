@@ -62,13 +62,13 @@ class ConversationRunRequest:
     """Inputs for the conversation e2e helper.
 
     Attributes:
-        server_url: Server URL.
-        api_key: Key of the API.
-        prompts: Prompt texts.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        timeout_seconds: Timeout in seconds.
-        sampling: Sampling overrides of the request.
+        server_url: WebSocket server address for this conversation.
+        api_key: Explicit API key; None falls back to the `API_KEY` environment variable.
+        prompts: User messages, one for each conversation turn.
+        gender: Profile gender; an empty value selects `DEFAULT_GENDER`.
+        personality: Profile personality; an empty value selects `DEFAULT_PERSONALITY`.
+        timeout_seconds: Time limit for each turn, in seconds.
+        sampling: Sampling overrides that every turn sends.
 
     """
 
@@ -155,10 +155,10 @@ async def run_conversation(request: ConversationRunRequest) -> None:
     """Execute a multi-turn conversation test.
 
     Args:
-        request: Request to run.
+        request: Server, profile, and prompts for the conversation.
 
     Raises:
-        ValueError: Conversation prompt list is empty; nothing to send.
+        ValueError: `request.prompts` is empty, so there is nothing to send.
 
     """
     if not request.prompts:

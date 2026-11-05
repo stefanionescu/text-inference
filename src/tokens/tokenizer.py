@@ -232,8 +232,7 @@ class ThreadSafeTokenizer:
         """Apply the tokenizer's built-in chat template to format messages.
 
         Args:
-            messages: List of message dicts with 'role' and 'content' keys.
-                      Roles are typically 'system', 'user', 'assistant'.
+            messages: Message dicts with 'role' and 'content' keys, such as the role 'user' or 'assistant'.
             is_generation_prompt_added: Whether to append the assistant turn start token.
             **template_options: Additional options passed to the provider template.
 

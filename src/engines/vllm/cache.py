@@ -19,13 +19,13 @@ class CacheResetEngine(Protocol):
         """Attempt a non-preemptive prefix-cache reset.
 
         Args:
-            reason: Reason text to report.
+            reason: Trigger label that `CacheResetCoordinator.try_reset` passes through unchanged.
 
         Returns:
-            Whether the check passes.
+            True after a reset; False makes the coordinator schedule a retry.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; the coordinator calls the real engine method.
 
         """
         raise NotImplementedError(reason)
@@ -43,14 +43,14 @@ class CacheResetCallback(Protocol):
         """Attempt one coordinated cache reset.
 
         Args:
-            reason: Reason text to report.
-            is_rate_limit_bypassed: Whether rate limit is bypassed.
+            reason: `timer` for a periodic reset, or `declined_retry` after a declined or failed attempt.
+            is_rate_limit_bypassed: Whether the reset skips the local interval check; the daemon always passes True.
 
         Returns:
-            Whether the check passes.
+            True after a reset. The daemon ignores this value.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `RuntimeDependencies` supplies the callback.
 
         """
         raise NotImplementedError(reason, is_rate_limit_bypassed)
@@ -63,7 +63,7 @@ class CacheResetCoordinator:
         """Initialize cache reset coordination state.
 
         Args:
-            reset_interval_seconds: Reset interval in seconds.
+            reset_interval_seconds: Minimum time between resets; zero or less disables the daemon and the rate limit.
 
         """
         self._reset_interval_seconds = max(0.0, float(reset_interval_seconds))
@@ -89,12 +89,12 @@ class CacheResetCoordinator:
         """Attempt a non-preemptive reset after applying the local rate limit.
 
         Args:
-            engine: Inference engine that serves the request.
-            reason: Reason text to report.
-            is_rate_limit_bypassed: Whether rate limit is bypassed.
+            engine: Engine whose `reset_caches` this method calls under the coordinator lock.
+            reason: Trigger label written to the logs and passed to the engine.
+            is_rate_limit_bypassed: Whether to skip the interval check, as the daemon and the last client disconnect do.
 
         Returns:
-            Whether the check passes.
+            True after a reset; False when the attempt is rate limited, declined, or failed.
 
         """
         async with self._lock:
@@ -130,7 +130,7 @@ class CacheResetCoordinator:
         """Schedule one bounded retry after a declined or failed reset.
 
         Args:
-            outcome: Outcome label of the operation.
+            outcome: `declined` or `failure`, stored as the latest outcome.
 
         """
         self._last_outcome = outcome
@@ -141,7 +141,7 @@ class CacheResetCoordinator:
         """Start the periodic daemon once when resets are enabled.
 
         Args:
-            reset_callback: Reset callback.
+            reset_callback: Callable that the daemon awaits for each periodic or retry attempt.
 
         """
         if self._daemon_task and not self._daemon_task.done():
@@ -166,7 +166,7 @@ class CacheResetCoordinator:
         """Run periodic resets and fixed-delay retries without a tight loop.
 
         Args:
-            reset_callback: Reset callback.
+            reset_callback: Callable awaited each time the wait times out, with the rate limit bypassed.
 
         """
         logger.info("cache reset daemon started interval=%ss", self._reset_interval_seconds)
@@ -183,7 +183,7 @@ class CacheResetCoordinator:
         """Cancel and await the cache daemon before engine shutdown.
 
         Raises:
-            outcome: The operation fails with this error.
+            outcome: The daemon task ended with an exception other than cancellation.
 
         """
         task = self._daemon_task

@@ -28,14 +28,14 @@ if TYPE_CHECKING:
 
 
 def _milliseconds_since_sent(state: StreamState, timestamp: float | None) -> float | None:
-    """Calculate milliseconds elapsed since the request was sent.
+    """Calculate milliseconds elapsed between the send and an event.
 
     Args:
-        state: State of the session or test run.
-        timestamp: Time as seconds since the epoch.
+        state: Stream state that holds the send timestamp.
+        timestamp: `time.perf_counter` reading of the event, or None when it has not happened.
 
     Returns:
-        Milliseconds elapsed since the request was sent.
+        Elapsed milliseconds, or None when `timestamp` is None.
 
     """
     if timestamp is None:
@@ -52,11 +52,11 @@ def record_token(state: StreamState, chunk: str) -> dict[str, float | None]:
     """Record a streaming token and return any newly triggered metrics.
 
     Args:
-        state: State of the session or test run.
-        chunk: One piece of streamed text.
+        state: Metric tracker that this token updates.
+        chunk: One piece of streamed text; empty text changes nothing.
 
     Returns:
-        Any newly triggered metrics.
+        Milliseconds for each first-time event that this token triggered.
 
     """
     metrics: dict[str, float | None] = {}
@@ -85,11 +85,11 @@ def finalize_metrics(state: StreamState, *, is_cancelled: bool = False) -> dict[
     """Build the final metrics dict after streaming completes.
 
     Args:
-        state: State of the session or test run.
-        is_cancelled: Whether it is cancelled.
+        state: Metric tracker for the finished response.
+        is_cancelled: Whether the stream ended with a cancel, which makes `ok` False.
 
     Returns:
-        The final metrics dict after streaming completes.
+        Latency fields, chunk count, and character count for the response.
 
     """
     done_timestamp = time.perf_counter()
@@ -123,15 +123,15 @@ async def consume_stream(websocket: WebSocketClientProtocol, state: StreamState)
     """Consume streaming response until done message, tracking metrics.
 
     Args:
-        websocket: WebSocket connection of the client.
-        state: State of the session or test run.
+        websocket: Connection to read response frames from.
+        state: Metric tracker for this response.
 
     Returns:
-        The resulting text.
+        The completion text after a `done` or `cancelled` frame.
 
     Raises:
-        RuntimeError: WebSocket closed before receiving 'done'.
-        StreamError: The operation fails with this error.
+        RuntimeError: The connection closed before a `done` or `cancelled` frame.
+        StreamError: The server sent an `error` frame.
 
     """
     async for message in iter_messages(websocket):

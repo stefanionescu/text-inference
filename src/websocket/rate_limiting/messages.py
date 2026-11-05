@@ -30,12 +30,12 @@ def select_rate_limiter(
     """Pick which limiter applies to the message type (if any).
 
     Args:
-        message_type: Type of the message.
-        message_limiter: Rate limiter for message.
-        cancel_limiter: Rate limiter for cancel.
+        message_type: Frame type that selects the limiter.
+        message_limiter: Limiter for regular frames.
+        cancel_limiter: Limiter for `cancel` frames.
 
     Returns:
-        Which limiter applies to the message type (if any).
+        The cancel limiter for `cancel`, None for exempt control frames, otherwise the message limiter.
 
     """
     if message_type == "cancel":
@@ -52,11 +52,11 @@ async def consume_limiter(
     """Attempt to consume a limiter token, sending an error on failure.
 
     Args:
-        websocket: WebSocket connection of the client.
-        limiter: Sliding-window rate limiter to apply.
+        websocket: Client socket that receives the rate-limit error.
+        limiter: Limiter that records this frame.
 
     Returns:
-        Whether the check passes.
+        True when the limiter accepts the frame, False after sending the error.
 
     """
     try:

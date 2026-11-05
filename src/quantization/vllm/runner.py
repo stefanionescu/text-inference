@@ -52,7 +52,7 @@ class CompressorRuntime(Protocol):
         """Return the LLM Compressor package version.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `_LLMCompressorRuntime` supplies the version.
 
         """
         raise NotImplementedError
@@ -64,13 +64,13 @@ class CompressorRuntime(Protocol):
         """Read model and decoder configuration from a local snapshot.
 
         Args:
-            source_path: Path of the source.
+            source_path: Folder of the acquired source snapshot.
 
         Returns:
-            Model and decoder configuration from a local snapshot.
+            The model configuration and the decoder configuration, as string-keyed mappings.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `_LLMCompressorRuntime` reads the configuration.
 
         """
         raise NotImplementedError(source_path)
@@ -86,13 +86,13 @@ class CompressorRuntime(Protocol):
         """Create a compressed-tensors checkpoint.
 
         Args:
-            source: Source checkpoint to read.
-            checkpoint_folder: Folder of the checkpoint.
-            policy: Quantization policy to apply.
-            settings: Application settings.
+            source: Acquired source snapshot to quantize.
+            checkpoint_folder: Empty folder that receives the export.
+            policy: Policy chosen for this model.
+            settings: Calibration settings read from the environment.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `_LLMCompressorRuntime` runs the quantization.
 
         """
         raise NotImplementedError(source, checkpoint_folder, policy, settings)
@@ -101,13 +101,13 @@ class CompressorRuntime(Protocol):
         """Return execution metadata that does not constrain cache reuse.
 
         Args:
-            environment: Environment variables to read.
+            environment: Variables that the integration can read.
 
         Returns:
-            Execution metadata that does not constrain cache reuse.
+            Values for the provenance file that cache matching ignores.
 
         Raises:
-            NotImplementedError: The backend does not implement this call.
+            NotImplementedError: This stub always raises; `_LLMCompressorRuntime` collects the metadata.
 
         """
         raise NotImplementedError(environment)
@@ -117,12 +117,12 @@ def _read_positive_integer(environment: Mapping[str, str], key: str, default: in
     """Read one positive environment integer.
 
     Args:
-        environment: Environment variables to read.
-        key: Lookup key.
-        default: Value to use when the setting is absent.
+        environment: Variables to read.
+        key: Variable name.
+        default: Value used when the variable is unset.
 
     Returns:
-        One positive environment integer.
+        The parsed integer.
 
     Raises:
         ValueError: `key` must be a positive integer.
@@ -139,11 +139,11 @@ def _read_binary_flag(environment: Mapping[str, str], key: str) -> bool:
     """Read one binary environment flag.
 
     Args:
-        environment: Environment variables to read.
-        key: Lookup key.
+        environment: Variables to read.
+        key: Variable name; an unset variable reads as off.
 
     Returns:
-        One binary environment flag.
+        True for `1`, False for `0`.
 
     Raises:
         ValueError: `key` must be 0 or 1.
@@ -162,12 +162,12 @@ class QuantizationSettings:
 
     Attributes:
         dataset: Name of the calibration dataset.
-        samples: Latency samples.
-        sequence_length: Sequence length.
-        batch_size: Batch size.
+        samples: Number of calibration samples.
+        sequence_length: Calibration sequence length.
+        batch_size: Calibration batch size.
         pipeline: Name of the calibration pipeline.
-        source_revision: Revision of the source.
-        is_rebuild_forced: Whether rebuild is forced.
+        source_revision: Source model revision to acquire.
+        is_rebuild_forced: Whether the run rebuilds even when a cached checkpoint matches.
 
     """
 
@@ -184,13 +184,13 @@ class QuantizationSettings:
         """Build settings from the host environment.
 
         Args:
-            environment: Environment variables to read.
+            environment: Variables that configure calibration and the source revision.
 
         Returns:
-            Settings from the host environment.
+            Validated settings.
 
         Raises:
-            ValueError: Calibration dataset and model revision must not be empty.
+            ValueError: The dataset or revision is empty, or the pipeline is not in `CALIBRATION_PIPELINES`.
 
         """
         dataset = environment.get("VLLM_CALIBRATION_DATASET", DEFAULT_CALIBRATION_DATASET).strip()
@@ -225,10 +225,10 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
     """Parse the quantizer command contract.
 
     Args:
-        argument_values: Command-line arguments to parse.
+        argument_values: Arguments with the model and output folder; None reads `sys.argv`.
 
     Returns:
-        The quantizer command contract.
+        Namespace with the model and the checkpoint folder.
 
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -246,10 +246,10 @@ def _build_request(
     """Build the complete cache-identity request.
 
     Args:
-        source: Source checkpoint to read.
-        policy: Quantization policy to apply.
-        settings: Application settings.
-        compressor_version: Version of the compressor.
+        source: Snapshot whose identity enters the request.
+        policy: Policy whose metadata enters the request.
+        settings: Settings whose calibration values enter the request.
+        compressor_version: Quantizer version recorded in the request.
 
     Returns:
         The complete cache-identity request.
@@ -279,8 +279,8 @@ def _is_cache_usable(checkpoint_folder: Path, request: QuantizationRequest) -> b
     """Return whether a matching cache remains a valid checkpoint.
 
     Args:
-        checkpoint_folder: Folder of the checkpoint.
-        request: Request to run.
+        checkpoint_folder: Folder that can hold a cached checkpoint.
+        request: Cache identity that the stored provenance must match.
 
     Returns:
         Whether a matching cache remains a valid checkpoint.
@@ -304,15 +304,15 @@ def run_quantization(
     """Quantize one model through a supplied compressor integration.
 
     Args:
-        argument_values: Command-line arguments to parse.
-        environment: Environment variables to read.
-        compressor: LLM Compressor entry points to call.
+        argument_values: Arguments with the model and output folder.
+        environment: Variables that configure this run.
+        compressor: Integration that performs the quantization.
 
     Returns:
-        The resulting number.
+        Exit code 0 after a reused cache or a finished export.
 
     Raises:
-        ValueError: LLM Compressor requires an unquantized source checkpoint.
+        ValueError: The source checkpoint is already quantized.
 
     """
     arguments = _parse_arguments(argument_values)

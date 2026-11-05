@@ -72,14 +72,14 @@ async def stream_timed(
     """Stream generation with timeout and cancellation support.
 
     Args:
-        request: Request to run.
+        request: Engine, prompt, limits, and cancellation check for this stream.
 
     Yields:
-        Generation with timeout and cancellation support.
+        Engine outputs until the stream ends, is cancelled, or times out.
 
     Raises:
-        StreamCancelledError: The operation fails with this error.
-        TimeoutError: The wait ran out of time.
+        StreamCancelledError: The cancellation check returned True; the engine request is aborted first.
+        TimeoutError: Generation passed `timeout_seconds`; the engine request is aborted first.
 
     """
     stream = request.engine.generate_stream(

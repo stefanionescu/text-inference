@@ -46,10 +46,10 @@ async def handle_turn_message(request: TurnMessageRequest) -> bool:
     """Plan and dispatch one session turn message.
 
     Args:
-        request: Request to run.
+        request: Turn frame with its socket, session, and runtime services.
 
     Returns:
-        Whether the check passes.
+        For `start`, whether the session started. For `message`, whether the turn was scheduled.
 
     """
     if request.message_type == "start":

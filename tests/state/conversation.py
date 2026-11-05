@@ -10,11 +10,11 @@ class ConversationSession:
     """Track state for a multi-turn conversation session.
 
     Attributes:
-        session_id: ID of the session.
-        gender: Name of the gender profile.
-        personality: Name of the personality profile.
-        prompt: Prompt text.
-        sampling: Sampling overrides of the request.
+        session_id: Client-side label printed in the test header.
+        gender: Gender of the selected prompt profile.
+        personality: Personality of the selected prompt profile.
+        prompt: Prompt text selected for that profile.
+        sampling: Overrides sent with the start frame and each turn.
 
     """
 

@@ -15,8 +15,8 @@ Sampling Parameters:
         0 = disabled, 30-50 is common for interactive applications.
 
     min_p: Minimum probability threshold
-        Filters out tokens below this probability. Good for avoiding
-        very unlikely tokens without being as restrictive as top_k.
+        Filters out tokens below this probability, which removes unlikely
+        tokens with less restriction than top_k.
 
     repetition_penalty: Penalty for repeating tokens (1.0 = no penalty)
         Values > 1.0 reduce repetition, 1.05-1.15 is typical.

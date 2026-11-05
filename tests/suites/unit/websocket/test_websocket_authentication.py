@@ -54,13 +54,13 @@ def _run_authentication(
     """Authenticate one connection against the API key "secret", by default with no earlier failures.
 
     Args:
-        headers: HTTP headers of the request.
-        websocket_settings: Settings for websocket.
-        authentication_failures: Authentication failures.
+        headers: Request headers that carry the key under test.
+        websocket_settings: Limits for the policy; None selects `_websocket_settings()`.
+        authentication_failures: Earlier failures per client; None starts empty.
         clock: Function that returns the current time.
 
     Returns:
-        Whether the check passes.
+        The `authenticate_websocket` result.
 
     """
     websocket = _FakeWebSocket(headers=headers)

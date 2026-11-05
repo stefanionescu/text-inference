@@ -28,13 +28,13 @@ class _DisconnectSecondSendWS:
     _send_count: int = 0
 
     async def send_text(self, _text: str) -> None:
-        """Test send text.
+        """Accept the first send and disconnect on every later send.
 
         Args:
             _text: Unused text that the caller's signature requires.
 
         Raises:
-            WebSocketDisconnect: The operation fails with this error.
+            WebSocketDisconnect: The send count reached `SECOND_SEND`.
 
         """
         self._send_count += 1

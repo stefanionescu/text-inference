@@ -7,8 +7,8 @@ Each connection gets a WebSocketLifecycle instance that:
 2. Runs a background watchdog task that checks for idleness
 3. Closes the connection automatically when idle timeout is reached
 
-This prevents resource exhaustion from abandoned connections (e.g., client
-crashed, network dropped) that would otherwise stay open indefinitely.
+This prevents resource exhaustion from abandoned connections, such as a crashed
+client or a dropped network, which stay open indefinitely without the watchdog.
 
 The watchdog runs periodically (WEBSOCKET_WATCHDOG_TICK_SECONDS) and compares
 the last activity time against the idle timeout (WEBSOCKET_IDLE_TIMEOUT_SECONDS).

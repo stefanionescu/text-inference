@@ -17,10 +17,10 @@ def _validate_numeric_bounds(settings: ApplicationSettings) -> list[str]:
     """Check numeric config values are within valid ranges.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings whose sampling values, timeouts, and token limits this check reads.
 
     Returns:
-        The resulting items.
+        One message per value outside its range; empty when all pass.
 
     """
     errors: list[str] = []
@@ -82,10 +82,10 @@ def _validate_required_settings(settings: ApplicationSettings) -> list[str]:
     """Validate settings that must be present for startup.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings whose API key, connection limit, and history budget this check reads.
 
     Returns:
-        The resulting items.
+        One message per missing or inconsistent value; empty when all pass.
 
     """
     errors: list[str] = []
@@ -107,10 +107,10 @@ def _validate_model_settings(settings: ApplicationSettings) -> list[str]:
     """Validate model selection settings.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings whose model source this check reads.
 
     Returns:
-        The resulting items.
+        The missing-model message, or an empty list.
 
     """
     errors: list[str] = []
@@ -123,10 +123,10 @@ def _validate_engine_settings(settings: ApplicationSettings) -> list[str]:
     """Validate engine and quantization settings.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings whose engine, cache precision, and quantization this check reads.
 
     Returns:
-        The resulting items.
+        One message per unsupported engine, precision, batch size, or quantization value.
 
     """
     errors: list[str] = []
@@ -157,10 +157,10 @@ def _validate_tokenizer_settings(settings: ApplicationSettings) -> list[str]:
     """Validate tokenizer availability for the configured model.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings whose model source names the tokenizer.
 
     Returns:
-        The resulting items.
+        One failure message, or an empty list when the source is unset or its tokenizer passes.
 
     """
     if not settings.model.source:
@@ -175,10 +175,10 @@ def validate_settings(settings: ApplicationSettings) -> None:
     """Validate resolved runtime settings once during startup.
 
     Args:
-        settings: Application settings.
+        settings: Resolved settings to check once during startup.
 
     Raises:
-        ValueError: The input is not valid.
+        ValueError: At least one check failed; the message joins every failure.
 
     """
     errors: list[str] = []

@@ -58,10 +58,10 @@ def _compile_flags(flag_names: tuple[str, ...]) -> re.RegexFlag:
     """Return combined regex flags from static flag names.
 
     Args:
-        flag_names: Flag names.
+        flag_names: Names from `_REGEX_FLAGS`.
 
     Returns:
-        Combined regex flags from static flag names.
+        The combined flags.
 
     """
     flags = re.NOFLAG
@@ -74,11 +74,11 @@ def _compile(pattern_text: str, flag_names: tuple[str, ...] = ()) -> re.Pattern[
     """Compile a configured regex pattern.
 
     Args:
-        pattern_text: Text of the pattern.
-        flag_names: Flag names.
+        pattern_text: Regular expression source from `config.text.filters`.
+        flag_names: Names of flags to combine.
 
     Returns:
-        The re.
+        The compiled pattern.
 
     """
     return re.compile(pattern_text, _compile_flags(flag_names))
@@ -121,10 +121,10 @@ def _strip_escaped_quotes(text: str) -> str:
     r"""Remove escaped quote sequences like \" or \\\" entirely.
 
     Args:
-        text: Text to process.
+        text: Text that can contain backslash-escaped quotes.
 
     Returns:
-        The updated text.
+        The text without those sequences.
 
     """
     if not text:

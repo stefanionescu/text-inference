@@ -84,7 +84,7 @@ class ConnectionRegistry:
             True if connection was accepted, False if at capacity
 
         Raises:
-            Exception: The operation fails with this error.
+            Exception: Adding the socket failed after the slot was acquired; the slot is released first.
 
         """
         metrics = get_metrics()
