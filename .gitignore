@@ -23,6 +23,7 @@ reports/
 
 # Logs and output files
 logs/
+!src/logs/
 *.log
 *.zip
 tests/results/
