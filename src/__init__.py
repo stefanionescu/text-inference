@@ -17,7 +17,7 @@ Architecture Overview:
     - session/: Session management
     - messages/: Message type handlers (start, message, cancel)
     - tokens/: Tokenization utilities
-    - files/, logging/: Runtime support modules
+    - files/, logs/: Runtime support modules
 
 Example:
     Start the selected dual-listener server process:
@@ -37,6 +37,6 @@ Environment Variables:
 
 """
 
-from src.logging.output import configure_dependency_output
+from src.logs.output import configure_dependency_output
 
 configure_dependency_output()

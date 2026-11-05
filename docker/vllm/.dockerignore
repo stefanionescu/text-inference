@@ -22,3 +22,19 @@
 !scripts/**
 !src/
 !src/**
+!config/
+!config/**
+
+# Keep local tool output and environment files out of the allowed folders.
+**/.git/**
+**/.venv/**
+**/venv/**
+**/__pycache__/**
+**/.pytest_cache/**
+**/.ruff_cache/**
+**/.mypy_cache/**
+**/coverage/**
+**/.env
+**/.env.*
+**/.dev.vars
+**/.dev.vars.*

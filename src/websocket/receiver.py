@@ -8,15 +8,15 @@ import logging
 import contextlib
 from dataclasses import dataclass
 
+from src.messages.turn import TurnMessageRequest, handle_turn_message
 from src.session.requests import has_running_task, abort_session_requests
 from config.runtime.websocket import WEBSOCKET_STATUS_OK, WEBSOCKET_CLIENT_CLOSE_CODE, WEBSOCKET_ERROR_INVALID_MESSAGE
+from src.telemetry.instruments import get_metrics
 
 from .errors import send_error
 from .parser import parse_client_message
 from .transport import safe_send_flat
 from .disconnects import is_expected_websocket_disconnect
-from ..messages.turn import TurnMessageRequest, handle_turn_message
-from ..telemetry.instruments import get_metrics
 from .rate_limiting.messages import consume_limiter, select_rate_limiter
 
 if TYPE_CHECKING:

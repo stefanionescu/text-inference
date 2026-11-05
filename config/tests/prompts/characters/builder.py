@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
-from ..blocks.shared import (
+from config.tests.prompts.blocks.shared import (
     AVOID_BLOCK,
     LANGUAGE_BLOCK,
     KNOWLEDGE_BLOCK,

@@ -32,10 +32,9 @@ import asyncio
 import logging
 import contextlib
 
+from src.telemetry.sentry import add_breadcrumb
 from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_CODE, WEBSOCKET_CLOSE_IDLE_REASON
-
-from ..telemetry.sentry import add_breadcrumb
-from ..telemetry.instruments import get_metrics
+from src.telemetry.instruments import get_metrics
 
 if TYPE_CHECKING:
     from fastapi import WebSocket

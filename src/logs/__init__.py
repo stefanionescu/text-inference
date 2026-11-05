@@ -1,7 +1,7 @@
 """Logging helpers."""
 
-from src.logging.output import is_raw_output_enabled, configure_dependency_output
-from src.logging.context import (
+from src.logs.output import is_raw_output_enabled, configure_dependency_output
+from src.logs.context import (
     LogContext,
     set_log_context,
     configure_logging,

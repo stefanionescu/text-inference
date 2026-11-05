@@ -102,6 +102,7 @@ optional-dependencies.vllm = [
 [dependency-groups]
 dev = [
   "pytest==9.0.3",
+  "pytest-cov==7.1.0",
 ]
 modelopt = [
   "compressed-tensors==0.17.1; sys_platform=='linux'",

@@ -180,7 +180,7 @@ ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
 
 WORKDIR /app
 
-USER appuser
+USER 10001
 
 # Health check for production readiness
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \

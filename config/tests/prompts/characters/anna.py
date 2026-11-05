@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..blocks import dislikes
-from .builder import personality_blocks, build_character_prompt
-from ..blocks.shared import ANNA_IDENTITY_BLOCK
-from ..personalities import (
+from config.tests.prompts.blocks import dislikes
+from config.tests.prompts.blocks.shared import ANNA_IDENTITY_BLOCK
+from config.tests.prompts.personalities import (
     ex,
     kpop,
     warm,
@@ -23,6 +22,8 @@ from ..personalities import (
     spiritual,
     shopaholic,
 )
+
+from .builder import personality_blocks, build_character_prompt
 
 if TYPE_CHECKING:
     from types import ModuleType

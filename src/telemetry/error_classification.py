@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..errors import RateLimitError, ValidationError, StreamCancelledError
+from src.errors import RateLimitError, ValidationError, StreamCancelledError
 
 ERROR_TYPE_LABELS: tuple[tuple[type[BaseException], str], ...] = (
     (ValidationError, "validation"),

@@ -8,6 +8,7 @@ from dataclasses import field, dataclass
 
 import sentry_sdk
 
+from src.logs import current_log_context
 from src.runtime.environment import read_environment_text, read_environment_float
 from config.runtime.telemetry import (
     SENTRY_DSN,
@@ -19,8 +20,6 @@ from config.runtime.telemetry import (
     SENTRY_TAG_SESSION_ID,
     SENTRY_RATE_LIMIT_SECONDS,
 )
-
-from ..logging import current_log_context
 
 logger = getLogger(__name__)
 

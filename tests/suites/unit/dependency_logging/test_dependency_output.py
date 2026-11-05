@@ -9,7 +9,7 @@ import importlib
 
 import pytest
 
-from src.logging import output
+from src.logs import output
 
 if TYPE_CHECKING:
     from pathlib import Path

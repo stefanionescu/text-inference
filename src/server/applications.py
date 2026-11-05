@@ -10,7 +10,7 @@ import contextlib
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse
 
-from src.logging import configure_logging
+from src.logs import configure_logging
 from src.server.readiness import ReadinessState
 from src.telemetry.sentry import capture_error
 from src.runtime.bootstrap import build_runtime_dependencies

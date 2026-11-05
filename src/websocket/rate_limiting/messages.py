@@ -12,11 +12,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.websocket.transport import safe_send_flat
 from config.runtime.websocket import WEBSOCKET_ERROR_RATE_LIMITED, WEBSOCKET_STATUS_RATE_LIMITED
+from src.telemetry.instruments import get_metrics
 
 from .window import RateLimitError, SlidingWindowRateLimiter
-from ..transport import safe_send_flat
-from ...telemetry.instruments import get_metrics
 
 if TYPE_CHECKING:
     from fastapi import WebSocket

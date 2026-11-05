@@ -146,7 +146,7 @@ RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser \
 ENV LOGS_ENABLED=0 \
     DEPENDENCY_LOG_FILE=-
 
-USER appuser
+USER 10001
 
 # Expose port
 EXPOSE 8000
