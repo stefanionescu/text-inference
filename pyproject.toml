@@ -102,7 +102,7 @@ optional-dependencies.vllm = [
 [dependency-groups]
 dev = [
   "pytest==9.0.3",
-  "pytest-cov==7.1.0",
+  "pytest-cov==7.1",
 ]
 modelopt = [
   "compressed-tensors==0.17.1; sys_platform=='linux'",
@@ -196,18 +196,12 @@ requires-dist = [
   "tensorrt-cu13-libs==10.15.1.29",
 ]
 
-[tool.pytest]
-ini_options.testpaths = [
-  "tests",
-]
-ini_options.addopts = "-q"
-
-[tool.deptry.per_rule_ignores]
-DEP001 = [
+[tool.deptry]
+per_rule_ignores.DEP001 = [
   "cuda",
   "mpi4py",
 ]
-DEP002 = [
+per_rule_ignores.DEP002 = [
   "accelerate",
   "compressed-tensors",
   "cuda-python",
@@ -241,3 +235,9 @@ DEP002 = [
   "uvloop",
   "wheel",
 ]
+
+[tool.pytest]
+ini_options.testpaths = [
+  "tests",
+]
+ini_options.addopts = "-q"
