@@ -8,3 +8,213 @@ indent_width = 2
 print_width = 80
 quotes = "double"
 override = [{ paths = ["**/*.py"], indent_width = 4, print_width = 120 }]
+
+[[import_rule]]
+name = "config-limits"
+paths = ["config/limits.py"]
+can_import = []
+
+[[import_rule]]
+name = "config-security"
+paths = ["config/security.py"]
+can_import = []
+
+[[import_rule]]
+name = "config-text"
+paths = ["config/text/**"]
+can_import = []
+
+[[import_rule]]
+name = "config-model"
+paths = ["config/model/**"]
+can_import = []
+
+[[import_rule]]
+name = "config-runtime"
+paths = ["config/runtime/**"]
+can_import = []
+
+[[import_rule]]
+name = "config-prompt"
+paths = ["config/prompt/**"]
+can_import = []
+
+[[import_rule]]
+name = "config-tests"
+paths = ["config/tests/**"]
+can_import = []
+
+[[import_rule]]
+name = "config-package"
+paths = ["config/__init__.py"]
+can_import = []
+
+[[import_rule]]
+name = "errors"
+paths = ["src/errors.py"]
+can_import = []
+
+[[import_rule]]
+name = "tokens"
+paths = ["src/tokens/**"]
+can_import = []
+
+[[import_rule]]
+name = "text"
+paths = ["src/text/**"]
+can_import = ["config-text"]
+
+[[import_rule]]
+name = "logs"
+paths = ["src/logs/**"]
+can_import = ["config-runtime"]
+
+[[import_rule]]
+name = "runtime-records"
+paths = ["src/runtime/__init__.py", "src/runtime/config.py", "src/runtime/environment.py", "src/runtime/limits.py", "src/runtime/settings.py", "src/runtime/validation.py"]
+can_import = ["config-limits", "config-security", "config-model", "config-runtime", "config-prompt", "tokens"]
+
+[[import_rule]]
+name = "telemetry"
+paths = ["src/telemetry/**"]
+can_import = ["config-runtime", "errors", "logs", "runtime-records"]
+
+[[import_rule]]
+name = "quantization-trt"
+paths = ["src/quantization/trt.py"]
+can_import = ["config-model", "quantization-core"]
+
+[[import_rule]]
+name = "quantization-vllm"
+paths = ["src/quantization/vllm/**"]
+can_import = ["config-model", "quantization-core"]
+
+[[import_rule]]
+name = "quantization-core"
+paths = ["src/quantization/**"]
+can_import = ["config-model", "tokens"]
+
+[[import_rule]]
+name = "hf-trt"
+paths = ["src/hf/trt.py"]
+can_import = ["config-model", "quantization-core", "hf-core"]
+
+[[import_rule]]
+name = "hf-vllm"
+paths = ["src/hf/vllm.py"]
+can_import = ["config-model", "quantization-core", "hf-core"]
+
+[[import_rule]]
+name = "hf-core"
+paths = ["src/hf/**"]
+can_import = ["config-model"]
+
+[[import_rule]]
+name = "scripts"
+paths = ["src/scripts/**"]
+can_import = ["config-model", "config-prompt"]
+
+[[import_rule]]
+name = "engine-trt"
+paths = ["src/engines/trt/**"]
+can_import = ["tokens", "runtime-records", "engine-protocol"]
+
+[[import_rule]]
+name = "engine-vllm"
+paths = ["src/engines/vllm/**"]
+can_import = ["config-runtime", "tokens", "runtime-records", "quantization-vllm", "engine-protocol"]
+
+[[import_rule]]
+name = "engine-protocol"
+paths = ["src/engines/**"]
+can_import = []
+
+[[import_rule]]
+name = "session-runtime"
+paths = ["src/session/runtime.py"]
+can_import = ["tokens", "runtime-records", "session-state", "execution-pipeline"]
+
+[[import_rule]]
+name = "session-state"
+paths = ["src/session/**"]
+can_import = ["config-runtime", "tokens", "runtime-records", "engine-protocol"]
+
+[[import_rule]]
+name = "execution-turn"
+paths = ["src/execution/turn.py"]
+can_import = ["config-runtime", "telemetry", "session-runtime", "session-state", "execution-pipeline", "runtime-composition", "websocket-transport"]
+
+[[import_rule]]
+name = "execution-pipeline"
+paths = ["src/execution/**"]
+can_import = ["config-runtime", "config-prompt", "errors", "tokens", "text", "runtime-records", "telemetry", "engine-protocol", "session-state"]
+
+[[import_rule]]
+name = "runtime-composition"
+paths = ["src/runtime/**"]
+can_import = ["tokens", "runtime-records", "telemetry", "engine-vllm", "engine-protocol", "session-runtime"]
+
+[[import_rule]]
+name = "websocket-endpoint"
+paths = ["src/websocket/endpoint.py", "src/websocket/receiver.py"]
+can_import = ["config-runtime", "logs", "telemetry", "session-state", "runtime-composition", "websocket-transport", "messages"]
+
+[[import_rule]]
+name = "websocket-transport"
+paths = ["src/websocket/**"]
+can_import = ["config-runtime", "errors", "runtime-records", "telemetry", "session-state"]
+
+[[import_rule]]
+name = "messages"
+paths = ["src/messages/**"]
+can_import = ["config-limits", "config-runtime", "config-prompt", "errors", "text", "runtime-records", "telemetry", "session-runtime", "session-state", "execution-turn", "runtime-composition", "websocket-transport"]
+
+[[import_rule]]
+name = "server-trt"
+paths = ["src/server/trt.py"]
+can_import = ["config-model", "runtime-records", "telemetry", "engine-trt", "server-core"]
+
+[[import_rule]]
+name = "server-vllm"
+paths = ["src/server/vllm.py"]
+can_import = ["config-model", "runtime-records", "telemetry", "engine-vllm", "server-core"]
+
+[[import_rule]]
+name = "server-core"
+paths = ["src/server/**"]
+can_import = ["config-runtime", "logs", "runtime-records", "telemetry", "runtime-composition", "websocket-endpoint", "websocket-transport"]
+
+[[import_rule]]
+name = "package-root"
+paths = ["src/__init__.py"]
+can_import = ["logs"]
+
+[[import_rule]]
+name = "docker"
+paths = ["docker/**"]
+can_import = []
+
+[[import_rule]]
+name = "tests-errors"
+paths = ["tests/harness/client/errors/**"]
+can_import = ["config-tests"]
+
+[[import_rule]]
+name = "tests-state"
+paths = ["tests/state/**"]
+can_import = ["tests-errors"]
+
+[[import_rule]]
+name = "tests-harness"
+paths = ["tests/harness/**"]
+can_import = ["config-runtime", "config-prompt", "config-tests", "tokens", "runtime-records", "session-state", "tests-errors", "tests-state"]
+
+[[import_rule]]
+name = "tests-suites"
+paths = ["tests/suites/**"]
+can_import = ["config-model", "config-runtime", "config-tests", "errors", "tokens", "text", "logs", "runtime-records", "telemetry", "quantization-trt", "quantization-vllm", "quantization-core", "hf-trt", "hf-vllm", "hf-core", "scripts", "engine-trt", "engine-vllm", "engine-protocol", "session-runtime", "session-state", "execution-turn", "execution-pipeline", "runtime-composition", "websocket-endpoint", "websocket-transport", "messages", "server-core", "tests-errors", "tests-state", "tests-harness"]
+
+[[import_rule]]
+name = "tests-package"
+paths = ["tests/**"]
+can_import = []

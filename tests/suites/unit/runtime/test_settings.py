@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.runtime import read_settings
+from src.runtime.settings import read_settings
 
 
 def test_settings_sequence_limits() -> None:

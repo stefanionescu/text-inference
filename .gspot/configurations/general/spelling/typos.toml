@@ -63,7 +63,6 @@ extend-exclude = [
   "**/node_modules/**",
   "**/pytest.xml",
   "**/reports/**",
-  "**/logs/**",
   "**/*.log",
   "**/*.zip",
   "tests/results/**",

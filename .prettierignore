@@ -61,7 +61,6 @@ uv.lock
 /venv/
 __pycache__/
 cache/
-logs/
 node_modules/
 pytest.xml
 reports/
