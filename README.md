@@ -29,7 +29,6 @@ Operational controls cover separate concerns:
 - [Develop the project](#develop-the-project)
 - [Inspect health and logs](#inspect-health-and-logs)
 - [Troubleshoot startup](#troubleshoot-startup)
-- [Advanced guide](#advanced-guide)
 
 ## Requirements
 
@@ -165,9 +164,6 @@ INT8 W8A8 and SmoothQuant remain available to vLLM through compatible
 because ModelOpt does not export that format in the unified Hugging Face schema
 required by the public PyTorch backend.
 
-The advanced guide explains recipe selection, calibration behavior, cache
-identity, and publishing.
-
 ## Connect to the WebSocket API
 
 Connect to `ws://<HOST>:8000/ws` with either authentication header:
@@ -221,9 +217,6 @@ turn:
 Normal generation emits `token` frames followed by `final` and `done`.
 Clients can send `cancel`, `ping`, or `end` as separate control frames.
 
-The advanced guide contains the complete frame schemas, lifecycle rules, close
-codes, and error contract.
-
 ## Configure the runtime
 
 Host deployment requires these values:
@@ -258,8 +251,7 @@ KV-cache memory and request sequence lengths determine how much concurrent
 generation work fits on the GPU.
 
 See [.env.example](.env.example) for supported host deployment and server
-variables. The advanced guide defines defaults, ranges, and ownership in
-detail.
+variables.
 
 ## Operate a host deployment
 
@@ -426,14 +418,3 @@ causes:
   a model that fits the available GPU.
 - A client connection failure points to a wrong API key, protocol order, or
   connection limit.
-
-The advanced guide provides the corresponding checks and recovery commands.
-
-## Advanced guide
-
-The [reference guide](REFERENCE.md) is the specialist reference. It covers:
-
-- The complete configuration and WebSocket contracts.
-- Inference-engine and quantization behavior.
-- Operations and observability.
-- Test clients and troubleshooting.
