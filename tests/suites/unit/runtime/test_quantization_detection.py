@@ -61,7 +61,7 @@ def test_detects_vllm_int(tmp_path: Path) -> None:
     assert detect_format(str(tmp_path), "vllm") == "compressed-tensors"
 
 
-def test_detects_legacy_int(tmp_path: Path) -> None:
+def test_detects_earlier_int(tmp_path: Path) -> None:
     """Test unsupported TRT INT8 metadata remains diagnosable."""
     config = {
         "quantization_config": {

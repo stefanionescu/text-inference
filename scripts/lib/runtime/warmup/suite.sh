@@ -3,10 +3,10 @@
 # Execute warmup and benchmark integration clients for each profile.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_SUITE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_SUITE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/runtime/warmup/logging.sh
-source "${_WARMUP_SUITE_DIR}/logging.sh"
+source "${_WARMUP_SUITE_FOLDER}/logging.sh"
 
 # _warmup_run_retries: Run one Python integration client with bounded retries.
 _warmup_run_retries() {
@@ -19,7 +19,7 @@ _warmup_run_retries() {
   local run_log=""
 
   for ((attempt = 1; attempt <= retries; attempt++)); do
-    run_log="${LOG_DIR:?LOG_DIR is required}/${prefix}_attempt${attempt}.log"
+    run_log="${LOG_FOLDER:?LOG_FOLDER is required}/${prefix}_attempt${attempt}.log"
     printf '[warmup] %s\n' \
       "${label}: attempt ${attempt} -> ${run_log}" \
       >>"${WARMUP_LOG_FILE:?WARMUP_LOG_FILE is required}" || return 1

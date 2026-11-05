@@ -20,8 +20,8 @@ AXIOM_METRICS_ENDPOINT = "https://api.axiom.co/v1/metrics"
 # OTel tuning
 # ---------------------------------------------------------------------------
 OTEL_RESOURCE_NAME = "text-inference-api"
-OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS = 5000
-OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS = 15000
+OTEL_TRACES_INTERVAL_MILLISECONDS = 5000
+OTEL_METRICS_INTERVAL_MILLISECONDS = 15000
 OTEL_TRACES_BATCH_SIZE = 512
 
 # ---------------------------------------------------------------------------
@@ -67,24 +67,24 @@ METRIC_TIMEOUT_DISCONNECTS_TOTAL = (
     "{connection}",
     "Idle timeout disconnects",
 )
-METRIC_RATE_LIMIT_VIOLATIONS_TOTAL = (
+METRIC_RATE_VIOLATIONS_TOTAL = (
     "text_inference.rate_limit_violations_total",
     "{violation}",
     "Rate limit hits",
 )
 METRIC_CACHE_RESETS_TOTAL = ("text_inference.cache_resets_total", "{reset}", "vLLM cache resets")
-METRIC_CACHE_RESET_SKIPS_TOTAL = (
+METRIC_RESET_SKIPS_TOTAL = (
     "text_inference.cache_reset_skips_total",
     "{skip}",
     "vLLM cache reset attempts skipped or declined",
 )
-METRIC_CACHE_RESET_FAILURES_TOTAL = (
+METRIC_RESET_FAILURES_TOTAL = (
     "text_inference.cache_reset_failures_total",
     "{failure}",
     "vLLM cache reset failures",
 )
 METRIC_PHASE_ERRORS_TOTAL = ("text_inference.phase_errors_total", "{error}", "Errors grouped by execution phase")
-METRIC_DISCONNECT_MID_STREAM_TOTAL = (
+METRIC_MIDSTREAM_DISCONNECT_TOTAL = (
     "text_inference.disconnect_mid_stream_total",
     "{disconnect}",
     "Client disconnects during server send",
@@ -94,12 +94,12 @@ METRIC_EARLY_CANCEL_TOTAL = (
     "{cancel}",
     "Cancelled generations before first token",
 )
-METRIC_EMPTY_MODEL_OUTPUT_TOTAL = (
+METRIC_EMPTY_OUTPUT_TOTAL = (
     "text_inference.empty_model_output_total",
     "{output}",
     "Generations that produced no output",
 )
-METRIC_ENGINE_ABORT_RETRYABLE_TOTAL = (
+METRIC_RETRYABLE_ABORT_TOTAL = (
     "text_inference.engine_abort_retryable_total",
     "{abort}",
     "Retryable abort calls issued to engine",
@@ -140,30 +140,30 @@ __all__ = [
     "METRIC_ACTIVE_CONNECTIONS",
     "METRIC_ACTIVE_GENERATIONS",
     "METRIC_CACHE_RESETS_TOTAL",
-    "METRIC_CACHE_RESET_FAILURES_TOTAL",
-    "METRIC_CACHE_RESET_SKIPS_TOTAL",
     "METRIC_CANCELLATION_TOTAL",
     "METRIC_COMPLETION_TOKENS",
     "METRIC_CONNECTIONS_REJECTED_TOTAL",
     "METRIC_CONNECTION_DURATION",
     "METRIC_CONNECTION_SEMAPHORE_WAIT",
-    "METRIC_DISCONNECT_MID_STREAM_TOTAL",
     "METRIC_EARLY_CANCEL_TOTAL",
-    "METRIC_EMPTY_MODEL_OUTPUT_TOTAL",
-    "METRIC_ENGINE_ABORT_RETRYABLE_TOTAL",
+    "METRIC_EMPTY_OUTPUT_TOTAL",
     "METRIC_ERRORS_TOTAL",
     "METRIC_GENERATIONS_PER_SESSION",
     "METRIC_GPU_MEMORY_FREE",
     "METRIC_GPU_MEMORY_TOTAL",
     "METRIC_GPU_MEMORY_USED",
     "METRIC_GPU_UTILIZATION",
+    "METRIC_MIDSTREAM_DISCONNECT_TOTAL",
     "METRIC_PHASE_ERRORS_TOTAL",
     "METRIC_PHASE_LATENCY",
     "METRIC_PROMPT_TOKENS",
     "METRIC_PROMPT_TOKENS_TOTAL",
-    "METRIC_RATE_LIMIT_VIOLATIONS_TOTAL",
+    "METRIC_RATE_VIOLATIONS_TOTAL",
     "METRIC_REQUESTS_TOTAL",
     "METRIC_REQUEST_LATENCY",
+    "METRIC_RESET_FAILURES_TOTAL",
+    "METRIC_RESET_SKIPS_TOTAL",
+    "METRIC_RETRYABLE_ABORT_TOTAL",
     "METRIC_SESSION_CHURN_TOTAL",
     "METRIC_STARTUP_DURATION",
     "METRIC_TIMEOUT_DISCONNECTS_TOTAL",
@@ -171,10 +171,10 @@ __all__ = [
     "METRIC_TOKEN_LATENCY",
     "METRIC_TTFT",
     "METRIC_WEBSOCKET_SEND_LATENCY",
-    "OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS",
+    "OTEL_METRICS_INTERVAL_MILLISECONDS",
     "OTEL_RESOURCE_NAME",
     "OTEL_TRACES_BATCH_SIZE",
-    "OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS",
+    "OTEL_TRACES_INTERVAL_MILLISECONDS",
     "SENTRY_DSN",
     "SENTRY_ENVIRONMENT",
     "SENTRY_RATE_LIMIT_SECONDS",

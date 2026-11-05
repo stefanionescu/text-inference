@@ -4,20 +4,20 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns temporary uv command logs and failure reporting.
 
-_UV_COMMAND_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_UV_COMMAND_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_UV_COMMAND_DIR}/../../shared/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_UV_COMMAND_FOLDER}/../../foundation/log.sh"
 
 # _uv_log_path: Print the persistent uv failure log path.
 _uv_log_path() {
-  local base_dir="${ROOT_DIR-}"
+  local base_folder="${ROOT_FOLDER-}"
 
-  [[ -n ${base_dir} ]] || base_dir="${PWD}"
+  [[ -n ${base_folder} ]] || base_folder="${PWD}"
   if [[ -n ${UV_INSTALL_LOG-} ]]; then
     printf '%s\n' "${UV_INSTALL_LOG}"
   else
-    printf '%s\n' "${base_dir}/logs/uv-install.log"
+    printf '%s\n' "${base_folder}/logs/uv-install.log"
   fi
 }
 
@@ -36,14 +36,14 @@ _uv_report_failure() {
   local temporary_log="$1"
   local status="$2"
   local log_file
-  local log_dir
+  local log_folder
   local timestamp
 
   shift 2
   log_file="$(_uv_log_path)" || return 1
-  log_dir="$(dirname -- "${log_file}")" || return 1
+  log_folder="$(dirname -- "${log_file}")" || return 1
   timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ')" || return 1
-  mkdir -p -- "${log_dir}" || return 1
+  mkdir -p -- "${log_folder}" || return 1
   {
     printf '===== %s\n' "${timestamp}"
     printf 'uv command: uv'

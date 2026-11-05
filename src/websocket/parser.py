@@ -22,12 +22,12 @@ from src.websocket.schemas import EndMessage, PingMessage, PongMessage, TurnMess
 if TYPE_CHECKING:
     from src.runtime.config import WebSocketSettings
 
-_client_message_model_type = StartMessage | TurnMessage | CancelMessage | PingMessage | PongMessage | EndMessage
-_client_message_type = Annotated[
+_ClientMessageModelType = StartMessage | TurnMessage | CancelMessage | PingMessage | PongMessage | EndMessage
+_ClientMessageType = Annotated[
     StartMessage | TurnMessage | CancelMessage | PingMessage | PongMessage | EndMessage,
     Field(discriminator="type"),
 ]
-_MESSAGE_ADAPTER: TypeAdapter[_client_message_model_type] = TypeAdapter(_client_message_type)
+_MESSAGE_ADAPTER: TypeAdapter[_ClientMessageModelType] = TypeAdapter(_ClientMessageType)
 
 
 def _format_validation_error(exception: ValidationError) -> str:

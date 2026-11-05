@@ -1,14 +1,14 @@
 """Hugging Face publishing and model-card policy."""
 
 HUGGING_FACE_MODEL_URL = "https://huggingface.co/{model_name}/tree/{source_revision}"
-FALLBACK_LICENSE = "other"
+DEFAULT_LICENSE = "other"
 LOCAL_LICENSE_PATH = "LICENSE"
 
 LICENSE_ID_FIELD = "license"
 LICENSE_NAME_FIELD = "license_name"
 LICENSE_LINK_FIELD = "license_link"
 
-MODEL_CARD_TEMPLATE_DIR = "templates"
+MODEL_CARD_TEMPLATE_FOLDER = "templates"
 TRT_MODEL_CARD_TEMPLATE = "trt.md"
 VLLM_MODEL_CARD_TEMPLATE = "vllm.md"
 MODEL_CARD_FILENAME = "README.md"
@@ -57,10 +57,10 @@ PYTHON_RUNTIME_VERSION = "3.12"
 
 __all__ = [
     "ALL_EXPERTS_LABEL",
+    "DEFAULT_LICENSE",
     "DISABLED_LABEL",
     "EMPTY_METADATA_ITEMS",
     "ENABLED_LABEL",
-    "FALLBACK_LICENSE",
     "HF_DEFAULT_REVISION",
     "HF_MODEL_REPO_TYPE",
     "HUGGING_FACE_MODEL_URL",
@@ -70,7 +70,7 @@ __all__ = [
     "LOCAL_LICENSE_PATH",
     "MODEL_CARD_FILENAME",
     "MODEL_CARD_JSON_INDENT",
-    "MODEL_CARD_TEMPLATE_DIR",
+    "MODEL_CARD_TEMPLATE_FOLDER",
     "NOT_APPLICABLE_LABEL",
     "PYTHON_RUNTIME_VERSION",
     "TRT_FORMAT_LABELS",

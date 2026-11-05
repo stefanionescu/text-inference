@@ -4,10 +4,10 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns explicit reset cleanup outside repository ownership.
 
-_RUNTIME_RESET_HOST_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_RESET_HOST_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RUNTIME_RESET_HOST_DIR}/../../shared/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RUNTIME_RESET_HOST_FOLDER}/../../foundation/log.sh"
 
 # _runtime_reset_remove_path: Remove one validated non-root host path.
 # Globals:

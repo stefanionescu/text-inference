@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 
-from src.server import create_probe_application, create_public_application
+from src.server import create_public_application, create_readiness_application
 from src.server.readiness import ReadinessState
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
 
@@ -32,7 +32,7 @@ def test_health_alive() -> None:
     """Test health reports the probe process event loop independently of readiness."""
     status = ReadinessState()
 
-    with TestClient(create_probe_application(status)) as client:
+    with TestClient(create_readiness_application(status)) as client:
         response = client.get("/healthz")
 
     assert response.status_code == HTTPStatus.OK
@@ -43,7 +43,7 @@ def test_readiness_transitions() -> None:
     """Test readiness stays false until serving and falls before draining."""
     status = ReadinessState()
 
-    with TestClient(create_probe_application(status)) as client:
+    with TestClient(create_readiness_application(status)) as client:
         assert client.get("/readyz").status_code == NOT_READY_STATUS
         status.is_runtime_initialized = True
         assert client.get("/readyz").status_code == NOT_READY_STATUS

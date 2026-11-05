@@ -80,12 +80,12 @@ def test_unexportable_request_rejected() -> None:
 
 def test_local_inspection_identity(tmp_path: Path) -> None:
     """Test local inspection separates source identity and runtime format."""
-    model_dir = tmp_path / "model"
-    model_dir.mkdir()
+    model_folder = tmp_path / "model"
+    model_folder.mkdir()
     config = {"quantization_config": {"quant_method": AWQ_FORMAT}}
-    (model_dir / "config.json").write_text(json.dumps(config), encoding="utf-8")
+    (model_folder / "config.json").write_text(json.dumps(config), encoding="utf-8")
 
-    inspection = inspect_model(str(model_dir), VLLM_ENGINE, None)
+    inspection = inspect_model(str(model_folder), VLLM_ENGINE, None)
 
     assert inspection.resolved_revision.startswith("local:")
     assert inspection.detected_format == AWQ_FORMAT

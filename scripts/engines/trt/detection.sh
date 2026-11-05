@@ -3,12 +3,12 @@
 # Detect TensorRT checkpoint and CUDA runtime capabilities.
 # Runtime: Bash 3.2+, Linux.
 
-_TRT_DETECTION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_TRT_DETECTION_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
-source "${_TRT_DETECTION_DIR}/../../config/values/trt.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_TRT_DETECTION_DIR}/../../lib/shared/log.sh"
+source "${_TRT_DETECTION_FOLDER}/../../config/values/trt.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_TRT_DETECTION_FOLDER}/../../lib/foundation/log.sh"
 
 # _trt_version_number: Convert a CUDA major.minor version for comparison.
 _trt_version_number() {
@@ -43,7 +43,7 @@ trt_cuda_version() {
 
 # trt_validate_cuda: Validate CUDA toolkit and driver minimum versions.
 # Globals:
-#   CFG_TRT_MIN_CUDA_VERSION
+#   TRT_MIN_CUDA_VERSION
 # Arguments:
 #   $1: Diagnostic phase name.
 # Outputs:
@@ -59,11 +59,11 @@ trt_validate_cuda() {
   local driver_number
   local output
 
-  minimum="$(_trt_version_number "${CFG_TRT_MIN_CUDA_VERSION}")" || return 1
+  minimum="$(_trt_version_number "${TRT_MIN_CUDA_VERSION}")" || return 1
   toolkit="$(trt_cuda_version)" || return 1
   toolkit_number="$(_trt_version_number "${toolkit}")" || return 1
   if ((toolkit_number < minimum)); then
-    log_write "[${phase}] CUDA ${CFG_TRT_MIN_CUDA_VERSION}+ required; found ${toolkit}"
+    log_write "[${phase}] CUDA ${TRT_MIN_CUDA_VERSION}+ required; found ${toolkit}"
     return 1
   fi
   output="$(nvidia-smi)" || return 1
@@ -74,7 +74,7 @@ trt_validate_cuda() {
   driver="${BASH_REMATCH[1]}"
   driver_number="$(_trt_version_number "${driver}")" || return 1
   if ((driver_number < minimum)); then
-    log_write "[${phase}] NVIDIA driver supports CUDA ${driver}; ${CFG_TRT_MIN_CUDA_VERSION}+ required"
+    log_write "[${phase}] NVIDIA driver supports CUDA ${driver}; ${TRT_MIN_CUDA_VERSION}+ required"
     return 1
   fi
 }

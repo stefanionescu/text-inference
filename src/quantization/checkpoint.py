@@ -24,10 +24,10 @@ CHECKPOINT_VALIDATION_ERRORS = (ImportError, KeyError, OSError, RuntimeError, Ty
 _CREATE_TOKENIZER: Callable[..., object] = cast("Callable[..., object]", AutoTokenizer.from_pretrained)
 
 
-def copy_source_assets(source_dir: Path, checkpoint_dir: Path) -> None:
+def copy_source_assets(source_folder: Path, checkpoint_folder: Path) -> None:
     """Copy tokenizer, processor, template, and custom-code assets."""
-    source_root = source_dir.resolve(strict=True)
-    checkpoint_root = checkpoint_dir.resolve(strict=True)
+    source_root = source_folder.resolve(strict=True)
+    checkpoint_root = checkpoint_folder.resolve(strict=True)
     if source_root == checkpoint_root:
         return
 
@@ -40,27 +40,27 @@ def copy_source_assets(source_dir: Path, checkpoint_dir: Path) -> None:
         shutil.copy2(source_file, checkpoint_root / source_file.name)
 
 
-def validate_tokenizer_assets(checkpoint_dir: Path) -> None:
+def validate_tokenizer_assets(checkpoint_folder: Path) -> None:
     """Require a locally loadable tokenizer."""
-    validation = validate_tokenizer_exists(str(checkpoint_dir))
+    validation = validate_tokenizer_exists(str(checkpoint_folder))
     if not validation.is_valid:
         message = validation.error_message or "Checkpoint tokenizer validation failed"
         raise ValueError(message)
     _CREATE_TOKENIZER(
-        checkpoint_dir,
+        checkpoint_folder,
         trust_remote_code=True,
         local_files_only=True,
     )
 
 
-def validate_checkpoint(checkpoint_dir: Path, engine: str, expected_format: str) -> Path:
+def validate_checkpoint(checkpoint_folder: Path, engine: str, expected_format: str) -> Path:
     """Validate weights, tokenizer, and exact quantization metadata."""
     validate_engine(engine)
     if expected_format not in QUANTIZATIONS_BY_ENGINE[engine]:
         message = f"Quantization format {expected_format!r} is not supported by {engine}"
         raise ValueError(message)
 
-    checkpoint_root = checkpoint_dir.resolve(strict=True)
+    checkpoint_root = checkpoint_folder.resolve(strict=True)
     if not (checkpoint_root / MODEL_CONFIG_FILENAME).is_file():
         message = "Checkpoint config.json is missing"
         raise FileNotFoundError(message)
@@ -78,7 +78,7 @@ def validate_checkpoint(checkpoint_dir: Path, engine: str, expected_format: str)
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
     """Parse checkpoint-validation arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument("--engine", required=True, choices=QUANTIZATIONS_BY_ENGINE)
     parser.add_argument("--format", dest="quantization_format", required=True)
     return parser.parse_args(argument_values)
@@ -87,7 +87,7 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
 def main(argument_values: Sequence[str] | None = None) -> int:
     """Validate one checkpoint."""
     arguments = _parse_arguments(argument_values)
-    validate_checkpoint(Path(arguments.checkpoint_dir), arguments.engine, arguments.quantization_format)
+    validate_checkpoint(Path(arguments.checkpoint_folder), arguments.engine, arguments.quantization_format)
     return 0
 
 

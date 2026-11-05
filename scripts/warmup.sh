@@ -5,22 +5,22 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly SCRIPT_DIR
-ROOT_DIR="$(CDPATH='' cd -- "${SCRIPT_DIR}/.." && pwd -P)" || exit 1
-readonly ROOT_DIR
-export ROOT_DIR
+SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
+readonly SCRIPT_FOLDER
+ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPT_FOLDER}/.." && pwd -P)" || exit 1
+readonly ROOT_FOLDER
+export ROOT_FOLDER
 
 # shellcheck source=scripts/config/defaults.sh
-source "${SCRIPT_DIR}/config/defaults.sh"
+source "${SCRIPT_FOLDER}/config/defaults.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${SCRIPT_DIR}/config/values/deployment.sh"
+source "${SCRIPT_FOLDER}/config/values/deployment.sh"
 # shellcheck source=scripts/lib/env/runtime.sh
-source "${SCRIPT_DIR}/lib/env/runtime.sh"
+source "${SCRIPT_FOLDER}/lib/env/runtime.sh"
 # shellcheck source=scripts/lib/env/warmup.sh
-source "${SCRIPT_DIR}/lib/env/warmup.sh"
+source "${SCRIPT_FOLDER}/lib/env/warmup.sh"
 # shellcheck source=scripts/lib/runtime/warmup/main.sh
-source "${SCRIPT_DIR}/lib/runtime/warmup/main.sh"
+source "${SCRIPT_FOLDER}/lib/runtime/warmup/main.sh"
 
 # _warmup_usage: Print the warmup command contract.
 _warmup_usage() {
@@ -39,7 +39,7 @@ main() {
   local is_help_requested=0
   local is_logging_enabled
 
-  cfg_assign_value is_logging_enabled LOGS_ENABLED "${CFG_LOGS_ENABLED_DEFAULT}"
+  config_assign_value is_logging_enabled LOGS_ENABLED "${LOGS_ENABLED_DEFAULT}"
 
   for argument in "$@"; do
     case "${argument}" in
@@ -66,10 +66,10 @@ main() {
   fi
   LOGS_ENABLED="${is_logging_enabled}"
   export LOGS_ENABLED
-  export VENV_DIR="${ROOT_DIR}/${CFG_RUNTIME_VENV_DIR_REL}"
-  runtime_initialize_paths "${ROOT_DIR}"
-  warmup_initialize_environment "${ROOT_DIR}"
-  warmup_run "${ROOT_DIR}"
+  export VENV_FOLDER="${ROOT_FOLDER}/${RUNTIME_VENV_RELATIVE_PATH}"
+  runtime_initialize_paths "${ROOT_FOLDER}"
+  warmup_initialize_environment "${ROOT_FOLDER}"
+  warmup_run "${ROOT_FOLDER}"
 }
 
 main "$@"

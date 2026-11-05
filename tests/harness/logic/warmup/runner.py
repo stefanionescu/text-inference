@@ -17,7 +17,7 @@ from dataclasses import dataclass
 import websockets
 
 from tests.state import StreamState, SessionContext
-from config.tests.defaults import WARMUP_FALLBACK_MESSAGE
+from config.tests.defaults import WARMUP_DEFAULT_MESSAGE
 from tests.harness.client.errors import ServerError
 from tests.harness.client.prompt import select_prompt
 from tests.harness.messages.warmup import WARMUP_DEFAULT_MESSAGES
@@ -48,8 +48,8 @@ from tests.harness.environment.settings import (
     DEFAULT_GENDER,
     DEFAULT_SERVER_URL,
     DEFAULT_PERSONALITY,
-    DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
-    DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
+    DEFAULT_PING_TIMEOUT_SECONDS,
+    DEFAULT_PING_INTERVAL_SECONDS,
 )
 from tests.harness.logic.conversation.stream import stream_exchange
 
@@ -152,7 +152,7 @@ def _select_config(arguments: argparse.Namespace) -> WarmupConfig:
 
     user_message = choose_message(
         arguments.message,
-        fallback=WARMUP_FALLBACK_MESSAGE,
+        default_message=WARMUP_DEFAULT_MESSAGE,
         defaults=WARMUP_DEFAULT_MESSAGES,
     )
     return WarmupConfig(
@@ -228,8 +228,8 @@ async def run_warmup(arguments: argparse.Namespace) -> None:
             config.authenticated_websocket_url,
             headers=config.authentication_headers,
             max_queue=None,
-            ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-            ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+            ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+            ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
         ),
     ) as websocket:
         await _run_transactions(websocket, config)

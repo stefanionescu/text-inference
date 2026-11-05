@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from collections.abc import Mapping
 
-EnvironmentValues = Mapping[str, str]
+type EnvironmentValues = Mapping[str, str]
 
 
 @dataclass(frozen=True, slots=True)

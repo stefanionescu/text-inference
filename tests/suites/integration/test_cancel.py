@@ -148,7 +148,7 @@ def test_cancel_recovery() -> None:
         assert recovery_done == {"type": "done", "status": 200}
 
 
-def test_cancel_before_start_allows_session_bootstrap() -> None:
+def test_early_cancel_allows_bootstrap() -> None:
     """Cancelling an idle connection must leave session bootstrap available."""
     with _test_client() as client, client.websocket_connect("/ws", headers={"X-API-Key": TEST_API_KEY}) as websocket:
         websocket.send_text(json.dumps(build_cancel_payload()))

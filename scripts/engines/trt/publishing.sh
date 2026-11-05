@@ -9,7 +9,7 @@
 #   HF_PUSH_PRIVATE
 #   HF_PUSH_REPO_ID
 #   HF_TOKEN
-#   VENV_DIR
+#   VENV_FOLDER
 # Arguments:
 #   $1: Checkpoint directory.
 #   $2: Quantization format.
@@ -18,16 +18,16 @@
 # Returns:
 #   The repository upload command status.
 trt_publish_checkpoint() {
-  local checkpoint_dir="$1"
+  local checkpoint_folder="$1"
   local quantization_format="$2"
-  local python_bin="${VENV_DIR:?VENV_DIR is required}/bin/python"
+  local python_bin="${VENV_FOLDER:?VENV_FOLDER is required}/bin/python"
   local -a arguments=(
-    --checkpoint-dir "${checkpoint_dir}"
+    --checkpoint-dir "${checkpoint_folder}"
     --repo-id "${HF_PUSH_REPO_ID:?HF_PUSH_REPO_ID is required}"
     --format "${quantization_format}"
   )
 
-  [[ -n ${HF_TOKEN-} && -d ${checkpoint_dir} && -x ${python_bin} ]] || return 1
+  [[ -n ${HF_TOKEN-} && -d ${checkpoint_folder} && -x ${python_bin} ]] || return 1
   [[ ${HF_PUSH_PRIVATE:?HF_PUSH_PRIVATE is required} != "1" ]] || arguments+=(--private)
   "${python_bin}" -m src.hf.trt "${arguments[@]}"
 }

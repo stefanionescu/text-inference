@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC2034 # reason: sourced build helpers consume ROOT_DIR
-ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-SHARED_DIR="${SCRIPT_DIR}/../shared"
+SCRIPT_FOLDER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC2034 # reason: sourced build helpers consume ROOT_FOLDER
+ROOT_FOLDER="$(cd "${SCRIPT_FOLDER}/../.." && pwd)"
+BASE_FOLDER="${SCRIPT_FOLDER}/../base"
 
 # usage: Print TensorRT Docker build help.
 usage() {
@@ -29,11 +29,11 @@ EOF
 }
 
 # shellcheck disable=SC2034 # reason: sourced build helpers consume DOCKERFILE
-DOCKERFILE="${SCRIPT_DIR}/Dockerfile"
-# shellcheck source=docker/shared/scripts/logs.sh
-source "${SHARED_DIR}/scripts/logs.sh"
-# shellcheck source=docker/shared/scripts/build/driver.sh
-source "${SHARED_DIR}/scripts/build/driver.sh"
+DOCKERFILE="${SCRIPT_FOLDER}/Dockerfile"
+# shellcheck source=docker/base/scripts/logs.sh
+source "${BASE_FOLDER}/scripts/logs.sh"
+# shellcheck source=docker/base/scripts/build/driver.sh
+source "${BASE_FOLDER}/scripts/build/driver.sh"
 
 # main: Reject unexpected arguments, then build the TensorRT image.
 main() {
@@ -44,7 +44,7 @@ main() {
     log_write "[build] ✗ TensorRT build does not accept positional arguments"
     exit 1
   fi
-  run_stack_build "${SCRIPT_DIR}" "text-inference-trt" "trt"
+  run_stack_build "${SCRIPT_FOLDER}" "text-inference-trt" "trt"
 }
 
 main "$@"

@@ -62,15 +62,15 @@ def _is_source_asset(path: Path) -> bool:
     return path.name in CHECKPOINT_ASSET_FILENAMES or path.suffix in SOURCE_FINGERPRINT_SUFFIXES
 
 
-def _fingerprint_local_source(model_dir: Path) -> str:
+def _fingerprint_local_source(model_folder: Path) -> str:
     """Fingerprint relevant files without reading multi-gigabyte weights."""
     digest = hashlib.sha256()
     file_count = 0
-    for path in sorted(model_dir.rglob("*")):
+    for path in sorted(model_folder.rglob("*")):
         if not path.is_file() or not _is_source_asset(path):
             continue
         file_stat = path.stat()
-        relative_path = path.relative_to(model_dir).as_posix()
+        relative_path = path.relative_to(model_folder).as_posix()
         digest.update(f"{relative_path}\0{file_stat.st_size}\0{file_stat.st_mtime_ns}\n".encode())
         file_count += 1
     if file_count == 0:
@@ -79,9 +79,9 @@ def _fingerprint_local_source(model_dir: Path) -> str:
     return f"local:{digest.hexdigest()}"
 
 
-def _build_local_source(model_dir: Path) -> SourceSnapshot:
+def _build_local_source(model_folder: Path) -> SourceSnapshot:
     """Build the identity for a local source directory."""
-    path = model_dir.resolve(strict=True)
+    path = model_folder.resolve(strict=True)
     return SourceSnapshot(
         identity=SourceIdentity(
             kind=LOCAL_SOURCE_KIND,
@@ -98,7 +98,7 @@ def _acquire_hub_source(
     revision: str,
     *,
     token: str | None,
-    cache_dir: str | None,
+    cache_folder: str | None,
 ) -> SourceSnapshot:
     """Acquire one immutable Hugging Face snapshot."""
     resolved_revision = HfApi(token=token).model_info(repo_id=model, revision=revision).sha
@@ -109,7 +109,7 @@ def _acquire_hub_source(
         repo_id=model,
         revision=resolved_revision,
         token=token,
-        cache_dir=cache_dir,
+        cache_dir=cache_folder,
     )
     return SourceSnapshot(
         identity=SourceIdentity(
@@ -127,7 +127,7 @@ def acquire_source(
     revision: str,
     *,
     token: str | None,
-    cache_dir: str | None,
+    cache_folder: str | None,
 ) -> SourceSnapshot:
     """Acquire a local directory or immutable Hugging Face snapshot."""
     model_path = Path(model).expanduser()
@@ -136,12 +136,12 @@ def acquire_source(
     if model_path.exists():
         message = "Model path must be a directory"
         raise NotADirectoryError(message)
-    return _acquire_hub_source(model, revision, token=token, cache_dir=cache_dir)
+    return _acquire_hub_source(model, revision, token=token, cache_folder=cache_folder)
 
 
 def derive_source_identity(
     model: str,
-    source_dir: Path,
+    source_folder: Path,
     revision: str,
 ) -> SourceIdentity:
     """Derive source identity from an acquired local path."""
@@ -149,7 +149,7 @@ def derive_source_identity(
     if model_path.is_dir():
         return _build_local_source(model_path).identity
 
-    resolved_revision = source_dir.resolve(strict=True).name
+    resolved_revision = source_folder.resolve(strict=True).name
     if not _COMMIT_PATTERN.fullmatch(resolved_revision):
         message = "Hugging Face snapshot path does not contain a commit revision"
         raise ValueError(message)
@@ -176,7 +176,7 @@ def main(argument_values: Sequence[str] | None = None) -> int:
         arguments.model,
         arguments.revision,
         token=os.environ.get("HF_TOKEN"),
-        cache_dir=os.environ.get("HUGGINGFACE_HUB_CACHE"),
+        cache_folder=os.environ.get("HUGGINGFACE_HUB_CACHE"),
     )
     sys.stdout.write(f"{snapshot.path}\n")
     return 0

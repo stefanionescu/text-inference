@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 def choose_message(
     words: list[str],
-    fallback: str,
+    default_message: str,
     *,
     defaults: Sequence[str] | None = None,
     rng: random.Random | None = None,
@@ -30,7 +30,7 @@ def choose_message(
 
     Args:
         words: Tokens captured from CLI arguments (for example, the remaining command line).
-        fallback: Default string used when no tokens/defaults are available.
+        default_message: Default string used when no tokens/defaults are available.
         defaults: Optional sequence of canned messages to sample from.
         rng: Optional random generator to make deterministic choices in tests.
 
@@ -55,7 +55,7 @@ def choose_message(
         chooser = rng or random
         return chooser.choice(list(defaults))
 
-    return fallback
+    return default_message
 
 
 __all__ = ["choose_message"]

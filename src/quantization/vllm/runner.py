@@ -62,12 +62,12 @@ class CompressorRuntime(Protocol):
     def quantize(
         self,
         source: SourceSnapshot,
-        checkpoint_dir: Path,
+        checkpoint_folder: Path,
         policy: QuantizationPolicy,
         settings: QuantizationSettings,
     ) -> None:
         """Create a compressed-tensors checkpoint."""
-        raise NotImplementedError(source, checkpoint_dir, policy, settings)
+        raise NotImplementedError(source, checkpoint_folder, policy, settings)
 
     def environment_metadata(self, environment: Mapping[str, str]) -> Mapping[str, object]:
         """Return execution metadata that does not constrain cache reuse."""
@@ -105,7 +105,7 @@ class QuantizationSettings:
     is_rebuild_forced: bool
 
     @classmethod
-    def from_environment(cls, environment: Mapping[str, str]) -> QuantizationSettings:
+    def read_environment(cls, environment: Mapping[str, str]) -> QuantizationSettings:
         """Build settings from the host environment."""
         dataset = environment.get("VLLM_CALIBRATION_DATASET", DEFAULT_CALIBRATION_DATASET).strip()
         revision = environment.get("SOURCE_REVISION", DEFAULT_MODEL_REVISION).strip()
@@ -139,7 +139,7 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
     """Parse the quantizer command contract."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--out", dest="checkpoint_dir", required=True)
+    parser.add_argument("--out", dest="checkpoint_folder", required=True)
     return parser.parse_args(argument_values)
 
 
@@ -170,12 +170,12 @@ def _build_request(
     )
 
 
-def _is_cache_usable(checkpoint_dir: Path, request: QuantizationRequest) -> bool:
+def _is_cache_usable(checkpoint_folder: Path, request: QuantizationRequest) -> bool:
     """Return whether a matching cache remains a valid checkpoint."""
-    if not cache_matches(checkpoint_dir, request):
+    if not cache_matches(checkpoint_folder, request):
         return False
     try:
-        validate_checkpoint(checkpoint_dir, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
+        validate_checkpoint(checkpoint_folder, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
     except CHECKPOINT_VALIDATION_ERRORS:
         return False
     return True
@@ -189,13 +189,13 @@ def run_quantization(
 ) -> int:
     """Quantize one model through a supplied compressor integration."""
     arguments = _parse_arguments(argument_values)
-    settings = QuantizationSettings.from_environment(environment)
-    checkpoint_dir = Path(arguments.checkpoint_dir).expanduser().resolve()
+    settings = QuantizationSettings.read_environment(environment)
+    checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()
     source = acquire_source(
         arguments.model,
         settings.source_revision,
         token=environment.get("HF_TOKEN"),
-        cache_dir=environment.get("HUGGINGFACE_HUB_CACHE"),
+        cache_folder=environment.get("HUGGINGFACE_HUB_CACHE"),
     )
     validate_tokenizer_assets(source.path)
     if detect_local_format(source.path) is not None:
@@ -207,20 +207,20 @@ def run_quantization(
     policy = select_policy(model_config, text_config)
     request = _build_request(source, policy, settings, compressor.version)
 
-    if not settings.is_rebuild_forced and _is_cache_usable(checkpoint_dir, request):
-        sys.stdout.write(f"[quant] Reusing compressed-tensors checkpoint: {checkpoint_dir}\n")
+    if not settings.is_rebuild_forced and _is_cache_usable(checkpoint_folder, request):
+        sys.stdout.write(f"[quant] Reusing compressed-tensors checkpoint: {checkpoint_folder}\n")
         return 0
 
-    if checkpoint_dir.exists():
-        shutil.rmtree(checkpoint_dir)
-    checkpoint_dir.mkdir(parents=True)
-    compressor.quantize(source, checkpoint_dir, policy, settings)
-    copy_source_assets(source.path, checkpoint_dir)
-    validate_checkpoint(checkpoint_dir, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
+    if checkpoint_folder.exists():
+        shutil.rmtree(checkpoint_folder)
+    checkpoint_folder.mkdir(parents=True)
+    compressor.quantize(source, checkpoint_folder, policy, settings)
+    copy_source_assets(source.path, checkpoint_folder)
+    validate_checkpoint(checkpoint_folder, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
     write_provenance(
-        checkpoint_dir,
+        checkpoint_folder,
         request,
-        exported_quantization=read_export_quantization(checkpoint_dir),
+        exported_quantization=read_export_quantization(checkpoint_folder),
         environment=compressor.environment_metadata(environment),
     )
     sys.stdout.write("[quant] LLM Compressor compressed-tensors export complete\n")

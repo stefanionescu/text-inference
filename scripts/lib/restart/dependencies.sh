@@ -4,33 +4,33 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns restart-time virtual environment replacement and repair.
 
-_RESTART_DEPENDENCIES_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RESTART_DEPENDENCIES_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/deps/venv.sh
-source "${_RESTART_DEPENDENCIES_DIR}/../deps/venv.sh"
+source "${_RESTART_DEPENDENCIES_FOLDER}/../deps/venv.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
-source "${_RESTART_DEPENDENCIES_DIR}/../runtime/cleanup/paths.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RESTART_DEPENDENCIES_DIR}/../shared/log.sh"
-# shellcheck source=scripts/lib/shared/pytorch_guard.sh
-source "${_RESTART_DEPENDENCIES_DIR}/../shared/pytorch_guard.sh"
+source "${_RESTART_DEPENDENCIES_FOLDER}/../runtime/cleanup/paths.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RESTART_DEPENDENCIES_FOLDER}/../foundation/log.sh"
+# shellcheck source=scripts/lib/foundation/pytorch_guard.sh
+source "${_RESTART_DEPENDENCIES_FOLDER}/../foundation/pytorch_guard.sh"
 
 # _restart_rebuild_dependencies: Replace both managed environments.
 _restart_rebuild_dependencies() {
-  local scripts_dir="$1"
+  local scripts_folder="$1"
 
   log_write "[restart] Rebuilding managed Python environments"
   runtime_remove_owned_path \
-    "${ROOT_DIR:?ROOT_DIR is required}" "${VENV_DIR:?VENV_DIR is required}" || return 1
+    "${ROOT_FOLDER:?ROOT_FOLDER is required}" "${VENV_FOLDER:?VENV_FOLDER is required}" || return 1
   runtime_remove_owned_path \
-    "${ROOT_DIR}" "${QUANT_VENV_DIR:?QUANT_VENV_DIR is required}" || return 1
-  venv_prepare "${VENV_DIR}" || return 1
-  bash "${scripts_dir}/steps/02_install_deps.sh"
+    "${ROOT_FOLDER}" "${QUANT_VENV_FOLDER:?QUANT_VENV_FOLDER is required}" || return 1
+  venv_prepare "${VENV_FOLDER}" || return 1
+  bash "${scripts_folder}/steps/install_deps.sh"
 }
 
 # _restart_torch_status: Return the managed environment compatibility status.
 _restart_torch_status() {
-  if [[ ! -x ${VENV_DIR:?VENV_DIR is required}/bin/python ]]; then
+  if [[ ! -x ${VENV_FOLDER:?VENV_FOLDER is required}/bin/python ]]; then
     return 0
   fi
   pytorch_guard_check "[restart]"
@@ -50,7 +50,7 @@ _restart_apply_transition() {
 
 # restart_prepare_dependencies: Rebuild dependencies when requested or required.
 # Globals:
-#   REINSTALL_REQUESTED, ROOT_DIR, QUANT_VENV_DIR, VENV_DIR.
+#   REINSTALL_REQUESTED, ROOT_FOLDER, QUANT_VENV_FOLDER, VENV_FOLDER.
 # Arguments:
 #   $1: Scripts directory. $2: Deployment transition.
 # Outputs:
@@ -58,7 +58,7 @@ _restart_apply_transition() {
 # Returns:
 #   0 for a compatible environment, non-zero otherwise.
 restart_prepare_dependencies() {
-  local scripts_dir="$1"
+  local scripts_folder="$1"
   local transition="$2"
   local torch_status=0
 
@@ -71,13 +71,13 @@ restart_prepare_dependencies() {
   elif ((torch_status != 0)); then
     return "${torch_status}"
   fi
-  if [[ ! -x ${VENV_DIR}/bin/python ]]; then
+  if [[ ! -x ${VENV_FOLDER}/bin/python ]]; then
     log_write "[restart] Managed environment is missing; rebuilding automatically"
     REINSTALL_REQUESTED=1
     export REINSTALL_REQUESTED
   fi
   if [[ ${REINSTALL_REQUESTED:?REINSTALL_REQUESTED is required} == "1" ]]; then
-    _restart_rebuild_dependencies "${scripts_dir}" || return 1
+    _restart_rebuild_dependencies "${scripts_folder}" || return 1
   fi
   torch_status=0
   pytorch_guard_check "[restart]" || torch_status=$?

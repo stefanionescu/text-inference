@@ -8,7 +8,7 @@ from huggingface_hub import HfApi
 from huggingface_hub.errors import HfHubHTTPError
 
 from config.model.publishing import (
-    FALLBACK_LICENSE,
+    DEFAULT_LICENSE,
     LICENSE_ID_FIELD,
     LICENSE_LINK_FIELD,
     LICENSE_NAME_FIELD,
@@ -33,7 +33,7 @@ def _read_card_field(card_metadata: object, field_name: str) -> str | None:
     return value.strip() if isinstance(value, str) and value.strip() else None
 
 
-def _build_fallback_license(
+def _build_default_license(
     model_name: str,
     source_kind: str,
     source_revision: str,
@@ -44,7 +44,7 @@ def _build_fallback_license(
         if source_kind == HUB_SOURCE_KIND
         else LOCAL_LICENSE_PATH
     )
-    return LicenseMetadata(identifier=FALLBACK_LICENSE, name=FALLBACK_LICENSE, link=link)
+    return LicenseMetadata(identifier=DEFAULT_LICENSE, name=DEFAULT_LICENSE, link=link)
 
 
 def read_license(
@@ -55,17 +55,17 @@ def read_license(
     hf_token: str | None,
 ) -> LicenseMetadata:
     """Read source license fields or return the selected `other` fallback."""
-    fallback_license = _build_fallback_license(model_name, source_kind, source_revision)
+    default_license = _build_default_license(model_name, source_kind, source_revision)
     if source_kind != HUB_SOURCE_KIND:
-        return fallback_license
+        return default_license
     try:
         model_record = HfApi(token=hf_token).model_info(repo_id=model_name, revision=source_revision)
     except (HfHubHTTPError, OSError, ValueError):
-        return fallback_license
+        return default_license
     card_metadata = model_record.card_data
     license_id = _read_card_field(card_metadata, LICENSE_ID_FIELD)
     if license_id is None:
-        return fallback_license
+        return default_license
     return LicenseMetadata(
         identifier=license_id,
         name=_read_card_field(card_metadata, LICENSE_NAME_FIELD) or license_id,

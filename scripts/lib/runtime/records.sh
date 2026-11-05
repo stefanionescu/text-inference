@@ -4,10 +4,10 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns the persisted runtime state format and atomic replacement.
 
-_RUNTIME_STATE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_STATE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_RUNTIME_STATE_DIR}/../../config/values/runtime.sh"
+source "${_RUNTIME_STATE_FOLDER}/../../config/values/runtime.sh"
 
 # _runtime_state_key: Validate one state key.
 _runtime_state_key() {
@@ -35,7 +35,7 @@ _runtime_state_value() {
 
 # runtime_state_read: Print one value from the persisted runtime state.
 # Globals:
-#   CFG_RUNTIME_STATE_FILE
+#   RUNTIME_STATE_FILE
 # Arguments:
 #   $1: Repository root.
 #   $2: Exact state key.
@@ -44,9 +44,9 @@ _runtime_state_value() {
 # Returns:
 #   0 for valid or absent state, non-zero for an invalid key or malformed file.
 runtime_state_read() {
-  local root_dir="$1"
+  local root_folder="$1"
   local requested_key="$2"
-  local state_file="${root_dir}/${CFG_RUNTIME_STATE_FILE}"
+  local state_file="${root_folder}/${RUNTIME_STATE_FILE}"
   local key
   local value
   local remainder
@@ -73,8 +73,8 @@ runtime_state_read() {
 
 # runtime_state_write: Atomically persist the active runtime configuration.
 # Globals:
-#   CFG_RUNTIME_RUN_DIR
-#   CFG_RUNTIME_STATE_FILE
+#   RUNTIME_RUN_FOLDER
+#   RUNTIME_STATE_FILE
 #   GPU_SM_ARCH
 #   INFERENCE_ENGINE
 #   KV_DTYPE
@@ -91,9 +91,9 @@ runtime_state_read() {
 # Returns:
 #   0 after atomic replacement, non-zero on validation or filesystem failure.
 runtime_state_write() {
-  local root_dir="$1"
-  local run_dir="${root_dir}/${CFG_RUNTIME_RUN_DIR}"
-  local state_file="${root_dir}/${CFG_RUNTIME_STATE_FILE}"
+  local root_folder="$1"
+  local run_folder="${root_folder}/${RUNTIME_RUN_FOLDER}"
+  local state_file="${root_folder}/${RUNTIME_STATE_FILE}"
   local value
 
   for value in \
@@ -108,7 +108,7 @@ runtime_state_write() {
     "${EXPORT_PROVENANCE-}"; do
     _runtime_state_value "${value}" || return 2
   done
-  mkdir -p -- "${run_dir}" || return 1
+  mkdir -p -- "${run_folder}" || return 1
   (
     local temporary_file
 

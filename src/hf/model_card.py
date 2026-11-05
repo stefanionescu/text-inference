@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, cast
 from pathlib import Path
 
 from src.hf.license import read_license
-from config.model.publishing import EMPTY_METADATA_ITEMS, HUGGING_FACE_MODEL_URL, MODEL_CARD_TEMPLATE_DIR
+from config.model.publishing import EMPTY_METADATA_ITEMS, HUGGING_FACE_MODEL_URL, MODEL_CARD_TEMPLATE_FOLDER
 from config.model.quantization import HUB_SOURCE_KIND
 
 if TYPE_CHECKING:
@@ -81,7 +81,7 @@ def build_provenance_fields(
 
 def format_model_card(template_name: str, card_fields: Mapping[str, object]) -> str:
     """Format one checked-in model-card template."""
-    template_path = Path(__file__).with_name(MODEL_CARD_TEMPLATE_DIR) / template_name
+    template_path = Path(__file__).with_name(MODEL_CARD_TEMPLATE_FOLDER) / template_name
     template = Template(template_path.read_text(encoding="utf-8"))
     return template.substitute(card_fields)
 

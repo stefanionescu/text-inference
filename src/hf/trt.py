@@ -95,7 +95,7 @@ def build_model_card(
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
     """Parse the stable checkpoint-upload command."""
     parser = argparse.ArgumentParser(description="Push a TensorRT-LLM ModelOpt checkpoint")
-    parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument("--repo-id", required=True)
     parser.add_argument("--format", dest="quantization_format", required=True)
     parser.add_argument("--private", action="store_true")
@@ -105,19 +105,19 @@ def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespac
 def main(argument_values: Sequence[str] | None = None) -> int:
     """Generate a model card and upload one ModelOpt checkpoint."""
     arguments = _parse_arguments(argument_values)
-    checkpoint_dir = Path(arguments.checkpoint_dir).resolve(strict=True)
-    if not checkpoint_dir.is_dir():
+    checkpoint_folder = Path(arguments.checkpoint_folder).resolve(strict=True)
+    if not checkpoint_folder.is_dir():
         message = "Checkpoint must be a directory"
         raise NotADirectoryError(message)
-    validate_checkpoint(checkpoint_dir, TRT_ENGINE, arguments.quantization_format)
+    validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)
     metadata = require_provenance(
-        checkpoint_dir,
+        checkpoint_folder,
         engine=TRT_ENGINE,
         expected_format=arguments.quantization_format,
     )
     hf_token = os.environ["HF_TOKEN"]
     model_card = build_model_card(metadata, arguments.repo_id, hf_token=hf_token)
-    (checkpoint_dir / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
+    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
 
     hf_client = HfApi(token=hf_token)
     hf_client.create_repo(
@@ -127,7 +127,7 @@ def main(argument_values: Sequence[str] | None = None) -> int:
         private=arguments.private,
     )
     hf_client.upload_folder(
-        folder_path=checkpoint_dir,
+        folder_path=checkpoint_folder,
         repo_id=arguments.repo_id,
         repo_type=HF_MODEL_REPO_TYPE,
         revision=HF_DEFAULT_REVISION,

@@ -79,7 +79,7 @@ class _LLMCompressorRuntime:
     def quantize(
         self,
         source: SourceSnapshot,
-        checkpoint_dir: Path,
+        checkpoint_folder: Path,
         policy: QuantizationPolicy,
         settings: QuantizationSettings,
     ) -> None:
@@ -99,7 +99,7 @@ class _LLMCompressorRuntime:
             trust_remote_code_model=True,
             dataset=settings.dataset,
             recipe=_build_recipe(policy),
-            output_dir=str(checkpoint_dir),
+            output_dir=str(checkpoint_folder),
             max_seq_length=settings.sequence_length,
             num_calibration_samples=settings.samples,
             batch_size=settings.batch_size,

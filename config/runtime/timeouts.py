@@ -8,10 +8,10 @@ Runtime environment overrides are resolved under ``src.runtime``.
 GENERATION_TIMEOUT_SECONDS = 60.0
 
 # Timeout for fetching license metadata from HuggingFace API
-HUGGING_FACE_LICENSE_TIMEOUT_SECONDS = 5.0
+HF_LICENSE_TIMEOUT_SECONDS = 5.0
 
 
 __all__ = [
     "GENERATION_TIMEOUT_SECONDS",
-    "HUGGING_FACE_LICENSE_TIMEOUT_SECONDS",
+    "HF_LICENSE_TIMEOUT_SECONDS",
 ]

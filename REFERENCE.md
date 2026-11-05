@@ -1,4 +1,4 @@
-# Text Inference Advanced Guide
+# Text inference reference guide
 
 This guide is for operators and maintainers who already understand the normal
 deployment path in the [README](README.md). It defines the exact runtime and
@@ -1182,7 +1182,7 @@ GET http://127.0.0.1:8001/readyz
 Check them locally with the fixed two-second helper or curl:
 
 ```shell
-bash scripts/probe.sh
+bash scripts/readiness.sh
 curl --fail --max-time 2 http://127.0.0.1:8001/healthz
 curl --fail --max-time 2 http://127.0.0.1:8001/readyz
 ```
@@ -1482,7 +1482,7 @@ mise run deps:verify
 
 ### Readiness probe fails
 
-The probe listener is intentionally loopback-only. Run `bash scripts/probe.sh`
+The probe listener is intentionally loopback-only. Run `bash scripts/readiness.sh`
 on the host or with `docker exec` inside the container, then inspect the detailed
 server log if readiness remains unavailable.
 
@@ -1492,7 +1492,7 @@ Check:
 
 ```shell
 tail -n 200 server.log
-bash scripts/probe.sh
+bash scripts/readiness.sh
 ```
 
 Then verify:

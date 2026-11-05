@@ -21,7 +21,7 @@ ARG APT_BUILD_ESSENTIAL_VERSION=12.10ubuntu1
 ARG APT_LIBZMQ3_DEV_VERSION=4.3.5-1build2
 ARG MPI_VERSION_PIN=4.1.6-7ubuntu2
 
-ENV VENV_DIR=/opt/venv
+ENV VENV_FOLDER=/opt/venv
 
 # ----------------------------------------------------------------------------
 # Builder bootstrap
@@ -48,18 +48,18 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Create virtual env
-RUN python3.12 -m venv "${VENV_DIR}"
+RUN python3.12 -m venv "${VENV_FOLDER}"
 
 # Make venv default
-ENV PATH="${VENV_DIR}/bin:${PATH}"
+ENV PATH="${VENV_FOLDER}/bin:${PATH}"
 
 # ----------------------------------------------------------------------------
 # App Python dependencies
 # ----------------------------------------------------------------------------
 WORKDIR /app
 COPY pyproject.toml uv.lock /app/
-RUN UV_PROJECT_ENVIRONMENT="${VENV_DIR}" \
-    uv sync --frozen --no-dev --extra trt --no-install-project --python "${VENV_DIR}/bin/python" --no-python-downloads
+RUN UV_PROJECT_ENVIRONMENT="${VENV_FOLDER}" \
+    uv sync --frozen --no-dev --extra trt --no-install-project --python "${VENV_FOLDER}/bin/python" --no-python-downloads
 
 # Prefer system CUDA libraries.
 ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
@@ -88,8 +88,8 @@ ARG APT_OPENSSL_VERSION=3.0.13-0ubuntu3.11
 ARG APT_PYTHON312_VERSION=3.12.3-1ubuntu0.13
 ARG MPI_VERSION_PIN=4.1.6-7ubuntu2
 
-ENV VENV_DIR=/opt/venv
-ENV PATH="${VENV_DIR}/bin:${PATH}"
+ENV VENV_FOLDER=/opt/venv
+ENV PATH="${VENV_FOLDER}/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
 
 # ----------------------------------------------------------------------------
@@ -144,19 +144,19 @@ ENV HF_HOME=/app/.hf
 ENV HUGGINGFACE_HUB_CACHE=/app/.hf/hub
 RUN mkdir -p /app/logs /app/.run /app/.hf
 
-COPY docker/shared/download/snapshot.py /app/docker/shared/download/snapshot.py
+COPY docker/base/download/snapshot.py /app/docker/base/download/snapshot.py
 
 RUN --mount=type=secret,id=hf_token,required=false \
-    "${VENV_DIR}/bin/python" /app/docker/shared/download/snapshot.py
+    "${VENV_FOLDER}/bin/python" /app/docker/base/download/snapshot.py
 
 ENV MODEL=/opt/models/model
 
 COPY src/ /app/src/
 COPY config/ /app/config/
 COPY scripts/ /app/scripts/
-COPY shared/scripts/ /app/shared/scripts/
-RUN RUNTIME_QUANTIZATION="$("${VENV_DIR}/bin/python" -m src.quantization.detection /opt/models/model)" \
-    "${VENV_DIR}/bin/python" -m src.scripts.validate \
+COPY base/scripts/ /app/base/scripts/
+RUN RUNTIME_QUANTIZATION="$("${VENV_FOLDER}/bin/python" -m src.quantization.detection /opt/models/model)" \
+    "${VENV_FOLDER}/bin/python" -m src.scripts.validate \
     && rm -rf /app/docker
 
 RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser \
@@ -184,7 +184,7 @@ USER 10001
 
 # Health check for production readiness
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD ["/app/scripts/probe.sh"]
+  CMD ["/app/scripts/readiness.sh"]
 
 EXPOSE 8000
 

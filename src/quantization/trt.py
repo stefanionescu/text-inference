@@ -34,9 +34,9 @@ def _parse_binary_flag(value: str) -> bool:
 def _add_request_arguments(parser: argparse.ArgumentParser) -> None:
     """Add shared ModelOpt artifact arguments."""
     parser.add_argument("--source-model", required=True)
-    parser.add_argument("--source-dir", required=True)
+    parser.add_argument("--source-dir", dest="source_folder", required=True)
     parser.add_argument("--source-revision", required=True)
-    parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument(
         "--format",
         dest="quantization_format",
@@ -76,7 +76,7 @@ def _build_request(arguments: argparse.Namespace) -> QuantizationRequest:
     revision = read_repository_revision(modelopt_repository)
     source = derive_source_identity(
         arguments.source_model,
-        Path(arguments.source_dir),
+        Path(arguments.source_folder),
         arguments.source_revision,
     )
     quantization: dict[str, object] = {
@@ -110,12 +110,12 @@ def _choose_cache_action(arguments: argparse.Namespace) -> str:
     """Return whether a matching TRT checkpoint can be reused."""
     if arguments.is_rebuild_forced:
         return _CACHE_REBUILD
-    checkpoint_dir = Path(arguments.checkpoint_dir).expanduser().resolve()
+    checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()
     request = _build_request(arguments)
-    if not cache_matches(checkpoint_dir, request):
+    if not cache_matches(checkpoint_folder, request):
         return _CACHE_REBUILD
     try:
-        validate_checkpoint(checkpoint_dir, TRT_ENGINE, arguments.quantization_format)
+        validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)
     except CHECKPOINT_VALIDATION_ERRORS:
         return _CACHE_REBUILD
     return _CACHE_REUSE
@@ -123,13 +123,13 @@ def _choose_cache_action(arguments: argparse.Namespace) -> str:
 
 def _finalize_checkpoint(arguments: argparse.Namespace) -> None:
     """Preserve assets, validate the export, and write provenance."""
-    checkpoint_dir = Path(arguments.checkpoint_dir).expanduser().resolve()
-    copy_source_assets(Path(arguments.source_dir), checkpoint_dir)
-    validate_checkpoint(checkpoint_dir, TRT_ENGINE, arguments.quantization_format)
+    checkpoint_folder = Path(arguments.checkpoint_folder).expanduser().resolve()
+    copy_source_assets(Path(arguments.source_folder), checkpoint_folder)
+    validate_checkpoint(checkpoint_folder, TRT_ENGINE, arguments.quantization_format)
     write_provenance(
-        checkpoint_dir,
+        checkpoint_folder,
         _build_request(arguments),
-        exported_quantization=read_export_quantization(checkpoint_dir),
+        exported_quantization=read_export_quantization(checkpoint_folder),
         environment={
             "gpu_name": arguments.gpu_name,
             "sm_arch": arguments.sm_arch,

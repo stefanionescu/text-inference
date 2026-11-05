@@ -4,10 +4,10 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns nvidia-smi parsing for host deployment.
 
-_GPU_QUERY_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_GPU_QUERY_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_GPU_QUERY_DIR}/../log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_GPU_QUERY_FOLDER}/../log.sh"
 
 # gpu_architecture: Print the supported GPU compute architecture.
 # Globals:

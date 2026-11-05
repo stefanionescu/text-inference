@@ -19,10 +19,10 @@ from dataclasses import dataclass
 from tests.state import SessionContext, CancelClientResult, NormalClientResult
 from config.tests.defaults import (
     CANCEL_CLIENT_COUNT_DEFAULT,
+    CANCEL_POST_SECONDS_DEFAULT,
+    CANCEL_DRAIN_SECONDS_DEFAULT,
     CANCEL_REQUEST_DELAY_SECONDS,
-    CANCEL_POST_WAIT_SECONDS_DEFAULT,
-    CANCEL_DRAIN_TIMEOUT_SECONDS_DEFAULT,
-    CANCEL_RECEIVE_TIMEOUT_SECONDS_DEFAULT,
+    CANCEL_RECEIVE_SECONDS_DEFAULT,
 )
 from tests.harness.client.prompt import select_prompt
 from tests.harness.client.websocket import build_api_key_headers
@@ -42,9 +42,9 @@ class CancelSuiteRequest:
     personality: str
     client_count: int = CANCEL_CLIENT_COUNT_DEFAULT
     cancel_delay_seconds: float = CANCEL_REQUEST_DELAY_SECONDS
-    drain_timeout_seconds: float = CANCEL_DRAIN_TIMEOUT_SECONDS_DEFAULT
-    post_cancel_wait_seconds: float = CANCEL_POST_WAIT_SECONDS_DEFAULT
-    receive_timeout_seconds: float = CANCEL_RECEIVE_TIMEOUT_SECONDS_DEFAULT
+    drain_timeout_seconds: float = CANCEL_DRAIN_SECONDS_DEFAULT
+    post_cancel_wait_seconds: float = CANCEL_POST_SECONDS_DEFAULT
+    receive_timeout_seconds: float = CANCEL_RECEIVE_SECONDS_DEFAULT
 
 
 def _session_context(request: CancelSuiteRequest, prompt: str) -> SessionContext:

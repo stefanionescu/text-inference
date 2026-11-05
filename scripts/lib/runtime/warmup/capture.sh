@@ -3,10 +3,10 @@
 # Mark and report warmup-specific server log capture boundaries.
 # Runtime: Bash 3.2+, Linux.
 
-_WARMUP_CAPTURE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_CAPTURE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_WARMUP_CAPTURE_DIR}/../../shared/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_WARMUP_CAPTURE_FOLDER}/../../foundation/log.sh"
 
 # _warmup_capture_active: Report whether the recorded warmup process exists.
 # Globals:

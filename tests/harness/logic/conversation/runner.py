@@ -38,8 +38,8 @@ from tests.harness.reporting.terminal import (
 from tests.harness.environment.settings import (
     DEFAULT_GENDER,
     DEFAULT_PERSONALITY,
-    DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
-    DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
+    DEFAULT_PING_TIMEOUT_SECONDS,
+    DEFAULT_PING_INTERVAL_SECONDS,
 )
 from tests.harness.environment.variables import read_environment_float, read_environment_integer
 
@@ -158,8 +158,8 @@ async def run_conversation(request: ConversationRunRequest) -> None:
         authenticated_websocket_url,
         headers=authentication_headers,
         max_queue=None,
-        ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-        ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+        ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+        ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
     ) as websocket:
         try:
             for index, user_text in enumerate(request.prompts, start=1):

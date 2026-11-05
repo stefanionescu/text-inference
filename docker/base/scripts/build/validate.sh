@@ -11,7 +11,7 @@ validate_model_revision() {
 
 # validate_models_for_engine: Validate Docker model inputs for an engine.
 # Globals:
-#   ROOT_DIR
+#   ROOT_FOLDER
 # Arguments:
 #   $1: Engine name.
 #   $2: Model name or path.
@@ -20,14 +20,14 @@ validate_models_for_engine() {
   local engine="$1"
   local model="$2"
   local model_revision="$3"
-  local root_dir="${ROOT_DIR:?ROOT_DIR is required for model validation}"
+  local root_folder="${ROOT_FOLDER:?ROOT_FOLDER is required for model validation}"
 
   if ! command -v python3 >/dev/null 2>&1; then
     log_write "[build] ✗ python3 is required for model inspection"
     return 1
   fi
 
-  PYTHONPATH="${root_dir}${PYTHONPATH:+:${PYTHONPATH}}" \
+  PYTHONPATH="${root_folder}${PYTHONPATH:+:${PYTHONPATH}}" \
     python3 -m src.quantization.inspection \
     --model "${model}" --revision "${model_revision}" --engine "${engine}" >/dev/null
 }

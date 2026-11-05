@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from tests.state import BenchmarkConfig
-from config.tests.defaults import BENCHMARK_FALLBACK_MESSAGE
+from config.tests.defaults import BENCHMARK_DEFAULT_MESSAGE
 from tests.harness.client.prompt import select_prompt
 from tests.harness.client.selection import choose_message
 from tests.harness.client.concurrency import sanitize_concurrency
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 def _build_config(arguments: argparse.Namespace) -> BenchmarkConfig:
     """Build benchmark configuration from CLI arguments."""
-    message = choose_message(arguments.message, fallback=BENCHMARK_FALLBACK_MESSAGE)
+    message = choose_message(arguments.message, default_message=BENCHMARK_DEFAULT_MESSAGE)
     sampling = getattr(arguments, "sampling", None) or None
     is_double_ttfb_enabled = bool(arguments.is_double_ttfb_enabled)
     prompt = select_prompt(arguments.gender, arguments.personality)

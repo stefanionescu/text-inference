@@ -5,20 +5,20 @@
 
 set -euo pipefail
 
-DEPLOY_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly DEPLOY_DIR
-SCRIPTS_DIR="$(CDPATH='' cd -- "${DEPLOY_DIR}/.." && pwd -P)" || exit 1
-readonly SCRIPTS_DIR
-ROOT_DIR="$(CDPATH='' cd -- "${SCRIPTS_DIR}/.." && pwd -P)" || exit 1
-readonly ROOT_DIR
-export ROOT_DIR
+DEPLOY_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
+readonly DEPLOY_FOLDER
+SCRIPTS_FOLDER="$(CDPATH='' cd -- "${DEPLOY_FOLDER}/.." && pwd -P)" || exit 1
+readonly SCRIPTS_FOLDER
+ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPTS_FOLDER}/.." && pwd -P)" || exit 1
+readonly ROOT_FOLDER
+export ROOT_FOLDER
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${SCRIPTS_DIR}/config/values/runtime.sh"
+source "${SCRIPTS_FOLDER}/config/values/runtime.sh"
 # shellcheck source=scripts/lib/restart/workflow.sh
-source "${SCRIPTS_DIR}/lib/restart/workflow.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${SCRIPTS_DIR}/lib/shared/log.sh"
+source "${SCRIPTS_FOLDER}/lib/restart/workflow.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${SCRIPTS_FOLDER}/lib/foundation/log.sh"
 
 # _restart_report_exit: Report the captured diagnostics for a failed workflow.
 _restart_report_exit() {
@@ -26,7 +26,7 @@ _restart_report_exit() {
 
   trap - EXIT
   if ((status != 0)); then
-    log_write "[restart] Restart failed; detailed diagnostics: ${ROOT_DIR}/${CFG_RUNTIME_SERVER_LOG_FILE}"
+    log_write "[restart] Restart failed; detailed diagnostics: ${ROOT_FOLDER}/${RUNTIME_SERVER_LOG_FILE}"
   fi
   exit "${status}"
 }
@@ -36,7 +36,7 @@ main() {
   (($# == 0)) || return 2
 
   trap _restart_report_exit EXIT
-  restart_execute_selected "${ROOT_DIR}" "${SCRIPTS_DIR}"
+  restart_execute_selected "${ROOT_FOLDER}" "${SCRIPTS_FOLDER}"
 }
 
 main "$@"

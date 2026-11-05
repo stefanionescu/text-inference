@@ -11,7 +11,7 @@ import asyncio
 
 from tests.harness.client.concurrency import distribute_requests
 
-from .connection import execute_connection
+from .connection import run_connection
 
 if TYPE_CHECKING:
     from tests.state import BenchmarkConfig
@@ -30,7 +30,7 @@ async def run_worker(count: int, config: BenchmarkConfig) -> list[dict[str, Any]
     """
     results: list[dict[str, Any]] = []
     for _ in range(count):
-        results.extend(await execute_connection(config))
+        results.extend(await run_connection(config))
     return results
 
 

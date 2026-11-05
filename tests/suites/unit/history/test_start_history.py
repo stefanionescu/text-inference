@@ -128,7 +128,7 @@ def test_history_merge_flows() -> None:
         session_runtime = _build_session(tokenizer=tokenizer)
         state = _make_state(session_runtime)
 
-        messages_1 = history_messages(
+        first_messages = history_messages(
             session_runtime,
             state,
             {
@@ -138,12 +138,12 @@ def test_history_merge_flows() -> None:
                 ],
             },
         )
-        assert any(message.content == "first hello" for message in messages_1)
+        assert any(message.content == "first hello" for message in first_messages)
 
         session_runtime.history.append_response(state, "follow-up", "")
         assert _history_turn_count(state) > 0
 
-        messages_2 = history_messages(
+        second_messages = history_messages(
             session_runtime,
             state,
             {
@@ -154,9 +154,9 @@ def test_history_merge_flows() -> None:
             },
         )
 
-        if any("OVERWRITE ATTEMPT" in message.content for message in messages_2):
+        if any("OVERWRITE ATTEMPT" in message.content for message in second_messages):
             pytest.fail("Assertion failed")
-        assert any(message.content == "first hello" for message in messages_2)
+        assert any(message.content == "first hello" for message in second_messages)
     with use_local_tokenizers() as tokenizer:
         session_runtime = _build_session(trigger_tokens=60, target_tokens=40, tokenizer=tokenizer)
         state = _make_state(session_runtime)

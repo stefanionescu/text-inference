@@ -3,12 +3,12 @@
 # Export build and runtime values for the detected NVIDIA GPU.
 # Runtime: Bash 3.2+, Linux.
 
-_GPU_ENVIRONMENT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_GPU_ENVIRONMENT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/gpu/query.sh
-source "${_GPU_ENVIRONMENT_DIR}/query.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_GPU_ENVIRONMENT_DIR}/../log.sh"
+# shellcheck source=scripts/lib/foundation/gpu/query.sh
+source "${_GPU_ENVIRONMENT_FOLDER}/query.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_GPU_ENVIRONMENT_FOLDER}/../log.sh"
 
 # _gpu_architecture_values: Print build values for one supported architecture.
 _gpu_architecture_values() {

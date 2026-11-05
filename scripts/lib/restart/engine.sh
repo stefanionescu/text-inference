@@ -4,18 +4,18 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns persisted deployment transition cleanup policy.
 
-_RESTART_ENGINE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RESTART_ENGINE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/lib/runtime/cleanup/artifacts.sh
-source "${_RESTART_ENGINE_DIR}/../runtime/cleanup/artifacts.sh"
+source "${_RESTART_ENGINE_FOLDER}/../runtime/cleanup/artifacts.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/main.sh
-source "${_RESTART_ENGINE_DIR}/../runtime/cleanup/main.sh"
+source "${_RESTART_ENGINE_FOLDER}/../runtime/cleanup/main.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/reset.sh
-source "${_RESTART_ENGINE_DIR}/../runtime/cleanup/reset.sh"
+source "${_RESTART_ENGINE_FOLDER}/../runtime/cleanup/reset.sh"
 # shellcheck source=scripts/lib/runtime/records.sh
-source "${_RESTART_ENGINE_DIR}/../runtime/records.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RESTART_ENGINE_DIR}/../shared/log.sh"
+source "${_RESTART_ENGINE_FOLDER}/../runtime/records.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RESTART_ENGINE_FOLDER}/../foundation/log.sh"
 
 # restart_transition_mode: Print cleanup mode for one requested deployment.
 # Globals:
@@ -28,7 +28,7 @@ source "${_RESTART_ENGINE_DIR}/../shared/log.sh"
 # Returns:
 #   0 for valid state, non-zero for malformed state.
 restart_transition_mode() {
-  local root_dir="$1"
+  local root_folder="$1"
   local requested_engine="$2"
   local requested_source="$3"
   local requested_revision="$4"
@@ -38,10 +38,10 @@ restart_transition_mode() {
   local previous_revision
   local previous_request
 
-  previous_engine="$(runtime_state_read "${root_dir}" INFERENCE_ENGINE)" || return 1
-  previous_source="$(runtime_state_read "${root_dir}" SOURCE_MODEL)" || return 1
-  previous_revision="$(runtime_state_read "${root_dir}" SOURCE_REVISION)" || return 1
-  previous_request="$(runtime_state_read "${root_dir}" REQUESTED_QUANTIZATION)" || return 1
+  previous_engine="$(runtime_state_read "${root_folder}" INFERENCE_ENGINE)" || return 1
+  previous_source="$(runtime_state_read "${root_folder}" SOURCE_MODEL)" || return 1
+  previous_revision="$(runtime_state_read "${root_folder}" SOURCE_REVISION)" || return 1
+  previous_request="$(runtime_state_read "${root_folder}" REQUESTED_QUANTIZATION)" || return 1
   if [[ -z ${previous_engine}${previous_source}${previous_revision}${previous_request} ]]; then
     printf 'fresh\n'
     return 0
@@ -71,26 +71,26 @@ restart_transition_mode() {
 # Returns:
 #   0 after cleanup, non-zero when cleanup fails.
 restart_apply_transition() {
-  local root_dir="$1"
+  local root_folder="$1"
   local transition="$2"
 
   case "${transition}" in
     fresh | same)
       log_write "[restart] Stopping repository-owned processes"
-      runtime_stop_owned_processes "${root_dir}"
+      runtime_stop_owned_processes "${root_folder}"
       ;;
     model)
       log_write "[restart] Model or quantization changed; clearing model and engine caches"
-      runtime_stop_owned_processes "${root_dir}" || return 1
-      runtime_clear_model_transition "${root_dir}"
+      runtime_stop_owned_processes "${root_folder}" || return 1
+      runtime_clear_model_transition "${root_folder}"
       ;;
     engine)
       log_write "[restart] Engine changed; clearing incompatible environments and caches"
-      runtime_stop_owned_processes "${root_dir}" || return 1
-      runtime_clear_engine_artifacts "${root_dir}"
+      runtime_stop_owned_processes "${root_folder}" || return 1
+      runtime_clear_engine_artifacts "${root_folder}"
       ;;
     reset)
-      runtime_reset_host "${root_dir}"
+      runtime_reset_host "${root_folder}"
       ;;
     *)
       log_write "[restart] Invalid deployment transition: ${transition}"

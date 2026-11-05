@@ -88,7 +88,7 @@ def build_model_card(
 def _parse_arguments(argument_values: Sequence[str] | None) -> argparse.Namespace:
     """Parse the stable checkpoint-upload command."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--checkpoint-dir", dest="checkpoint_folder", required=True)
     parser.add_argument("--repo-id", required=True)
     parser.add_argument("--private", action="store_true")
     return parser.parse_args(argument_values)
@@ -98,19 +98,19 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     """Upload the configured checkpoint."""
     arguments = _parse_arguments(argument_values)
 
-    checkpoint_dir = Path(arguments.checkpoint_dir).resolve(strict=True)
-    if not checkpoint_dir.is_dir():
+    checkpoint_folder = Path(arguments.checkpoint_folder).resolve(strict=True)
+    if not checkpoint_folder.is_dir():
         message = "Checkpoint must be a directory"
         raise NotADirectoryError(message)
-    validate_checkpoint(checkpoint_dir, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
+    validate_checkpoint(checkpoint_folder, VLLM_ENGINE, COMPRESSED_TENSORS_FORMAT)
     metadata = require_provenance(
-        checkpoint_dir,
+        checkpoint_folder,
         engine=VLLM_ENGINE,
         expected_format=COMPRESSED_TENSORS_FORMAT,
     )
     hf_token = os.environ["HF_TOKEN"]
     model_card = build_model_card(metadata, arguments.repo_id, hf_token=hf_token)
-    (checkpoint_dir / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
+    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
 
     hf_client = HfApi(token=hf_token)
     hf_client.create_repo(
@@ -120,7 +120,7 @@ def main(argument_values: Sequence[str] | None = None) -> int:
         private=arguments.private,
     )
     hf_client.upload_folder(
-        folder_path=checkpoint_dir,
+        folder_path=checkpoint_folder,
         repo_id=arguments.repo_id,
         repo_type=HF_MODEL_REPO_TYPE,
         revision=HF_DEFAULT_REVISION,

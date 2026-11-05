@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
 from dataclasses import dataclass
 
 
@@ -27,7 +26,7 @@ class TransactionMetrics:
 
     ttfb_ms: float | None = None
     first_sentence_ms: float | None = None
-    first_3_words_ms: float | None = None
+    first_three_words_ms: float | None = None
 
 
 __all__ = [

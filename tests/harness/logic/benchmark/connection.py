@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol
 
 
-async def _execute_phase(
+async def _run_phase(
     websocket: WebSocketClientProtocol,
     config: BenchmarkConfig,
     phase: int,
@@ -129,13 +129,13 @@ def _build_success_result(metrics: dict[str, Any], phase: int) -> dict[str, Any]
         "phase": phase,
         "ttfb_ms": metrics.get("ttfb_ms"),
         "first_sentence_ms": metrics.get("time_to_first_complete_sentence_ms"),
-        "first_3_words_ms": metrics.get("time_to_first_3_words_ms"),
+        "first_three_words_ms": metrics.get("time_to_first_3_words_ms"),
     }
 
 
 def _build_error_result(message: dict[str, Any], phase: int) -> dict[str, Any]:
     """Build an error result from a server error message."""
-    error = ServerError.from_message(message)
+    error = ServerError.decode_message(message)
     return {
         "ok": False,
         "phase": phase,
@@ -145,7 +145,7 @@ def _build_error_result(message: dict[str, Any], phase: int) -> dict[str, Any]:
     }
 
 
-async def execute_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
+async def run_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
     """Execute one or two transactions over a single WebSocket connection."""
     phases = 2 if config.is_double_ttfb_enabled else 1
     results: list[dict[str, Any]] = []
@@ -163,7 +163,7 @@ async def execute_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
         ) as websocket:
             try:
                 for phase in range(1, phases + 1):
-                    result = await _execute_phase(websocket, config, phase, session_id)
+                    result = await _run_phase(websocket, config, phase, session_id)
                     results.append(result)
                     if not result.get("ok"):
                         break
@@ -179,4 +179,4 @@ async def execute_connection(config: BenchmarkConfig) -> list[dict[str, Any]]:
     return results or [error_result("connection_failed", phase=1)]
 
 
-__all__ = ["execute_connection"]
+__all__ = ["run_connection"]

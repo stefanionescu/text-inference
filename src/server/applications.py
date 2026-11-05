@@ -99,7 +99,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await handle_websocket_connection(websocket, runtime_dependencies)
 
 
-async def probe_status(request: Request) -> JSONResponse:
+async def readiness_status(request: Request) -> JSONResponse:
     """Report event-loop health or public runtime readiness."""
     if request.url.path == "/healthz":
         return JSONResponse({"status": "alive"})
@@ -137,18 +137,18 @@ def create_public_application(
     return application
 
 
-def create_probe_application(readiness_state: ReadinessState) -> FastAPI:
+def create_readiness_application(readiness_state: ReadinessState) -> FastAPI:
     """Create the fixed loopback health and readiness application."""
     application = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     application.state.readiness_state = readiness_state
-    application.get("/healthz")(probe_status)
-    application.get("/readyz")(probe_status)
+    application.get("/healthz")(readiness_status)
+    application.get("/readyz")(readiness_status)
     return application
 
 
 __all__ = [
-    "create_probe_application",
     "create_public_application",
-    "probe_status",
+    "create_readiness_application",
+    "readiness_status",
     "websocket_endpoint",
 ]

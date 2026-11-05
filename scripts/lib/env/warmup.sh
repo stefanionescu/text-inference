@@ -3,16 +3,16 @@
 # Initialize validated warmup runtime values.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_ENV_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_ENV_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
-source "${_WARMUP_ENV_DIR}/../../config/defaults.sh"
+source "${_WARMUP_ENV_FOLDER}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${_WARMUP_ENV_DIR}/../../config/values/deployment.sh"
+source "${_WARMUP_ENV_FOLDER}/../../config/values/deployment.sh"
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_WARMUP_ENV_DIR}/../../config/values/runtime.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_WARMUP_ENV_DIR}/../shared/log.sh"
+source "${_WARMUP_ENV_FOLDER}/../../config/values/runtime.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_WARMUP_ENV_FOLDER}/../foundation/log.sh"
 
 # _warmup_positive_integer: Validate and export one positive integer.
 _warmup_positive_integer() {
@@ -33,7 +33,7 @@ _warmup_positive_integer() {
 
 # warmup_initialize_environment: Export warmup paths, timeouts, and retries.
 # Globals:
-#   WARMUP_PROBE_SCRIPT
+#   WARMUP_READINESS_SCRIPT
 #   WARMUP_HEALTH_POLL_INTERVAL_SECONDS
 #   WARMUP_LOCK_FILE
 #   WARMUP_LOG_FILE
@@ -47,16 +47,16 @@ _warmup_positive_integer() {
 # Returns:
 #   0 for valid values, non-zero otherwise.
 warmup_initialize_environment() {
-  local root_dir="$1"
+  local root_folder="$1"
 
-  cfg_export_default \
+  config_export_default \
     WARMUP_HEALTH_POLL_INTERVAL_SECONDS \
-    "${CFG_WARMUP_HEALTH_POLL_INTERVAL_SECONDS_DEFAULT}"
-  cfg_export_default WARMUP_RUN_DELAY_SECONDS "${CFG_WARMUP_RUN_DELAY_SECONDS_DEFAULT}"
-  cfg_export_default WARMUP_LOG_FILE "${root_dir}/${CFG_RUNTIME_WARMUP_LOG_FILE}"
-  cfg_export_default WARMUP_LOCK_FILE "${root_dir}/${CFG_RUNTIME_WARMUP_LOCK_FILE}"
-  WARMUP_PROBE_SCRIPT="${root_dir}/scripts/probe.sh"
-  export WARMUP_PROBE_SCRIPT
-  _warmup_positive_integer WARMUP_TIMEOUT_SECONDS "${CFG_WARMUP_TIMEOUT_SECONDS_DEFAULT}"
-  _warmup_positive_integer WARMUP_RETRIES "${CFG_WARMUP_RETRIES_DEFAULT}"
+    "${WARMUP_HEALTH_POLL_SECONDS}"
+  config_export_default WARMUP_RUN_DELAY_SECONDS "${WARMUP_DELAY_SECONDS_DEFAULT}"
+  config_export_default WARMUP_LOG_FILE "${root_folder}/${RUNTIME_WARMUP_LOG_FILE}"
+  config_export_default WARMUP_LOCK_FILE "${root_folder}/${RUNTIME_WARMUP_LOCK_FILE}"
+  WARMUP_READINESS_SCRIPT="${root_folder}/scripts/readiness.sh"
+  export WARMUP_READINESS_SCRIPT
+  _warmup_positive_integer WARMUP_TIMEOUT_SECONDS "${WARMUP_TIMEOUT_SECONDS_DEFAULT}"
+  _warmup_positive_integer WARMUP_RETRIES "${WARMUP_RETRIES_DEFAULT}"
 }

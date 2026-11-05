@@ -35,12 +35,12 @@ from tests.harness.client.websocket import (
 )
 from tests.harness.reporting.terminal import dim, write_line
 from tests.harness.environment.settings import (
-    DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
-    DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
+    DEFAULT_PING_TIMEOUT_SECONDS,
+    DEFAULT_PING_INTERVAL_SECONDS,
 )
 
 from .phases import run_drain_phase, run_cancel_phase, run_recovery_phase
-from .handlers import build_recovery_handlers
+from .callbacks import build_recovery_callbacks
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol
@@ -80,7 +80,7 @@ async def _consume_recovery_stream(
     receive_timeout_seconds: float,
 ) -> tuple[str, dict[str, Any], str | None, bool]:
     state = StreamState()
-    handlers = build_recovery_handlers(state)
+    callbacks = build_recovery_callbacks(state)
     is_cancelled = False
     error: str | None = None
     metrics: dict[str, Any] = {}
@@ -89,7 +89,7 @@ async def _consume_recovery_stream(
         async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
             result = await dispatch_message(
                 message,
-                handlers,
+                callbacks,
                 default=lambda _message: True,
             )
 
@@ -178,8 +178,8 @@ async def run_normal_client(request: NormalClientRequest) -> NormalClientResult:
                 request.server_url,
                 headers=request.authentication_headers,
                 max_queue=None,
-                ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-                ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
             ),
         ) as websocket:
             return await _run_normal_session(websocket, request)
@@ -265,8 +265,8 @@ async def run_canceling_client(request: CancelingClientRequest) -> CancelClientR
                 request.server_url,
                 headers=request.authentication_headers,
                 max_queue=None,
-                ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-                ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+                ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+                ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
             ),
         ) as websocket:
             return await _run_canceling_session(websocket, request)

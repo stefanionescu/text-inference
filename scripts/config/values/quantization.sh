@@ -5,5 +5,5 @@
 
 # shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 
-CFG_QUANT_DEFAULT_MODEL_REVISION="main"
-CFG_QUANT_DEFAULT_FORCE_REBUILD="0"
+QUANT_DEFAULT_MODEL_REVISION="main"
+QUANT_DEFAULT_FORCE_REBUILD="0"

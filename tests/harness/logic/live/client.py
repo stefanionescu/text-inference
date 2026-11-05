@@ -187,7 +187,7 @@ class LiveClient:
     def _handle_error_frame(self, message: dict[str, object], context: _StreamContext) -> StreamResult:
         """Handle an error message frame."""
         context.printer.finish()
-        error = ServerError.from_message(message)
+        error = ServerError.decode_message(message)
         _log_server_error(message)
         if error.is_recoverable():
             return StreamResult(text=context.state.completion_text, is_successful=False, error=error)

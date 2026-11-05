@@ -4,16 +4,16 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns detached server process creation and PID persistence.
 
-_SERVER_PROCESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_SERVER_PROCESS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
-source "${_SERVER_PROCESS_DIR}/../../../config/values/deployment.sh"
+source "${_SERVER_PROCESS_FOLDER}/../../../config/values/deployment.sh"
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_SERVER_PROCESS_DIR}/../../../config/values/runtime.sh"
+source "${_SERVER_PROCESS_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/runtime/process.sh
-source "${_SERVER_PROCESS_DIR}/../process.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_SERVER_PROCESS_DIR}/../../shared/log.sh"
+source "${_SERVER_PROCESS_FOLDER}/../process.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_SERVER_PROCESS_FOLDER}/../../foundation/log.sh"
 
 # _server_module: Print the selected server process module.
 _server_module() {
@@ -30,13 +30,13 @@ _server_module() {
 # _server_build_command: Assign the managed uvicorn command array.
 _server_build_command() {
   local server_module
-  local python_bin="${VENV_DIR:?VENV_DIR is required}/bin/python"
+  local python_bin="${VENV_FOLDER:?VENV_FOLDER is required}/bin/python"
 
   server_module="$(_server_module)" || return 1
   [[ -x ${python_bin} ]] || return 127
-  if ! PYTHONPATH="${ROOT_DIR:?ROOT_DIR is required}${PYTHONPATH:+:${PYTHONPATH}}" \
+  if ! PYTHONPATH="${ROOT_FOLDER:?ROOT_FOLDER is required}${PYTHONPATH:+:${PYTHONPATH}}" \
     "${python_bin}" -m src.scripts.validation.package uvicorn >/dev/null 2>&1; then
-    log_write "[server] uvicorn is not installed in ${VENV_DIR}"
+    log_write "[server] uvicorn is not installed in ${VENV_FOLDER}"
     return 127
   fi
   SERVER_COMMAND=("${python_bin}" -m "${server_module}")
@@ -44,7 +44,7 @@ _server_build_command() {
 
 # server_guard_start: Reject startup while an owned server process is active.
 # Globals:
-#   CFG_RUNTIME_SERVER_PID_FILE
+#   RUNTIME_SERVER_PID_FILE
 # Arguments:
 #   $1: Repository root.
 # Outputs:
@@ -52,8 +52,8 @@ _server_build_command() {
 # Returns:
 #   0 when startup is safe, non-zero when the server is already running.
 server_guard_start() {
-  local root_dir="$1"
-  local pid_file="${root_dir}/${CFG_RUNTIME_SERVER_PID_FILE}"
+  local root_folder="$1"
+  local pid_file="${root_folder}/${RUNTIME_SERVER_PID_FILE}"
   local pid
 
   if ! pid="$(runtime_read_pid "${pid_file}")"; then
@@ -70,7 +70,7 @@ server_guard_start() {
 
 # server_start: Start uvicorn in a detached process group.
 # Globals:
-#   CFG_RUNTIME_SERVER_LOG_FILE
+#   RUNTIME_SERVER_LOG_FILE
 #   SERVER_PID
 # Arguments:
 #   $1: Repository root.
@@ -79,9 +79,9 @@ server_guard_start() {
 # Returns:
 #   0 after persisting the process identifier, non-zero on failure.
 server_start() {
-  local root_dir="$1"
-  local pid_file="${root_dir}/${CFG_RUNTIME_SERVER_PID_FILE}"
-  local server_log="${root_dir}/${CFG_RUNTIME_SERVER_LOG_FILE}"
+  local root_folder="$1"
+  local pid_file="${root_folder}/${RUNTIME_SERVER_PID_FILE}"
+  local server_log="${root_folder}/${RUNTIME_SERVER_LOG_FILE}"
 
   _server_build_command || return 1
   PYTHONUNBUFFERED=1 setsid "${SERVER_COMMAND[@]}" >>"${server_log}" 2>&1 &

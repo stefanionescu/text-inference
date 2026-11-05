@@ -4,15 +4,15 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the managed Python CUDA package compatibility probe.
 
-_PYTORCH_GUARD_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_PYTORCH_GUARD_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_PYTORCH_GUARD_DIR}/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_PYTORCH_GUARD_FOLDER}/log.sh"
 
 # pytorch_guard_check: Detect mismatched Torch packages.
 # Globals:
-#   ROOT_DIR
-#   VENV_DIR
+#   ROOT_FOLDER
+#   VENV_FOLDER
 # Arguments:
 #   $1: Diagnostic prefix.
 # Outputs:
@@ -21,7 +21,7 @@ source "${_PYTORCH_GUARD_DIR}/log.sh"
 #   0 for compatible packages, 42 for a CUDA mismatch, or another probe status.
 pytorch_guard_check() {
   local prefix="$1"
-  local python_bin="${VENV_DIR:?VENV_DIR is required}/bin/python"
+  local python_bin="${VENV_FOLDER:?VENV_FOLDER is required}/bin/python"
   local output
   local status
 
@@ -30,7 +30,7 @@ pytorch_guard_check() {
     return 1
   fi
   if output="$(
-    PYTHONPATH="${ROOT_DIR:?ROOT_DIR is required}${PYTHONPATH:+:${PYTHONPATH}}" \
+    PYTHONPATH="${ROOT_FOLDER:?ROOT_FOLDER is required}${PYTHONPATH:+:${PYTHONPATH}}" \
       "${python_bin}" -m src.scripts.guard 2>&1
   )"; then
     return 0

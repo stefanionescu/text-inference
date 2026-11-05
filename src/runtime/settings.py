@@ -6,11 +6,11 @@ import os
 
 from config.limits import (
     MIN_P_MAX,
-    MIN_P_MIN,
     TOP_K_MAX,
     TOP_K_MIN,
     TOP_P_MAX,
     TOP_P_MIN,
+    MIN_P_LOWER,
     TEMPERATURE_MAX,
     TEMPERATURE_MIN,
     PRESENCE_PENALTY_MAX,
@@ -56,10 +56,10 @@ from config.runtime.websocket import (
     AUTHENTICATION_FAILURE_LIMIT,
     WEBSOCKET_CANCELS_PER_WINDOW,
     WEBSOCKET_MESSAGES_PER_WINDOW,
+    WEBSOCKET_RATE_WINDOW_SECONDS,
     WEBSOCKET_IDLE_TIMEOUT_SECONDS,
     WEBSOCKET_WATCHDOG_TICK_SECONDS,
-    WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS,
-    WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
+    HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
 )
 
 
@@ -169,7 +169,7 @@ def _build_sampling_settings(environment: EnvironmentValues) -> SamplingSettings
         maximum_top_p=TOP_P_MAX,
         minimum_top_k=TOP_K_MIN,
         maximum_top_k=TOP_K_MAX,
-        minimum_min_p=MIN_P_MIN,
+        minimum_min_p=MIN_P_LOWER,
         maximum_min_p=MIN_P_MAX,
         minimum_repetition_penalty=REPETITION_PENALTY_MIN,
         maximum_repetition_penalty=REPETITION_PENALTY_MAX,
@@ -199,7 +199,7 @@ def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSetti
         handshake_acquire_timeout_seconds=_read_environment_float(
             environment,
             "WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS",
-            WEBSOCKET_HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
+            HANDSHAKE_ACQUIRE_TIMEOUT_SECONDS,
         ),
         protocol_version=_read_environment_integer(
             environment, "WEBSOCKET_PROTOCOL_VERSION", WEBSOCKET_PROTOCOL_VERSION
@@ -210,7 +210,7 @@ def _build_websocket_settings(environment: EnvironmentValues, limits: LimitSetti
         rate_limit_window_seconds=_read_environment_float(
             environment,
             "WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS",
-            WEBSOCKET_RATE_LIMIT_WINDOW_SECONDS,
+            WEBSOCKET_RATE_WINDOW_SECONDS,
         ),
         maximum_messages_per_window=_read_environment_integer(
             environment,

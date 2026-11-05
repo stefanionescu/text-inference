@@ -5,37 +5,37 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly SCRIPT_DIR
-ROOT_DIR="$(CDPATH='' cd -- "${SCRIPT_DIR}/.." && pwd -P)" || exit 1
-readonly ROOT_DIR
-export ROOT_DIR
+SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
+readonly SCRIPT_FOLDER
+ROOT_FOLDER="$(CDPATH='' cd -- "${SCRIPT_FOLDER}/.." && pwd -P)" || exit 1
+readonly ROOT_FOLDER
+export ROOT_FOLDER
 
 # shellcheck source=scripts/config/defaults.sh
-source "${SCRIPT_DIR}/config/defaults.sh"
+source "${SCRIPT_FOLDER}/config/defaults.sh"
 # shellcheck source=scripts/config/messages/main.sh
-source "${SCRIPT_DIR}/config/messages/main.sh"
+source "${SCRIPT_FOLDER}/config/messages/main.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${SCRIPT_DIR}/config/values/deployment.sh"
+source "${SCRIPT_FOLDER}/config/values/deployment.sh"
 # shellcheck source=scripts/lib/restart/engine.sh
-source "${SCRIPT_DIR}/lib/restart/engine.sh"
+source "${SCRIPT_FOLDER}/lib/restart/engine.sh"
 # shellcheck source=scripts/lib/runtime/background.sh
-source "${SCRIPT_DIR}/lib/runtime/background.sh"
+source "${SCRIPT_FOLDER}/lib/runtime/background.sh"
 # shellcheck source=scripts/lib/runtime/warmup/process.sh
-source "${SCRIPT_DIR}/lib/runtime/warmup/process.sh"
-# shellcheck source=scripts/lib/shared/deployment.sh
-source "${SCRIPT_DIR}/lib/shared/deployment.sh"
-# shellcheck source=scripts/lib/shared/inspection.sh
-source "${SCRIPT_DIR}/lib/shared/inspection.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${SCRIPT_DIR}/lib/shared/log.sh"
+source "${SCRIPT_FOLDER}/lib/runtime/warmup/process.sh"
+# shellcheck source=scripts/lib/foundation/deployment.sh
+source "${SCRIPT_FOLDER}/lib/foundation/deployment.sh"
+# shellcheck source=scripts/lib/foundation/inspection.sh
+source "${SCRIPT_FOLDER}/lib/foundation/inspection.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${SCRIPT_FOLDER}/lib/foundation/log.sh"
 
 # _main_usage: Print deployment command help and terminate.
 _main_usage() {
   local status="$1"
   local line
 
-  for line in "${CFG_MAIN_USAGE_LINES[@]}"; do
+  for line in "${MAIN_USAGE_LINES[@]}"; do
     printf '%s\n' "${line//\$0/$0}"
   done
   exit "${status}"
@@ -74,7 +74,7 @@ _main_read_value_flag() {
 
 # _main_parse_args: Parse the host deployment command contract.
 _main_parse_args() {
-  local engine="${CFG_DEFAULT_ENGINE}"
+  local engine="${DEFAULT_ENGINE}"
   local model=""
   local quantization=""
   local is_logging_enabled="0"
@@ -117,18 +117,18 @@ main() {
   _main_parse_args "$@" || _main_usage 2
   deployment_require_environment
   deployment_inspect_model \
-    "${ROOT_DIR}" "${SOURCE_MODEL}" "${INFERENCE_ENGINE}" "${REQUESTED_QUANTIZATION}"
+    "${ROOT_FOLDER}" "${SOURCE_MODEL}" "${INFERENCE_ENGINE}" "${REQUESTED_QUANTIZATION}"
   transition="$(
     restart_transition_mode \
-      "${ROOT_DIR}" "${INFERENCE_ENGINE}" "${SOURCE_MODEL}" \
+      "${ROOT_FOLDER}" "${INFERENCE_ENGINE}" "${SOURCE_MODEL}" \
       "${SOURCE_REVISION}" "${REQUESTED_QUANTIZATION}"
   )"
-  warmup_stop_existing "${ROOT_DIR}"
-  restart_apply_transition "${ROOT_DIR}" "${transition}"
+  warmup_stop_existing "${ROOT_FOLDER}"
+  restart_apply_transition "${ROOT_FOLDER}" "${transition}"
   runtime_start_background \
-    "${ROOT_DIR}" \
+    "${ROOT_FOLDER}" \
     "Starting ${INFERENCE_ENGINE} deployment" \
-    bash "${SCRIPT_DIR}/deploy/main.sh"
+    bash "${SCRIPT_FOLDER}/deploy/main.sh"
 }
 
 main "$@"

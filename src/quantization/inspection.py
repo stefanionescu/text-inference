@@ -87,17 +87,17 @@ def _mapping(value: object) -> dict[str, object]:
     return cast("dict[str, object]", value)
 
 
-def _local_fingerprint(model_dir: Path) -> str:
+def _local_fingerprint(model_folder: Path) -> str:
     """Fingerprint checkpoint-relevant local files without hashing weights."""
     digest = hashlib.sha256()
     file_count = 0
-    for path in sorted(model_dir.rglob("*")):
+    for path in sorted(model_folder.rglob("*")):
         if not path.is_file():
             continue
         if path.name not in CHECKPOINT_ASSET_FILENAMES and path.suffix not in SOURCE_FINGERPRINT_SUFFIXES:
             continue
         file_stat = path.stat()
-        relative_path = path.relative_to(model_dir).as_posix()
+        relative_path = path.relative_to(model_folder).as_posix()
         digest.update(f"{relative_path}\0{file_stat.st_size}\0{file_stat.st_mtime_ns}\n".encode())
         file_count += 1
     if file_count == 0:
@@ -106,12 +106,12 @@ def _local_fingerprint(model_dir: Path) -> str:
     return f"local:{digest.hexdigest()}"
 
 
-def _local_payloads(model_dir: Path) -> list[tuple[str, object]]:
+def _local_payloads(model_folder: Path) -> list[tuple[str, object]]:
     """Read supported local quantization configuration files."""
     payloads = [
         (filename, json.loads(config_path.read_text(encoding="utf-8")))
         for filename in QUANTIZATION_CONFIG_FILENAMES
-        if (config_path := model_dir / filename).is_file()
+        if (config_path := model_folder / filename).is_file()
     ]
     if not payloads:
         message = "Model configuration was not found"
@@ -119,7 +119,7 @@ def _local_payloads(model_dir: Path) -> list[tuple[str, object]]:
     return payloads
 
 
-def _resolved_revision(response: dict[str, object]) -> str:
+def _pinned_revision(response: dict[str, object]) -> str:
     """Read and validate one immutable Hub revision."""
     resolved_revision = response.get("sha")
     if not isinstance(resolved_revision, str) or not _COMMIT_PATTERN.fullmatch(resolved_revision):
@@ -169,7 +169,7 @@ def _remote_metadata(model: str, revision: str, token: str | None) -> tuple[str,
     revision_path = quote(revision, safe="")
     metadata_path = f"/api/models/{model_path}/revision/{revision_path}"
     response = _mapping(_json_request(metadata_path, token))
-    resolved_revision = _resolved_revision(response)
+    resolved_revision = _pinned_revision(response)
     return resolved_revision, _remote_payloads(
         model_path,
         resolved_revision,

@@ -37,7 +37,7 @@ def success_result(
     phase: int = 1,
     ttfb_ms: float | None = None,
     first_sentence_ms: float | None = None,
-    first_3_words_ms: float | None = None,
+    first_three_words_ms: float | None = None,
 ) -> dict[str, Any]:
     """Create a success result dict with timing metrics."""
     return {
@@ -45,7 +45,7 @@ def success_result(
         "phase": phase,
         "ttfb_ms": ttfb_ms,
         "first_sentence_ms": first_sentence_ms,
-        "first_3_words_ms": first_3_words_ms,
+        "first_three_words_ms": first_three_words_ms,
     }
 
 
@@ -62,8 +62,8 @@ def result_to_dict(payload: BenchmarkMetrics) -> dict[str, Any]:
             result["ttfb_ms"] = payload.ttfb_ms
         if payload.first_sentence_ms is not None:
             result["first_sentence_ms"] = payload.first_sentence_ms
-        if payload.first_3_words_ms is not None:
-            result["first_3_words_ms"] = payload.first_3_words_ms
+        if payload.first_three_words_ms is not None:
+            result["first_three_words_ms"] = payload.first_three_words_ms
     return result
 
 

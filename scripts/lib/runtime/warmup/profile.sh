@@ -3,10 +3,10 @@
 # Resolve warmup profile variants from configuration or repository defaults.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_PROFILE_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_PROFILE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
-source "${_WARMUP_PROFILE_DIR}/../../../config/values/deployment.sh"
+source "${_WARMUP_PROFILE_FOLDER}/../../../config/values/deployment.sh"
 
 # _warmup_trim: Print a value without surrounding whitespace.
 _warmup_trim() {
@@ -78,7 +78,7 @@ warmup_detect_profiles() {
     done <<<"${output}"
   fi
   if [[ ${#WARMUP_PROMPT_PAIRS[@]} == 0 ]]; then
-    _warmup_add_profile "${CFG_WARMUP_DEFAULT_GENDER_PRIMARY}" "" || return 1
-    _warmup_add_profile "${CFG_WARMUP_DEFAULT_GENDER_SECONDARY}" ""
+    _warmup_add_profile "${WARMUP_GENDER_PRIMARY_DEFAULT}" "" || return 1
+    _warmup_add_profile "${WARMUP_GENDER_SECONDARY_DEFAULT}" ""
   fi
 }

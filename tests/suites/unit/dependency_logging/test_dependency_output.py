@@ -30,7 +30,7 @@ def test_default_dependency_capture(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     capture_path = tmp_path / "dependencies.log"
     logger_name = "scenario.dependency.capture"
     dependency_logger = logging.getLogger(logger_name)
-    original_handlers = dependency_logger.handlers.copy()
+    original_sinks = dependency_logger.handlers.copy()
     original_level = dependency_logger.level
     original_propagation = dependency_logger.propagate
     is_propagation_configured = True
@@ -47,7 +47,7 @@ def test_default_dependency_capture(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     finally:
         for destination in dependency_logger.handlers:
             destination.close()
-        dependency_logger.handlers = original_handlers
+        dependency_logger.handlers = original_sinks
         dependency_logger.setLevel(original_level)
         dependency_logger.propagate = original_propagation
 
@@ -56,7 +56,7 @@ def test_default_dependency_capture(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert os.environ["SCENARIO_QUIET"] == "1"
 
 
-def test_logs_preserve_handlers(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_logs_preserve_sinks(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test raw mode leaves dependency logging unsuppressed."""
     output_module = importlib.reload(output)
     logger_name = "scenario.dependency.visible"

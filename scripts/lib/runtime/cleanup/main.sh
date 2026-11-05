@@ -4,14 +4,14 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns termination of repository-recorded process groups.
 
-_RUNTIME_CLEANUP_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_CLEANUP_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_RUNTIME_CLEANUP_DIR}/../../../config/values/runtime.sh"
+source "${_RUNTIME_CLEANUP_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/runtime/process.sh
-source "${_RUNTIME_CLEANUP_DIR}/../process.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RUNTIME_CLEANUP_DIR}/../../shared/log.sh"
+source "${_RUNTIME_CLEANUP_FOLDER}/../process.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RUNTIME_CLEANUP_FOLDER}/../../foundation/log.sh"
 
 # _runtime_cleanup_wait: Wait briefly for an owned process to stop.
 # Globals:
@@ -72,7 +72,7 @@ _runtime_cleanup_process() {
 
 # runtime_stop_owned_process: Stop one selected repository process group.
 # Globals:
-#   CFG_RUNTIME_DEPLOYMENT_PID_FILE, CFG_RUNTIME_SERVER_PID_FILE.
+#   RUNTIME_DEPLOYMENT_PID_FILE, RUNTIME_SERVER_PID_FILE.
 # Arguments:
 #   $1: Repository root. $2: server or deployment.
 # Outputs:
@@ -80,13 +80,13 @@ _runtime_cleanup_process() {
 # Returns:
 #   0 when no selected process remains, non-zero otherwise.
 runtime_stop_owned_process() {
-  local root_dir="$1"
+  local root_folder="$1"
   local process_owner="$2"
   local pid_file
 
   case "${process_owner}" in
-    server) pid_file="${root_dir}/${CFG_RUNTIME_SERVER_PID_FILE}" ;;
-    deployment) pid_file="${root_dir}/${CFG_RUNTIME_DEPLOYMENT_PID_FILE}" ;;
+    server) pid_file="${root_folder}/${RUNTIME_SERVER_PID_FILE}" ;;
+    deployment) pid_file="${root_folder}/${RUNTIME_DEPLOYMENT_PID_FILE}" ;;
     *) return 2 ;;
   esac
   _runtime_cleanup_process "${pid_file}"
@@ -102,10 +102,10 @@ runtime_stop_owned_process() {
 # Returns:
 #   0 when no owned process remains, non-zero otherwise.
 runtime_stop_owned_processes() {
-  local root_dir="$1"
+  local root_folder="$1"
   local status=0
 
-  runtime_stop_owned_process "${root_dir}" server || status=1
-  runtime_stop_owned_process "${root_dir}" deployment || status=1
+  runtime_stop_owned_process "${root_folder}" server || status=1
+  runtime_stop_owned_process "${root_folder}" deployment || status=1
   return "${status}"
 }

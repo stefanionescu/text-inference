@@ -40,8 +40,8 @@ from tests.harness.reporting.terminal import (
     format_metrics_inline,
 )
 from tests.harness.environment.settings import (
-    DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
-    DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
+    DEFAULT_PING_TIMEOUT_SECONDS,
+    DEFAULT_PING_INTERVAL_SECONDS,
 )
 
 if TYPE_CHECKING:
@@ -84,7 +84,7 @@ async def _collect_response(websocket: WebSocketClientProtocol, state: StreamSta
     try:
         return await consume_stream(websocket, state)
     except StreamError as exception:
-        raise ServerError.from_message(exception.message) from exception
+        raise ServerError.decode_message(exception.message) from exception
 
 
 def _print_exchange(
@@ -185,8 +185,8 @@ async def run_history_replay(request: HistoryRunRequest) -> None:
     async with connect_websocket(
         authenticated_url,
         headers=authentication_headers,
-        ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-        ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+        ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+        ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
     ) as websocket:
         try:
             await _run_history_sequence(

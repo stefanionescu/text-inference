@@ -4,9 +4,9 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=docker/shared/scripts/logs.sh
-source "${SCRIPT_DIR}/logs.sh"
+SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=docker/base/scripts/logs.sh
+source "${SCRIPT_FOLDER}/logs.sh"
 # shellcheck source=scripts/config/defaults.sh
 source "/app/scripts/config/defaults.sh"
 
@@ -21,7 +21,7 @@ wait_for_readiness() {
 
   log_write "[warmup] Waiting for server readiness"
   while ((elapsed_seconds < maximum_wait_seconds)); do
-    if /app/scripts/probe.sh; then
+    if /app/scripts/readiness.sh; then
       log_write "[warmup] Server ready after ${elapsed_seconds} seconds"
       return 0
     fi
@@ -37,8 +37,8 @@ main() {
   local maximum_wait_seconds="${WARMUP_MAX_WAIT_SECONDS-}"
   local wait_interval_seconds="${WARMUP_WAIT_INTERVAL_SECONDS-}"
 
-  cfg_set_default maximum_wait_seconds "300"
-  cfg_set_default wait_interval_seconds "5"
+  config_set_default maximum_wait_seconds "300"
+  config_set_default wait_interval_seconds "5"
   wait_for_readiness "${maximum_wait_seconds}" "${wait_interval_seconds}"
 }
 

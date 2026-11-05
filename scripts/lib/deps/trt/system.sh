@@ -4,16 +4,16 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns privileged host package installation for TensorRT.
 
-_TRT_SYSTEM_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_TRT_SYSTEM_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/deployment.sh
-source "${_TRT_SYSTEM_DIR}/../../../config/values/deployment.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_TRT_SYSTEM_DIR}/../../shared/log.sh"
+source "${_TRT_SYSTEM_FOLDER}/../../../config/values/deployment.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_TRT_SYSTEM_FOLDER}/../../foundation/log.sh"
 
 # _trt_install_mpi: Install the pinned MPI development packages.
 # Globals:
-#   CFG_PYTHON_VERSION
+#   DEPLOY_PYTHON_VERSION
 #   EUID
 #   MPI_VERSION_PIN
 # Arguments:
@@ -38,7 +38,7 @@ _trt_install_mpi() {
     --no-upgrade \
     --no-install-recommends \
     libopenmpi-dev \
-    "python${CFG_PYTHON_VERSION}-dev" \
+    "python${DEPLOY_PYTHON_VERSION}-dev" \
     "libopenmpi3t64${mpi_version}" \
     "openmpi-bin${mpi_version}" \
     "openmpi-common${mpi_version}" || return 1

@@ -1,6 +1,6 @@
 """Message handler builders for cancel test phases.
 
-This module provides factory functions that create message handlers
+This module provides factory functions that create message callbacks
 for the cancel and recovery phases. Handlers update StreamState as
 messages arrive and signal completion when done.
 """
@@ -30,7 +30,7 @@ class DispatchResult(TypedDict, total=False):
 
 
 type DispatchValue = bool | DispatchResult
-type MessageHandler = Callable[[dict[str, object]], DispatchValue]
+type MessageCallback = Callable[[dict[str, object]], DispatchValue]
 
 
 def _message_text(message: dict[str, object], key: str) -> str:
@@ -77,10 +77,10 @@ def _handle_error(message: dict[str, object]) -> DispatchResult:
     return {"is_done": True, "error": str(error_message)}
 
 
-def build_cancel_handlers(state: StreamState) -> dict[str, MessageHandler]:
-    """Build message handlers for the cancel phase.
+def build_cancel_callbacks(state: StreamState) -> dict[str, MessageCallback]:
+    """Build message callbacks for the cancel phase.
 
-    These handlers track basic state without timing metrics since
+    These callbacks track basic state without timing metrics since
     the cancel phase is interrupted before completion.
 
     Args:
@@ -90,22 +90,22 @@ def build_cancel_handlers(state: StreamState) -> dict[str, MessageHandler]:
         Dict mapping message types to handler functions.
 
     """
-    handlers: dict[str, MessageHandler] = {
+    callbacks: dict[str, MessageCallback] = {
         "token": partial(_record_token, state, is_first_tracked=False),
         "final": partial(_apply_result_text, state),
         "done": partial(_cancel_done, is_cancelled=False),
         "cancelled": partial(_cancel_done, is_cancelled=True),
         "error": _handle_error,
     }
-    if handlers.keys() != EXPECTED_MESSAGE_TYPES:
+    if callbacks.keys() != EXPECTED_MESSAGE_TYPES:
         raise AssertionError
-    return handlers
+    return callbacks
 
 
-def build_recovery_handlers(state: StreamState) -> dict[str, MessageHandler]:
-    """Build message handlers for the recovery phase.
+def build_recovery_callbacks(state: StreamState) -> dict[str, MessageCallback]:
+    """Build message callbacks for the recovery phase.
 
-    These handlers track full timing metrics since the recovery
+    These callbacks track full timing metrics since the recovery
     phase runs to completion.
 
     Args:
@@ -115,16 +115,16 @@ def build_recovery_handlers(state: StreamState) -> dict[str, MessageHandler]:
         Dict mapping message types to handler functions.
 
     """
-    handlers: dict[str, MessageHandler] = {
+    callbacks: dict[str, MessageCallback] = {
         "token": partial(_record_token, state, is_first_tracked=True),
         "final": partial(_apply_result_text, state),
         "done": partial(_recovery_done, state, is_cancelled=False),
         "cancelled": partial(_recovery_done, state, is_cancelled=True),
         "error": _handle_error,
     }
-    if handlers.keys() != EXPECTED_MESSAGE_TYPES:
+    if callbacks.keys() != EXPECTED_MESSAGE_TYPES:
         raise AssertionError
-    return handlers
+    return callbacks
 
 
-__all__ = ["build_cancel_handlers", "build_recovery_handlers"]
+__all__ = ["build_cancel_callbacks", "build_recovery_callbacks"]

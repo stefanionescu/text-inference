@@ -4,12 +4,12 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns operating-system certificate package installation.
 
-_CERTS_DEPS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_CERTS_DEPS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
-source "${_CERTS_DEPS_DIR}/../../config/defaults.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_CERTS_DEPS_DIR}/../shared/log.sh"
+source "${_CERTS_DEPS_FOLDER}/../../config/defaults.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_CERTS_DEPS_FOLDER}/../foundation/log.sh"
 
 # _certs_bundle: Print the installed distribution CA bundle path.
 _certs_bundle() {
@@ -80,7 +80,7 @@ certs_export_environment() {
   local bundle
 
   bundle="$(_certs_bundle)" || return 1
-  cfg_export_default REQUESTS_CA_BUNDLE "${bundle}"
-  cfg_export_default CURL_CA_BUNDLE "${bundle}"
-  cfg_export_default GIT_SSL_CAINFO "${bundle}"
+  config_export_default REQUESTS_CA_BUNDLE "${bundle}"
+  config_export_default CURL_CA_BUNDLE "${bundle}"
+  config_export_default GIT_SSL_CAINFO "${bundle}"
 }

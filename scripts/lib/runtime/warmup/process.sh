@@ -4,16 +4,16 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns warmup process termination through its persisted PID.
 
-_WARMUP_PROCESS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_PROCESS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_WARMUP_PROCESS_DIR}/../../../config/values/runtime.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_WARMUP_PROCESS_DIR}/../../shared/log.sh"
+source "${_WARMUP_PROCESS_FOLDER}/../../../config/values/runtime.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_WARMUP_PROCESS_FOLDER}/../../foundation/log.sh"
 
 # warmup_stop_existing: Stop the warmup process recorded by the repository.
 # Globals:
-#   CFG_RUNTIME_WARMUP_LOCK_FILE
+#   RUNTIME_WARMUP_LOCK_FILE
 # Arguments:
 #   $1: Repository root.
 # Outputs:
@@ -21,8 +21,8 @@ source "${_WARMUP_PROCESS_DIR}/../../shared/log.sh"
 # Returns:
 #   0 when no recorded process remains, non-zero when termination fails.
 warmup_stop_existing() {
-  local root_dir="$1"
-  local lock_file="${root_dir}/${CFG_RUNTIME_WARMUP_LOCK_FILE}"
+  local root_folder="$1"
+  local lock_file="${root_folder}/${RUNTIME_WARMUP_LOCK_FILE}"
   local pid
   local attempt
 

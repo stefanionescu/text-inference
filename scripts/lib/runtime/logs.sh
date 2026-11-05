@@ -4,20 +4,20 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns the tail process and warmup-specific operator log stream.
 
-_RUNTIME_LOGS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_LOGS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 # shellcheck source=scripts/lib/runtime/warmup/capture.sh
-source "${_RUNTIME_LOGS_DIR}/warmup/capture.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RUNTIME_LOGS_DIR}/../shared/log.sh"
+source "${_RUNTIME_LOGS_FOLDER}/warmup/capture.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RUNTIME_LOGS_FOLDER}/../foundation/log.sh"
 # _runtime_log_stream_start: Start tail through a private FIFO.
 _runtime_log_stream_start() {
   local log_file="$1"
   local temporary_root="${TMPDIR-}"
 
   [[ -n ${temporary_root} ]] || temporary_root="/tmp"
-  _RUNTIME_LOG_STREAM_DIR="$(mktemp -d "${temporary_root}/yap-log.XXXXXX")" || return 1
-  trap 'rm -rf -- "${_RUNTIME_LOG_STREAM_DIR}"' EXIT
-  _RUNTIME_LOG_STREAM_FIFO="${_RUNTIME_LOG_STREAM_DIR}/stream"
+  _RUNTIME_LOG_STREAM_FOLDER="$(mktemp -d "${temporary_root}/yap-log.XXXXXX")" || return 1
+  trap 'rm -rf -- "${_RUNTIME_LOG_STREAM_FOLDER}"' EXIT
+  _RUNTIME_LOG_STREAM_FIFO="${_RUNTIME_LOG_STREAM_FOLDER}/stream"
   mkfifo "${_RUNTIME_LOG_STREAM_FIFO}" || return 1
   tail -n +1 -F "${log_file}" >"${_RUNTIME_LOG_STREAM_FIFO}" &
   _RUNTIME_LOG_STREAM_PID=$!
@@ -56,7 +56,7 @@ _runtime_log_route_captured() {
 
 # _runtime_log_stream_stop: Stop tail and remove its private FIFO.
 # Globals:
-#   _RUNTIME_LOG_STREAM_DIR
+#   _RUNTIME_LOG_STREAM_FOLDER
 #   _RUNTIME_LOG_STREAM_FIFO
 #   _RUNTIME_LOG_STREAM_PID
 # Arguments:
@@ -78,10 +78,10 @@ _runtime_log_stream_stop() {
   if [[ -n ${_RUNTIME_LOG_STREAM_FIFO-} ]]; then
     rm -f -- "${_RUNTIME_LOG_STREAM_FIFO}" || status=1
   fi
-  if [[ -n ${_RUNTIME_LOG_STREAM_DIR-} && -d ${_RUNTIME_LOG_STREAM_DIR} ]]; then
-    rmdir -- "${_RUNTIME_LOG_STREAM_DIR}" || status=1
+  if [[ -n ${_RUNTIME_LOG_STREAM_FOLDER-} && -d ${_RUNTIME_LOG_STREAM_FOLDER} ]]; then
+    rmdir -- "${_RUNTIME_LOG_STREAM_FOLDER}" || status=1
   fi
-  unset _RUNTIME_LOG_STREAM_DIR _RUNTIME_LOG_STREAM_FIFO _RUNTIME_LOG_STREAM_PID
+  unset _RUNTIME_LOG_STREAM_FOLDER _RUNTIME_LOG_STREAM_FIFO _RUNTIME_LOG_STREAM_PID
   return "${status}"
 }
 

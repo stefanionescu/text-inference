@@ -9,7 +9,7 @@ Metrics reported:
 - stream_ms: time from first token to done
 - chunks: number of token messages received
 - chars: size of final response (characters)
-- first_3_words_ms: time from request send to first three words
+- first_three_words_ms: time from request send to first three words
 
 Usage:
   mise run test:e2e:warmup

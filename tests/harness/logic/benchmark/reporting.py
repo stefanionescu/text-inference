@@ -76,17 +76,20 @@ def _format_latency_line(label: str, samples: list[float]) -> str:
     """Format a latency statistics line."""
     if not samples:
         return ""
-    p50 = percentile(samples, 0.5)
-    p95 = percentile(samples, 0.95, is_previous_selected=True)
+    median_value = percentile(samples, 0.5)
+    high_percentile = percentile(samples, 0.95, is_previous_selected=True)
     average = sum(samples) / len(samples)
-    return f"  {label:>12}  avg={average:>6.0f}ms  p50={p50:>6.0f}ms  p95={p95:>6.0f}ms  {dim(f'(n={len(samples)})')}"
+    percentiles = f"p50={median_value:>6.0f}ms  p95={high_percentile:>6.0f}ms"
+    return f"  {label:>12}  avg={average:>6.0f}ms  {percentiles}  {dim(f'(n={len(samples)})')}"
 
 
 def _print_latency_section(successful_results: Iterable[dict[str, Any]], prefix: str = "") -> None:
     results = list(successful_results)
     ttfb = [result["ttfb_ms"] for result in results if result.get("ttfb_ms") is not None]
     first_sentence = [result["first_sentence_ms"] for result in results if result.get("first_sentence_ms") is not None]
-    first_three_words = [result["first_3_words_ms"] for result in results if result.get("first_3_words_ms") is not None]
+    first_three_words = [
+        result["first_three_words_ms"] for result in results if result.get("first_three_words_ms") is not None
+    ]
 
     latency_series = [
         ("TTFB", ttfb),

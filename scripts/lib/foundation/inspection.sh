@@ -3,20 +3,20 @@
 # Resolve immutable model identity and quantization before deployment mutation.
 # Runtime: Bash 3.2+, Linux.
 
-_INSPECTION_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_INSPECTION_FOUNDATION_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
-source "${_INSPECTION_SHARED_DIR}/../../config/defaults.sh"
+source "${_INSPECTION_FOUNDATION_FOLDER}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/quantization.sh
-source "${_INSPECTION_SHARED_DIR}/../../config/values/quantization.sh"
+source "${_INSPECTION_FOUNDATION_FOLDER}/../../config/values/quantization.sh"
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_INSPECTION_SHARED_DIR}/../../config/values/runtime.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_INSPECTION_SHARED_DIR}/log.sh"
+source "${_INSPECTION_FOUNDATION_FOLDER}/../../config/values/runtime.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_INSPECTION_FOUNDATION_FOLDER}/log.sh"
 
 # _inspection_run: Run the standard-library-only metadata inspector.
 _inspection_run() {
-  local root_dir="$1"
+  local root_folder="$1"
   local model="$2"
   local engine="$3"
   local requested_quantization="$4"
@@ -25,10 +25,10 @@ _inspection_run() {
   local requested_revision
   local -a arguments
 
-  cfg_assign_value requested_revision MODEL_REVISION "${CFG_QUANT_DEFAULT_MODEL_REVISION}"
+  config_assign_value requested_revision MODEL_REVISION "${QUANT_DEFAULT_MODEL_REVISION}"
   arguments=(--model "${model}" --engine "${engine}" --revision "${requested_revision}")
   [[ -z ${requested_quantization} ]] || arguments+=(--quantization "${requested_quantization}")
-  PYTHONPATH="${root_dir}${PYTHONPATH:+:${PYTHONPATH}}" \
+  PYTHONPATH="${root_folder}${PYTHONPATH:+:${PYTHONPATH}}" \
     python3 -m src.quantization.inspection "${arguments[@]}" \
     >"${output_file}" 2>"${diagnostics_file}"
 }
@@ -81,11 +81,11 @@ _inspection_report() {
 # Returns:
 #   0 after exporting the resolved model fields, non-zero otherwise.
 deployment_inspect_model() {
-  local root_dir="$1"
-  local temporary_dir="${TMPDIR-}"
+  local root_folder="$1"
+  local temporary_folder="${TMPDIR-}"
   local output_file
   local diagnostics_file
-  local server_log="${root_dir}/${CFG_RUNTIME_SERVER_LOG_FILE}"
+  local server_log="${root_folder}/${RUNTIME_SERVER_LOG_FILE}"
   local line
   local status=0
 
@@ -93,13 +93,13 @@ deployment_inspect_model() {
     log_write "[inspect] python3 is required for early model inspection"
     return 1
   }
-  [[ -n ${temporary_dir} ]] || temporary_dir="/tmp"
-  output_file="$(mktemp "${temporary_dir}/yap-inspection.XXXXXX")" || return 1
+  [[ -n ${temporary_folder} ]] || temporary_folder="/tmp"
+  output_file="$(mktemp "${temporary_folder}/yap-inspection.XXXXXX")" || return 1
   trap 'rm -f -- "${output_file}"; trap - RETURN' RETURN
-  diagnostics_file="$(mktemp "${temporary_dir}/yap-inspection-log.XXXXXX")" || return 1
+  diagnostics_file="$(mktemp "${temporary_folder}/yap-inspection-log.XXXXXX")" || return 1
   trap 'rm -f -- "${output_file}" "${diagnostics_file}"; trap - RETURN' RETURN
   _inspection_run \
-    "${root_dir}" "$2" "$3" "$4" "${output_file}" "${diagnostics_file}" || status=1
+    "${root_folder}" "$2" "$3" "$4" "${output_file}" "${diagnostics_file}" || status=1
   while IFS= read -r line || [[ -n ${line} ]]; do
     printf '%s\n' "${line}" >>"${server_log}" || status=1
     if log_is_repository_line "${line}"; then

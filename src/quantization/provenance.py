@@ -85,9 +85,9 @@ class QuantizationRequest:
         }
 
 
-def read_provenance(checkpoint_dir: Path) -> dict[str, object]:
+def read_provenance(checkpoint_folder: Path) -> dict[str, object]:
     """Read and validate one provenance document."""
-    payload = json.loads((checkpoint_dir / METADATA_FILENAME).read_text(encoding="utf-8"))
+    payload = json.loads((checkpoint_folder / METADATA_FILENAME).read_text(encoding="utf-8"))
     metadata = _validate_json_mapping(payload)
     if metadata.get("schema_version") != METADATA_SCHEMA_VERSION:
         message = "Unsupported quantization metadata schema"
@@ -95,30 +95,30 @@ def read_provenance(checkpoint_dir: Path) -> dict[str, object]:
     return metadata
 
 
-def cache_matches(checkpoint_dir: Path, request: QuantizationRequest) -> bool:
+def cache_matches(checkpoint_folder: Path, request: QuantizationRequest) -> bool:
     """Return whether persisted metadata matches the requested export."""
     try:
-        metadata = read_provenance(checkpoint_dir)
+        metadata = read_provenance(checkpoint_folder)
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
         return False
     return metadata.get("cache_key") == request.cache_key
 
 
 def write_provenance(
-    checkpoint_dir: Path,
+    checkpoint_folder: Path,
     request: QuantizationRequest,
     *,
     exported_quantization: Mapping[str, object],
     environment: Mapping[str, object],
 ) -> None:
     """Atomically persist complete quantization provenance."""
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_folder.mkdir(parents=True, exist_ok=True)
     temporary_path: Path | None = None
     try:
         with NamedTemporaryFile(
             mode="w",
             encoding="utf-8",
-            dir=checkpoint_dir,
+            dir=checkpoint_folder,
             prefix=".quantization_metadata.",
             suffix=".tmp",
             delete=False,
@@ -146,23 +146,23 @@ def write_provenance(
 
 
 def require_provenance(
-    checkpoint_dir: Path,
+    checkpoint_folder: Path,
     *,
     engine: str,
     expected_format: str,
 ) -> dict[str, object]:
     """Read provenance and require the expected engine and format."""
-    metadata = read_provenance(checkpoint_dir)
+    metadata = read_provenance(checkpoint_folder)
     if metadata.get("engine") != engine or metadata.get("format") != expected_format:
         message = f"Checkpoint provenance does not describe {engine} {expected_format}"
         raise ValueError(message)
     return metadata
 
 
-def read_export_quantization(checkpoint_dir: Path) -> dict[str, object]:
+def read_export_quantization(checkpoint_folder: Path) -> dict[str, object]:
     """Read the exported checkpoint quantization configuration."""
     config = _validate_json_mapping(
-        json.loads((checkpoint_dir / MODEL_CONFIG_FILENAME).read_text(encoding="utf-8")),
+        json.loads((checkpoint_folder / MODEL_CONFIG_FILENAME).read_text(encoding="utf-8")),
     )
     quantization = config.get(QUANTIZATION_CONFIG_FIELD)
     if quantization is None:

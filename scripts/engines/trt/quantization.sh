@@ -3,20 +3,20 @@
 # Export TensorRT checkpoints with NVIDIA Model Optimizer.
 # Runtime: Bash 3.2+, Linux.
 
-_TRT_QUANTIZATION_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_TRT_QUANTIZATION_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/trt.sh
-source "${_TRT_QUANTIZATION_DIR}/../../config/values/trt.sh"
+source "${_TRT_QUANTIZATION_FOLDER}/../../config/values/trt.sh"
 # shellcheck source=scripts/engines/trt/cache.sh
-source "${_TRT_QUANTIZATION_DIR}/cache.sh"
+source "${_TRT_QUANTIZATION_FOLDER}/cache.sh"
 # shellcheck source=scripts/engines/trt/modelopt.sh
-source "${_TRT_QUANTIZATION_DIR}/modelopt.sh"
+source "${_TRT_QUANTIZATION_FOLDER}/modelopt.sh"
 # shellcheck source=scripts/lib/env/trt.sh
-source "${_TRT_QUANTIZATION_DIR}/../../lib/env/trt.sh"
+source "${_TRT_QUANTIZATION_FOLDER}/../../lib/env/trt.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
-source "${_TRT_QUANTIZATION_DIR}/../../lib/runtime/cleanup/paths.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_TRT_QUANTIZATION_DIR}/../../lib/shared/log.sh"
+source "${_TRT_QUANTIZATION_FOLDER}/../../lib/runtime/cleanup/paths.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_TRT_QUANTIZATION_FOLDER}/../../lib/foundation/log.sh"
 
 # _trt_kv_format: Print the KV-cache format for one quantization format.
 _trt_kv_format() {
@@ -45,9 +45,9 @@ _trt_run_quantizer() {
     "${quantizer_python}" "$@"
     return
   fi
-  HF_HUB_DISABLE_PROGRESS_BARS="${CFG_TRT_DISABLE_HF_PROGRESS_BARS}" \
-    TQDM_DISABLE="${CFG_TRT_TQDM_DISABLE_DEFAULT}" \
-    TRTLLM_LOG_LEVEL="${CFG_TRT_QUANT_LOG_LEVEL}" \
+  HF_HUB_DISABLE_PROGRESS_BARS="${TRT_DISABLE_PROGRESS_BARS}" \
+    TQDM_DISABLE="${TRT_TQDM_DISABLE_DEFAULT}" \
+    TRTLLM_LOG_LEVEL="${TRT_QUANT_LOG_LEVEL}" \
     "${quantizer_python}" "$@"
 }
 
@@ -65,10 +65,10 @@ _trt_run_quantizer() {
 #   0 after reuse or export, non-zero otherwise.
 trt_export_checkpoint() {
   local source_model="$1"
-  local source_dir="$2"
-  local checkpoint_dir="$3"
+  local source_folder="$2"
+  local checkpoint_folder="$3"
   local quantization_format="$4"
-  local quantizer_python="${QUANT_VENV_DIR:?QUANT_VENV_DIR is required}/bin/python"
+  local quantizer_python="${QUANT_VENV_FOLDER:?QUANT_VENV_FOLDER is required}/bin/python"
   local quantizer_script
   local cache_action
   local kv_cache_format
@@ -78,15 +78,15 @@ trt_export_checkpoint() {
   kv_cache_format="$(_trt_kv_format "${quantization_format}")" || return 1
   trt_prepare_modelopt || return 1
   cache_action="$(trt_cache_action \
-    "${source_model}" "${source_dir}" "${checkpoint_dir}" \
+    "${source_model}" "${source_folder}" "${checkpoint_folder}" \
     "${quantization_format}" "${kv_cache_format}")" || return 1
   if [[ ${cache_action} == "reuse" ]]; then
-    log_write "[quant] Reusing ModelOpt checkpoint: ${checkpoint_dir}"
+    log_write "[quant] Reusing ModelOpt checkpoint: ${checkpoint_folder}"
     return 0
   fi
-  quantizer_script="${MODELOPT_REPO_DIR}/examples/llm_ptq/hf_ptq.py"
+  quantizer_script="${MODELOPT_REPO_FOLDER}/examples/llm_ptq/hf_ptq.py"
   arguments=(
-    "${quantizer_script}" --pyt_ckpt_path "${source_dir}" --export_path "${checkpoint_dir}"
+    "${quantizer_script}" --pyt_ckpt_path "${source_folder}" --export_path "${checkpoint_folder}"
     --trust_remote_code --qformat "${quantization_format}" --dataset "${TRT_CALIBRATION_DATASET}"
     --calib_size "${TRT_CALIBRATION_SAMPLES}" --calib_seq "${TRT_CALIBRATION_SEQUENCE_LENGTH}"
     --gpu_max_mem_percentage "${TRT_CALIBRATION_MEMORY_FRACTION}"
@@ -94,11 +94,11 @@ trt_export_checkpoint() {
   )
   [[ ${quantization_format} != "int4_awq" ]] || arguments+=(--awq_block_size "${TRT_AWQ_BLOCK_SIZE}")
   [[ ${TRT_SEQUENTIAL_DEVICE_MAP} != "1" ]] || arguments+=(--use_seq_device_map)
-  runtime_remove_owned_path "${ROOT_DIR}" "${checkpoint_dir}" || return 1
-  mkdir -p -- "${checkpoint_dir}" || return 1
+  runtime_remove_owned_path "${ROOT_FOLDER}" "${checkpoint_folder}" || return 1
+  mkdir -p -- "${checkpoint_folder}" || return 1
   _trt_run_quantizer "${quantizer_python}" "${arguments[@]}" || return 1
   trt_finalize_checkpoint \
-    "${source_model}" "${source_dir}" "${checkpoint_dir}" \
+    "${source_model}" "${source_folder}" "${checkpoint_folder}" \
     "${quantization_format}" "${kv_cache_format}" || return 1
-  log_write "[quant] Quantization complete: ${checkpoint_dir}"
+  log_write "[quant] Quantization complete: ${checkpoint_folder}"
 }

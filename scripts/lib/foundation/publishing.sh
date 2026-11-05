@@ -3,14 +3,14 @@
 # Validate Hugging Face export publishing inputs.
 # Runtime: Bash 3.2+, Linux.
 
-_PUBLISHING_SHARED_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_PUBLISHING_FOUNDATION_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/defaults.sh
-source "${_PUBLISHING_SHARED_DIR}/../../config/defaults.sh"
+source "${_PUBLISHING_FOUNDATION_FOLDER}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${_PUBLISHING_SHARED_DIR}/../../config/values/deployment.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_PUBLISHING_SHARED_DIR}/log.sh"
+source "${_PUBLISHING_FOUNDATION_FOLDER}/../../config/values/deployment.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_PUBLISHING_FOUNDATION_FOLDER}/log.sh"
 
 # publishing_validate: Validate upload credentials and destination policy.
 # Globals:
@@ -29,7 +29,7 @@ publishing_validate() {
     log_write "[env] --push requires HF_PUSH_REPO_ID"
     return 1
   fi
-  cfg_assign_value HF_PUSH_PRIVATE HF_PUSH_PRIVATE "${CFG_HF_PUSH_PRIVATE_DEFAULT}"
+  config_assign_value HF_PUSH_PRIVATE HF_PUSH_PRIVATE "${HF_PUSH_PRIVATE_DEFAULT}"
   case "${HF_PUSH_PRIVATE}" in
     0 | 1) ;;
     *)

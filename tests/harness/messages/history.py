@@ -6,12 +6,12 @@ import json
 from typing import cast
 from pathlib import Path
 
-_EXAMPLE_DIR = Path(__file__).with_name("examples")
+_EXAMPLE_FOLDER = Path(__file__).with_name("examples")
 
 
 def _read_warm_history() -> list[dict[str, str]]:
     """Load warm-history messages from JSON fixture examples."""
-    raw: object = json.loads((_EXAMPLE_DIR / "warm_history.json").read_text(encoding="utf-8"))
+    raw: object = json.loads((_EXAMPLE_FOLDER / "warm_history.json").read_text(encoding="utf-8"))
     if not isinstance(raw, list):
         message = "warm history fixture must be a list"
         raise TypeError(message)

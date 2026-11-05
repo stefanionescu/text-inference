@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
 
-class ProbeServer(uvicorn.Server):
+class ReadinessServer(uvicorn.Server):
     """Run without competing for process signal ownership."""
 
     def install_signal_handlers(self) -> None:
@@ -76,7 +76,7 @@ def _build_server_config(
 
 async def serve_applications(
     public_application: FastAPI,
-    probe_application: FastAPI,
+    readiness_application: FastAPI,
     readiness_state: ReadinessState,
     *,
     is_logging_enabled: bool,
@@ -92,31 +92,31 @@ async def serve_applications(
         ),
         readiness_state,
     )
-    probe_server = ProbeServer(
+    readiness_server = ReadinessServer(
         _build_server_config(
-            probe_application,
-            listeners.PROBE_SERVER_HOST,
-            listeners.PROBE_SERVER_PORT,
+            readiness_application,
+            listeners.READINESS_SERVER_HOST,
+            listeners.READINESS_SERVER_PORT,
             is_logging_enabled=False,
             lifespan="off",
         ),
     )
     public_task = asyncio.create_task(public_server.serve())
-    probe_task = asyncio.create_task(probe_server.serve())
+    readiness_task = asyncio.create_task(readiness_server.serve())
     try:
-        done, _ = await asyncio.wait({public_task, probe_task}, return_when=asyncio.FIRST_COMPLETED)
+        done, _ = await asyncio.wait({public_task, readiness_task}, return_when=asyncio.FIRST_COMPLETED)
         if public_task in done:
-            probe_server.should_exit = True
-        if probe_task in done:
+            readiness_server.should_exit = True
+        if readiness_task in done:
             public_server.should_exit = True
-        await asyncio.gather(public_task, probe_task)
+        await asyncio.gather(public_task, readiness_task)
     finally:
         readiness_state.start_draining()
 
 
 def run_applications(
     public_application: FastAPI,
-    probe_application: FastAPI,
+    readiness_application: FastAPI,
     readiness_state: ReadinessState,
     *,
     is_logging_enabled: bool,
@@ -125,11 +125,11 @@ def run_applications(
     asyncio.run(
         serve_applications(
             public_application,
-            probe_application,
+            readiness_application,
             readiness_state,
             is_logging_enabled=is_logging_enabled,
         ),
     )
 
 
-__all__ = ["ProbeServer", "run_applications", "serve_applications"]
+__all__ = ["ReadinessServer", "run_applications", "serve_applications"]

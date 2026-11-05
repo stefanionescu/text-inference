@@ -27,19 +27,19 @@ from .patterns import (
     EMOTICON_PATTERN,
     HTML_TAG_PATTERN,
     SUBTRACTION_PATTERN,
-    TEMP_KELVIN_PATTERN,
     WORD_HYPHEN_PATTERN,
     ACTION_EMOTE_PATTERN,
-    TEMP_CELSIUS_PATTERN,
     DEGREE_SYMBOL_PATTERN,
     NEWLINE_TOKEN_PATTERN,
+    DEGREES_KELVIN_PATTERN,
     EXAGGERATED_OH_PATTERN,
     SPACED_DOT_RUN_PATTERN,
     COLLAPSE_SPACES_PATTERN,
+    DEGREES_CELSIUS_PATTERN,
     NEGATIVE_NUMBER_PATTERN,
-    TEMP_FAHRENHEIT_PATTERN,
     DOUBLE_DOT_SPACE_PATTERN,
     FREESTYLE_PREFIX_PATTERN,
+    DEGREES_FAHRENHEIT_PATTERN,
     SPACE_BEFORE_PUNCT_PATTERN,
     SINGLE_LETTER_SUFFIX_PATTERN,
     ELLIPSIS_TRAILING_DOT_PATTERN,
@@ -181,9 +181,9 @@ def _normalize_stream_dots(text: str) -> str:
 
 def _verbalize_units(text: str) -> str:
     """Verbalize temperature, degree, and percentage symbols."""
-    cleaned = TEMP_FAHRENHEIT_PATTERN.sub(" degrees Fahrenheit", text)
-    cleaned = TEMP_CELSIUS_PATTERN.sub(" degrees Celsius", cleaned)
-    cleaned = TEMP_KELVIN_PATTERN.sub(" degrees Kelvin", cleaned)
+    cleaned = DEGREES_FAHRENHEIT_PATTERN.sub(" degrees Fahrenheit", text)
+    cleaned = DEGREES_CELSIUS_PATTERN.sub(" degrees Celsius", cleaned)
+    cleaned = DEGREES_KELVIN_PATTERN.sub(" degrees Kelvin", cleaned)
     cleaned = DEGREE_SYMBOL_PATTERN.sub(" degrees", cleaned)
     return PERCENT_PATTERN.sub(" percent", cleaned)
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=docker/shared/scripts/logs.sh
-source "/app/shared/scripts/logs.sh"
-# shellcheck source=docker/shared/scripts/server.sh
-source "/app/shared/scripts/server.sh"
+SCRIPT_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=docker/base/scripts/logs.sh
+source "/app/base/scripts/logs.sh"
+# shellcheck source=docker/base/scripts/server.sh
+source "/app/base/scripts/server.sh"
 
 is_logging_enabled=0
 case "$#" in
@@ -32,23 +32,23 @@ LOGS_ENABLED="${is_logging_enabled}"
 export LOGS_ENABLED
 
 # shellcheck source=docker/trt/scripts/env.sh
-source "${SCRIPT_DIR}/env.sh"
+source "${SCRIPT_FOLDER}/env.sh"
 trt_export_defaults
-# shellcheck source=scripts/lib/shared/gpu/environment.sh
-source "/app/scripts/lib/shared/gpu/environment.sh"
+# shellcheck source=scripts/lib/foundation/gpu/environment.sh
+source "/app/scripts/lib/foundation/gpu/environment.sh"
 # shellcheck source=scripts/lib/env/trt.sh
 source "/app/scripts/lib/env/trt.sh"
 gpu_detect
 gpu_apply_environment
 
 : "${API_KEY:?API_KEY is required}"
-RUNTIME_QUANTIZATION="$("${VENV_DIR:?VENV_DIR is required}/bin/python" \
+RUNTIME_QUANTIZATION="$("${VENV_FOLDER:?VENV_FOLDER is required}/bin/python" \
   -m src.quantization.detection "${MODEL:?MODEL is required}")"
 export RUNTIME_QUANTIZATION
 if [[ -n ${RUNTIME_QUANTIZATION} ]]; then
   trt_validate_format "${RUNTIME_QUANTIZATION}" "${GPU_SM_ARCH}" || exit 1
 fi
-"${VENV_DIR}/bin/python" -m src.scripts.validate
+"${VENV_FOLDER}/bin/python" -m src.scripts.validate
 CUDA_DEVICE_MAX_CONNECTIONS=2
 export CUDA_DEVICE_MAX_CONNECTIONS
 log_write "[trt] Model: ${MODEL}"

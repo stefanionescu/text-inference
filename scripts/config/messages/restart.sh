@@ -5,7 +5,7 @@
 
 # shellcheck disable=SC2034 # reason: sourced configuration exports user-facing message values
 
-CFG_RESTART_USAGE_LINES=(
+RESTART_USAGE_LINES=(
   "Usage:"
   "  scripts/restart.sh [--engine trt|vllm] [--model MODEL [--quantization FORMAT]]"
   "                     [--reinstall] [--reset] [--push] [--logs]"

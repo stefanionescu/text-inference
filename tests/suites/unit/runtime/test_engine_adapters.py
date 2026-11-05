@@ -127,7 +127,7 @@ def test_trt_aborts_generation() -> None:
     assert generation.is_aborted
 
 
-def test_trt_closing_stream_aborts_unfinished_generation() -> None:
+def test_trt_stream_close_aborts() -> None:
     """Closing a consumer must release its unfinished backend request."""
     generation = _FakeGeneration(
         chunks=[_FakeChunk(outputs=[_FakeCompletion(text="waiting", token_ids=[7])], finished=False)],
@@ -144,7 +144,7 @@ def test_trt_closing_stream_aborts_unfinished_generation() -> None:
     assert generation.is_aborted
 
 
-def test_trt_timeout_aborts_unfinished_generation() -> None:
+def test_trt_timeout_aborts() -> None:
     """A timed-out consumer must abort work before releasing its request."""
 
     async def _timeout() -> None:

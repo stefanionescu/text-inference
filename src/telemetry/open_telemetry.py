@@ -26,8 +26,8 @@ from config.runtime.telemetry import (
     AXIOM_TRACES_ENDPOINT,
     AXIOM_METRICS_ENDPOINT,
     OTEL_TRACES_BATCH_SIZE,
-    OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS,
-    OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS,
+    OTEL_TRACES_INTERVAL_MILLISECONDS,
+    OTEL_METRICS_INTERVAL_MILLISECONDS,
 )
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ def initialize_open_telemetry() -> None:
             1000,
             read_environment_integer(
                 "OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS",
-                OTEL_TRACES_EXPORT_INTERVAL_MILLISECONDS,
+                OTEL_TRACES_INTERVAL_MILLISECONDS,
             ),
         ),
     )
@@ -102,7 +102,7 @@ def initialize_open_telemetry() -> None:
             1000,
             read_environment_integer(
                 "OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS",
-                OTEL_METRICS_EXPORT_INTERVAL_MILLISECONDS,
+                OTEL_METRICS_INTERVAL_MILLISECONDS,
             ),
         ),
     )

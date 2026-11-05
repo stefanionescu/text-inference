@@ -20,27 +20,27 @@ from config.runtime.telemetry import (
     METRIC_REQUEST_LATENCY,
     METRIC_STARTUP_DURATION,
     METRIC_COMPLETION_TOKENS,
+    METRIC_RESET_SKIPS_TOTAL,
     METRIC_ACTIVE_CONNECTIONS,
     METRIC_ACTIVE_GENERATIONS,
     METRIC_CACHE_RESETS_TOTAL,
     METRIC_CANCELLATION_TOTAL,
     METRIC_EARLY_CANCEL_TOTAL,
+    METRIC_EMPTY_OUTPUT_TOTAL,
     METRIC_PHASE_ERRORS_TOTAL,
     METRIC_CONNECTION_DURATION,
     METRIC_PROMPT_TOKENS_TOTAL,
     METRIC_SESSION_CHURN_TOTAL,
+    METRIC_RESET_FAILURES_TOTAL,
+    METRIC_RATE_VIOLATIONS_TOTAL,
+    METRIC_RETRYABLE_ABORT_TOTAL,
     METRIC_TOKENS_GENERATED_TOTAL,
     METRIC_WEBSOCKET_SEND_LATENCY,
-    METRIC_CACHE_RESET_SKIPS_TOTAL,
     METRIC_GENERATIONS_PER_SESSION,
-    METRIC_EMPTY_MODEL_OUTPUT_TOTAL,
     METRIC_CONNECTION_SEMAPHORE_WAIT,
     METRIC_TIMEOUT_DISCONNECTS_TOTAL,
-    METRIC_CACHE_RESET_FAILURES_TOTAL,
     METRIC_CONNECTIONS_REJECTED_TOTAL,
-    METRIC_DISCONNECT_MID_STREAM_TOTAL,
-    METRIC_RATE_LIMIT_VIOLATIONS_TOTAL,
-    METRIC_ENGINE_ABORT_RETRYABLE_TOTAL,
+    METRIC_MIDSTREAM_DISCONNECT_TOTAL,
 )
 
 from .gpu import register_gpu_observables
@@ -140,15 +140,15 @@ class MetricInstruments:
         self.cancellation_total = _counter(meter, METRIC_CANCELLATION_TOTAL)
         self.errors_total = _counter(meter, METRIC_ERRORS_TOTAL)
         self.timeout_disconnects_total = _counter(meter, METRIC_TIMEOUT_DISCONNECTS_TOTAL)
-        self.rate_limit_violations_total = _counter(meter, METRIC_RATE_LIMIT_VIOLATIONS_TOTAL)
+        self.rate_limit_violations_total = _counter(meter, METRIC_RATE_VIOLATIONS_TOTAL)
         self.cache_resets_total = _counter(meter, METRIC_CACHE_RESETS_TOTAL)
-        self.cache_reset_failures_total = _counter(meter, METRIC_CACHE_RESET_FAILURES_TOTAL)
-        self.cache_reset_skips_total = _counter(meter, METRIC_CACHE_RESET_SKIPS_TOTAL)
+        self.cache_reset_failures_total = _counter(meter, METRIC_RESET_FAILURES_TOTAL)
+        self.cache_reset_skips_total = _counter(meter, METRIC_RESET_SKIPS_TOTAL)
         self.phase_errors_total = _counter(meter, METRIC_PHASE_ERRORS_TOTAL)
-        self.disconnect_mid_stream_total = _counter(meter, METRIC_DISCONNECT_MID_STREAM_TOTAL)
+        self.disconnect_mid_stream_total = _counter(meter, METRIC_MIDSTREAM_DISCONNECT_TOTAL)
         self.early_cancel_total = _counter(meter, METRIC_EARLY_CANCEL_TOTAL)
-        self.empty_model_output_total = _counter(meter, METRIC_EMPTY_MODEL_OUTPUT_TOTAL)
-        self.engine_abort_retryable_total = _counter(meter, METRIC_ENGINE_ABORT_RETRYABLE_TOTAL)
+        self.empty_model_output_total = _counter(meter, METRIC_EMPTY_OUTPUT_TOTAL)
+        self.engine_abort_retryable_total = _counter(meter, METRIC_RETRYABLE_ABORT_TOTAL)
 
     def _initialize_updown_counters(self, meter: metrics.Meter) -> None:
         """Initialize gauges represented by up-down counters."""

@@ -53,11 +53,11 @@ def _handle_cancelled(_: dict[str, Any], state: StreamState) -> dict[str, Any]:
 
 
 def _handle_error(message: dict[str, Any]) -> None:
-    error = ServerError.from_message(message)
+    error = ServerError.decode_message(message)
     raise error
 
 
-def _build_exchange_handlers(state: StreamState, exchange_index: int) -> dict[str, _StreamCallback]:
+def _build_exchange_callbacks(state: StreamState, exchange_index: int) -> dict[str, _StreamCallback]:
     return {
         "token": lambda message: _handle_token(message, state, exchange_index),
         "final": lambda message: _handle_result(message, state),
@@ -78,13 +78,13 @@ async def stream_exchange(
     exchange_index: int,
 ) -> tuple[str, dict[str, Any]]:
     """Stream a single exchange and return the assistant response and metrics."""
-    handlers = _build_exchange_handlers(state, exchange_index)
+    callbacks = _build_exchange_callbacks(state, exchange_index)
     is_done_seen = False
     done_payload: dict[str, Any] | None = None
     async for message in iter_messages(websocket):
         keep_streaming = await dispatch_message(
             message,
-            handlers,
+            callbacks,
             default=lambda payload: _log_unknown_exchange_message(payload, exchange_index),
         )
         if isinstance(keep_streaming, dict) and keep_streaming.get("is_done"):

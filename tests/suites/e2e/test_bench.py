@@ -4,7 +4,7 @@ Runs N total sessions with up to M concurrent connections. For each request,
 records:
 - ttfb_ms: time to first token
 - first_sentence_ms: time to first complete sentence
-- first_3_words_ms: time to first three words
+- first_three_words_ms: time to first three words
 
 Prints p50/p95 for each metric across completed requests. No intermediate logs.
 

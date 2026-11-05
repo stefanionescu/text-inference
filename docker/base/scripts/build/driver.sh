@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # Shared validate, build, and push transaction for concrete engine stacks.
 
-_BUILD_DRIVER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_BUILD_DRIVER_FOLDER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# shellcheck source=docker/shared/scripts/build/docker.sh
-source "${_BUILD_DRIVER_DIR}/docker.sh"
-# shellcheck source=docker/shared/scripts/build/args.sh
-source "${_BUILD_DRIVER_DIR}/args.sh"
-# shellcheck source=docker/shared/scripts/build/context.sh
-source "${_BUILD_DRIVER_DIR}/context.sh"
-# shellcheck source=docker/shared/scripts/build/validate.sh
-source "${_BUILD_DRIVER_DIR}/validate.sh"
+# shellcheck source=docker/base/scripts/build/docker.sh
+source "${_BUILD_DRIVER_FOLDER}/docker.sh"
+# shellcheck source=docker/base/scripts/build/args.sh
+source "${_BUILD_DRIVER_FOLDER}/args.sh"
+# shellcheck source=docker/base/scripts/build/context.sh
+source "${_BUILD_DRIVER_FOLDER}/context.sh"
+# shellcheck source=docker/base/scripts/build/validate.sh
+source "${_BUILD_DRIVER_FOLDER}/validate.sh"
 # shellcheck source=scripts/config/values/deployment.sh
-source "${ROOT_DIR:?ROOT_DIR is required}/scripts/config/values/deployment.sh"
+source "${ROOT_FOLDER:?ROOT_FOLDER is required}/scripts/config/values/deployment.sh"
 # shellcheck source=scripts/lib/deps/venv.sh
-source "${ROOT_DIR}/scripts/lib/deps/venv.sh"
+source "${ROOT_FOLDER}/scripts/lib/deps/venv.sh"
 
 # run_stack_build: Validate, build, and push one concrete engine image.
 # Arguments:
@@ -22,16 +22,16 @@ source "${ROOT_DIR}/scripts/lib/deps/venv.sh"
 #   $2: Prefix of the temporary build folder.
 #   $3: Engine name.
 run_stack_build() {
-  local stack_dir="$1"
-  local tmp_prefix="$2"
+  local stack_folder="$1"
+  local folder_prefix="$2"
   local engine="$3"
 
   : "${DOCKER_USERNAME:?DOCKER_USERNAME is required}"
   : "${DOCKER_TOKEN:?DOCKER_TOKEN is required}"
   : "${MODEL:?MODEL is required}"
   : "${TAG:?TAG is required}"
-  cfg_set_default IMAGE_NAME "${CFG_DOCKER_DEFAULT_IMAGE_NAME}"
-  cfg_set_default NO_CACHE "${CFG_DOCKER_DEFAULT_NO_CACHE}"
+  config_set_default IMAGE_NAME "${DOCKER_DEFAULT_IMAGE_NAME}"
+  config_set_default NO_CACHE "${DOCKER_DEFAULT_NO_CACHE}"
   export IMAGE_NAME NO_CACHE
 
   if [[ ! ${TAG} =~ ^${engine}- ]]; then
@@ -51,7 +51,7 @@ run_stack_build() {
   log_write "[build]   Model: ${MODEL}"
   log_write "[build]   Revision: ${MODEL_REVISION}"
 
-  prepare_shared_build_context "${stack_dir}" "${tmp_prefix}"
+  prepare_shared_build_context "${stack_folder}" "${folder_prefix}"
   init_build_args
   append_model_build_args
 

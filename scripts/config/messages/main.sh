@@ -5,7 +5,7 @@
 
 # shellcheck disable=SC2034,SC2016 # reason: sourced configuration exports variables consumed by parent scripts; message config intentionally stores literal shell snippets for user output
 
-CFG_MAIN_USAGE_LINES=(
+MAIN_USAGE_LINES=(
   "Usage:"
   '  $0 [--engine trt|vllm] --model MODEL [--quantization FORMAT] [--push] [--logs]'
   ""
@@ -47,4 +47,4 @@ CFG_MAIN_USAGE_LINES=(
   "  --logs              Stream third-party runtime and quantization logs"
 )
 
-CFG_MAIN_MSG_INVALID_ARGS="[main] Not enough arguments"
+MAIN_MESSAGE_INVALID_ARGS="[main] Not enough arguments"

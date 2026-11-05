@@ -4,23 +4,23 @@
 # Runtime: Bash 3.2+, macOS and Linux.
 # Boundary: Owns destructive cleanup below the verified repository root.
 
-_RUNTIME_ARTIFACTS_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_ARTIFACTS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_RUNTIME_ARTIFACTS_DIR}/../../../config/values/runtime.sh"
+source "${_RUNTIME_ARTIFACTS_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
-source "${_RUNTIME_ARTIFACTS_DIR}/paths.sh"
+source "${_RUNTIME_ARTIFACTS_FOLDER}/paths.sh"
 
 # _runtime_clear_owned_paths: Remove repository-relative paths.
 _runtime_clear_owned_paths() {
-  local root_dir="$1"
+  local root_folder="$1"
   local relative_path
   local status=0
 
   shift
   for relative_path in "$@"; do
     runtime_remove_owned_path \
-      "${root_dir}" "${root_dir}/${relative_path}" || status=1
+      "${root_folder}" "${root_folder}/${relative_path}" || status=1
   done
   return "${status}"
 }
@@ -35,10 +35,10 @@ _runtime_clear_owned_paths() {
 # Returns:
 #   0 when every owned path is removed, non-zero otherwise.
 _runtime_clear_model_artifacts() {
-  local root_dir="$1"
+  local root_folder="$1"
 
   _runtime_clear_owned_paths \
-    "${root_dir}" \
+    "${root_folder}" \
     ".compressed-tensors" \
     ".flashinfer" \
     ".hf" \
@@ -62,10 +62,10 @@ _runtime_clear_model_artifacts() {
 # Returns:
 #   0 when every selected artifact is removed, non-zero otherwise.
 runtime_clear_model_transition() {
-  local root_dir="$1"
+  local root_folder="$1"
 
   _runtime_clear_owned_paths \
-    "${root_dir}" \
+    "${root_folder}" \
     ".flashinfer" \
     ".hf" \
     ".modelopt-repo" \
@@ -86,12 +86,12 @@ runtime_clear_model_transition() {
 # Returns:
 #   0 when every owned path is removed, non-zero otherwise.
 runtime_clear_engine_artifacts() {
-  local root_dir="$1"
+  local root_folder="$1"
   local status=0
 
-  _runtime_clear_model_artifacts "${root_dir}" || status=1
+  _runtime_clear_model_artifacts "${root_folder}" || status=1
   _runtime_clear_owned_paths \
-    "${root_dir}" \
+    "${root_folder}" \
     ".pip_cache" \
     ".venv" \
     ".venv-quant" || status=1
@@ -100,7 +100,7 @@ runtime_clear_engine_artifacts() {
 
 # runtime_clear_reset_artifacts: Clear all repository deployment state.
 # Globals:
-#   CFG_RUNTIME_LOG_DIR and runtime path constants.
+#   RUNTIME_LOG_FOLDER and runtime path constants.
 # Arguments:
 #   $1: Repository root.
 # Outputs:
@@ -108,16 +108,16 @@ runtime_clear_engine_artifacts() {
 # Returns:
 #   0 when every owned path is removed, non-zero otherwise.
 runtime_clear_reset_artifacts() {
-  local root_dir="$1"
+  local root_folder="$1"
   local status=0
 
-  runtime_clear_engine_artifacts "${root_dir}" || status=1
+  runtime_clear_engine_artifacts "${root_folder}" || status=1
   _runtime_clear_owned_paths \
-    "${root_dir}" \
-    "${CFG_RUNTIME_RUN_DIR}" \
-    "${CFG_RUNTIME_LOG_DIR}" \
-    "${CFG_RUNTIME_SERVER_PID_FILE}" \
-    "${CFG_RUNTIME_SERVER_LOG_FILE}" \
-    "${CFG_RUNTIME_SERVER_LOG_TRIM_FILE}" || status=1
+    "${root_folder}" \
+    "${RUNTIME_RUN_FOLDER}" \
+    "${RUNTIME_LOG_FOLDER}" \
+    "${RUNTIME_SERVER_PID_FILE}" \
+    "${RUNTIME_SERVER_LOG_FILE}" \
+    "${RUNTIME_SERVER_TRIM_FILE}" || status=1
   return "${status}"
 }

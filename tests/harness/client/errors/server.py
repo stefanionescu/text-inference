@@ -31,7 +31,7 @@ class ServerError(TestClientError):
         super().__init__(f"{error_code}: {message}")
 
     @classmethod
-    def from_message(cls, payload: dict[str, object]) -> ServerError:
+    def decode_message(cls, payload: dict[str, object]) -> ServerError:
         """Create an appropriate ServerError subclass from a server error message."""
         raw_error_code = payload.get("code") or payload.get("error_code") or "unknown"
         error_code = raw_error_code if isinstance(raw_error_code, str) else str(raw_error_code)

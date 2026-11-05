@@ -430,7 +430,7 @@ The advanced guide provides the corresponding checks and recovery commands.
 
 ## Advanced guide
 
-The [advanced guide](ADVANCED.md) is the specialist reference. It covers:
+The [reference guide](REFERENCE.md) is the specialist reference. It covers:
 
 - The complete configuration and WebSocket contracts.
 - Inference-engine and quantization behavior.

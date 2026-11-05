@@ -4,17 +4,17 @@
 # Runtime: Bash 3.2+, Linux.
 # Boundary: Owns opt-in destructive reset of inference host resources.
 
-_RUNTIME_RESET_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_RUNTIME_RESET_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 # shellcheck source=scripts/lib/runtime/cleanup/artifacts.sh
-source "${_RUNTIME_RESET_DIR}/artifacts.sh"
+source "${_RUNTIME_RESET_FOLDER}/artifacts.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/host.sh
-source "${_RUNTIME_RESET_DIR}/host.sh"
+source "${_RUNTIME_RESET_FOLDER}/host.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/main.sh
-source "${_RUNTIME_RESET_DIR}/main.sh"
+source "${_RUNTIME_RESET_FOLDER}/main.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/python.sh
-source "${_RUNTIME_RESET_DIR}/python.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_RUNTIME_RESET_DIR}/../../shared/log.sh"
+source "${_RUNTIME_RESET_FOLDER}/python.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_RUNTIME_RESET_FOLDER}/../../foundation/log.sh"
 # _runtime_reset_kill_pattern: Signal all helpers matching one reset pattern.
 _runtime_reset_kill_pattern() {
   local signal_name="$1"
@@ -32,8 +32,8 @@ _runtime_reset_kill_pattern() {
   log_write "[reset] pkill failed for pattern '${pattern}' with status ${status}"
   return "${status}"
 }
-# _runtime_reset_engine_helpers: Terminate broad inference helper matches.
-_runtime_reset_engine_helpers() {
+# _runtime_reset_engine_processes: Terminate broad inference helper matches.
+_runtime_reset_engine_processes() {
   local pattern
   local status=0
   local -a patterns=(
@@ -119,20 +119,20 @@ _runtime_reset_gpu() {
 # Returns:
 #   0 when every reset stage succeeds, non-zero otherwise.
 runtime_reset_host() {
-  local root_dir="$1"
+  local root_folder="$1"
   local status=0
 
   log_write "[reset] Stopping repository-owned process groups"
-  runtime_stop_owned_processes "${root_dir}" || status=1
+  runtime_stop_owned_processes "${root_folder}" || status=1
   log_write "[reset] Terminating inference engine helpers"
-  _runtime_reset_engine_helpers || status=1
+  _runtime_reset_engine_processes || status=1
   log_write "[reset] Terminating GPU processes and resetting the GPU"
   _runtime_reset_gpu || status=1
   log_write "[reset] Removing repository deployment artifacts"
-  runtime_clear_reset_artifacts "${root_dir}" || status=1
+  runtime_clear_reset_artifacts "${root_folder}" || status=1
   log_write "[reset] Removing host inference and package caches"
   runtime_reset_host_caches || status=1
-  runtime_cleanup_python_artifacts "${root_dir}" || status=1
+  runtime_cleanup_python_artifacts "${root_folder}" || status=1
   if ((status != 0)); then
     log_write "[reset] Reset completed with failures"
   fi

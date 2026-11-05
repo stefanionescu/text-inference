@@ -29,7 +29,7 @@ from tests.harness.client.websocket import (
 )
 from tests.harness.reporting.terminal import dim, write_line
 
-from .handlers import build_cancel_handlers, build_recovery_handlers
+from .callbacks import build_cancel_callbacks, build_recovery_callbacks
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol
@@ -71,7 +71,7 @@ async def _consume_cancel_messages(
     receive_timeout_seconds: float,
     cancel_delay_seconds: float,
 ) -> CancelLoop:
-    handlers = build_cancel_handlers(state)
+    callbacks = build_cancel_callbacks(state)
     loop = CancelLoop()
     start_time = time.perf_counter()
 
@@ -79,7 +79,7 @@ async def _consume_cancel_messages(
         async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
             result = await dispatch_message(
                 message,
-                handlers,
+                callbacks,
                 default=lambda _message: True,
             )
             await _send_cancel_if_due(
@@ -233,7 +233,7 @@ async def run_recovery_phase(
     await asyncio.sleep(post_cancel_wait_seconds)
 
     state = StreamState()
-    handlers = build_recovery_handlers(state)
+    callbacks = build_recovery_callbacks(state)
 
     recovery_payload = build_message_payload(user_message, sampling=context.sampling)
     await websocket.send(json.dumps(recovery_payload))
@@ -247,7 +247,7 @@ async def run_recovery_phase(
         async for message in iter_messages(websocket, receive_timeout_seconds=receive_timeout_seconds):
             result = await dispatch_message(
                 message,
-                handlers,
+                callbacks,
                 default=lambda _message: True,
             )
 

@@ -3,12 +3,12 @@
 # Format warmup log paths and report probe results.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-_WARMUP_LOGGING_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+_WARMUP_LOGGING_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # shellcheck source=scripts/config/values/runtime.sh
-source "${_WARMUP_LOGGING_DIR}/../../../config/values/runtime.sh"
-# shellcheck source=scripts/lib/shared/log.sh
-source "${_WARMUP_LOGGING_DIR}/../../shared/log.sh"
+source "${_WARMUP_LOGGING_FOLDER}/../../../config/values/runtime.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${_WARMUP_LOGGING_FOLDER}/../../foundation/log.sh"
 
 # warmup_log_prefix: Print a filesystem-safe probe label.
 # Globals:
@@ -32,8 +32,8 @@ warmup_log_prefix() {
 
 # warmup_phase_result: Report one probe result to operator and server logs.
 # Globals:
-#   CFG_RUNTIME_SERVER_LOG_FILE
-#   ROOT_DIR
+#   RUNTIME_SERVER_LOG_FILE
+#   ROOT_FOLDER
 # Arguments:
 #   $1: Probe label.
 #   $2: OK or FAIL.
@@ -52,5 +52,5 @@ warmup_phase_result() {
     line="${line} (see ${detail})"
   fi
   log_write "${line}"
-  printf '%s\n' "${line}" >>"${ROOT_DIR:?ROOT_DIR is required}/${CFG_RUNTIME_SERVER_LOG_FILE}"
+  printf '%s\n' "${line}" >>"${ROOT_FOLDER:?ROOT_FOLDER is required}/${RUNTIME_SERVER_LOG_FILE}"
 }

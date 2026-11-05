@@ -5,7 +5,7 @@
 
 # shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 
-CFG_STOP_USAGE_LINES=(
+STOP_USAGE_LINES=(
   "Usage:"
   "  bash scripts/stop.sh"
   "      Stop only repository-recorded process groups."
@@ -14,7 +14,7 @@ CFG_STOP_USAGE_LINES=(
   "      Reset the dedicated inference host, GPU, caches, models, and environments."
 )
 
-CFG_STOP_MSG_STOP="[stop] Stopping repository-owned deployment processes"
-CFG_STOP_MSG_STOP_DONE="[stop] Repository-owned deployment processes stopped"
-CFG_STOP_MSG_RESET="[reset] Starting explicit dedicated-host reset"
-CFG_STOP_MSG_RESET_DONE="[reset] Dedicated-host reset completed"
+STOP_MESSAGE_SERVER="[stop] Stopping repository-owned deployment processes"
+STOP_MESSAGE_SERVER_DONE="[stop] Repository-owned deployment processes stopped"
+STOP_MESSAGE_RESET="[reset] Starting explicit dedicated-host reset"
+STOP_MESSAGE_RESET_DONE="[reset] Dedicated-host reset completed"

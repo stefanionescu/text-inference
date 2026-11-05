@@ -7,7 +7,7 @@ This package provides the cancel test suite that verifies:
 4. Multiple concurrent clients work correctly (one cancels, others complete)
 
 Modules:
-    handlers: Message handler builders for cancel and recovery phases
+    callbacks: Message callback builders for cancel and recovery phases
     phases: Phase execution functions (cancel, drain, recovery)
     clients: Client flow orchestration (canceling and normal clients)
     output: Result printing functions

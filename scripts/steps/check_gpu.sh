@@ -5,11 +5,11 @@
 
 set -euo pipefail
 
-STEP_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
-readonly STEP_DIR
+STEP_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
+readonly STEP_FOLDER
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "${STEP_DIR}/../lib/shared/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "${STEP_FOLDER}/../lib/foundation/log.sh"
 
 # main: Probe the NVIDIA management interface.
 main() {

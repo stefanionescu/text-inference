@@ -2,8 +2,8 @@
 #
 # Run one engine server, raw capture, filtered console, and readiness warmup.
 
-# shellcheck source=scripts/lib/shared/log.sh
-source "/app/scripts/lib/shared/log.sh"
+# shellcheck source=scripts/lib/foundation/log.sh
+source "/app/scripts/lib/foundation/log.sh"
 
 # container_show_usage: Print the fixed Docker runtime interface.
 # Globals:
@@ -27,15 +27,15 @@ EOF
 _container_follow_log() {
   local log_file="$1"
   local server_pid="$2"
-  local pipe_dir
+  local pipe_folder
   local pipe_path
   local tail_pid
   local tail_status=0
   local line
 
-  pipe_dir="$(mktemp -d /tmp/yap-log.XXXXXX)" || return 1
-  trap 'rm -rf -- "${pipe_dir}"; trap - RETURN' RETURN
-  pipe_path="${pipe_dir}/stream"
+  pipe_folder="$(mktemp -d /tmp/yap-log.XXXXXX)" || return 1
+  trap 'rm -rf -- "${pipe_folder}"; trap - RETURN' RETURN
+  pipe_path="${pipe_folder}/stream"
   mkfifo "${pipe_path}" || return 1
   tail --pid="${server_pid}" -n +1 -F "${log_file}" >"${pipe_path}" &
   tail_pid=$!
@@ -65,13 +65,13 @@ start_warmup_server() {
   touch "${server_log}" || return 1
   log_write "[${engine}] Starting server"
   DEPENDENCY_LOG_FILE="-" \
-    "${VENV_DIR:?VENV_DIR is required}/bin/python" -m "${server_module}" \
+    "${VENV_FOLDER:?VENV_FOLDER is required}/bin/python" -m "${server_module}" \
     >>"${server_log}" 2>&1 &
   server_pid=$!
   trap 'if kill -0 "${server_pid}" 2>/dev/null; then kill -TERM "${server_pid}"; fi' INT TERM
   _container_follow_log "${server_log}" "${server_pid}" &
   follower_pid=$!
-  /app/shared/scripts/warmup.sh &
+  /app/base/scripts/warmup.sh &
   set +e
   wait "${server_pid}"
   server_status=$?

@@ -290,3 +290,31 @@ reason = "The test sets return_value on a Mock, which vulture reads as an unused
 check = "secrets/environment-examples"
 paths = ["tests/suites/unit/dependency_logging/test_dependency_output.py"]
 reason = "The test asserts a variable the code sets for a dependency; nobody configures it."
+
+[[naming.exception]]
+languages = ["bash"]
+allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]
+reason = "Third-party tools read these exact environment variable names."
+
+[[naming.exception]]
+languages = ["bash"]
+allowed_names = ["TRT_DEFAULT_CACHE_FP8", "TRT_FP8_SM_ARCHS", "TRT_NVFP4_SM_ARCHS"]
+reason = "FP8 and NVFP4 are the names of the quantization formats, so the digits belong to the name."
+
+[[naming.exception]]
+languages = ["python"]
+allowed_names = ["FP8_FORMAT", "INT4_AWQ_FORMAT", "MODELOPT_FP4_BACKEND", "MOE_WNA16_BACKEND", "NVFP4_FORMAT", "test_detects_nvfp4"]
+reason = "FP8, INT4, FP4, WNA16, and NVFP4 are the names of quantization formats and backends, so the digits belong to the name."
+
+[[naming.exception]]
+paths = ["tests/**"]
+languages = ["python"]
+allowed_names = ["tmp_path"]
+reason = "pytest injects this fixture by its exact name."
+
+[[naming.exception]]
+paths = ["src/server/listeners.py"]
+languages = ["python"]
+allowed_names = ["install_signal_handlers"]
+reason = "This method overrides uvicorn.Server.install_signal_handlers, so the name must match."
+

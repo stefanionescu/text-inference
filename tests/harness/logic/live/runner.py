@@ -14,8 +14,8 @@ from tests.harness.client.errors import ServerError, IdleTimeoutError, Connectio
 from tests.harness.client.websocket import open_websocket, connect_websocket, build_websocket_url, build_api_key_headers
 from tests.harness.reporting.terminal import dim, write_line, section_header
 from tests.harness.environment.settings import (
-    DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
-    DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
+    DEFAULT_PING_TIMEOUT_SECONDS,
+    DEFAULT_PING_INTERVAL_SECONDS,
 )
 
 from .cli import run_interactive_loop
@@ -85,8 +85,8 @@ async def _run_session(connection: LiveConnection) -> None:
             connection.server_url,
             headers=connection.authentication_headers,
             max_queue=None,
-            ping_interval=DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
-            ping_timeout=DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
+            ping_interval=DEFAULT_PING_INTERVAL_SECONDS,
+            ping_timeout=DEFAULT_PING_TIMEOUT_SECONDS,
         ),
     ) as websocket:
         client = LiveClient(websocket, connection.session, connection.timeout_seconds)

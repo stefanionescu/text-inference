@@ -124,7 +124,7 @@ async def send_initial_user_turn(
 
 async def dispatch_message[ResultT](
     message: dict[str, object],
-    handlers: Mapping[str, Callable[[dict[str, object]], Awaitable[ResultT] | ResultT]],
+    callbacks: Mapping[str, Callable[[dict[str, object]], Awaitable[ResultT] | ResultT]],
     *,
     default: Callable[[dict[str, object]], Awaitable[ResultT] | ResultT] | None = None,
 ) -> ResultT | None:
@@ -133,7 +133,7 @@ async def dispatch_message[ResultT](
     Callbacks can be synchronous or asynchronous callables.
     """
     message_type = message.get("type")
-    message_callback = handlers.get(message_type) if isinstance(message_type, str) else None
+    message_callback = callbacks.get(message_type) if isinstance(message_type, str) else None
     if message_callback is None:
         message_callback = default
     if message_callback is None:

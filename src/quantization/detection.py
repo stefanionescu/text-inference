@@ -26,16 +26,16 @@ def detect_format(
 ) -> str | None:
     """Read exact quantization metadata and ensure the engine accepts it."""
     validate_engine(engine)
-    _resolved_revision, detected_format = inspect_metadata(model, revision=revision, token=hf_token)
+    _pinned_revision, detected_format = inspect_metadata(model, revision=revision, token=hf_token)
     return detected_format
 
 
-def detect_local_format(model_dir: Path) -> str | None:
+def detect_local_format(model_folder: Path) -> str | None:
     """Read quantization metadata from an already acquired local checkpoint."""
     payloads = [
         (filename, json.loads(path.read_text(encoding="utf-8")))
         for filename in QUANTIZATION_CONFIG_FILENAMES
-        if (path := model_dir / filename).is_file()
+        if (path := model_folder / filename).is_file()
     ]
     if not payloads:
         message = "Model configuration was not found"
