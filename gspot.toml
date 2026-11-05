@@ -263,11 +263,6 @@ paths = ["src/hf/templates/**"]
 reason = "The JSON fences hold a ${quantization_summary} field that becomes valid JSON only when the template renders."
 
 [[ignore]]
-check = "docs/required-files"
-rule = "missing-license"
-reason = "The repository owner has not chosen a license yet, and agents should not choose one for them."
-
-[[ignore]]
 check = "structure/shared-prefixes"
 paths = ["tests/suites/**"]
 reason = "pytest discovers test modules by the test_ prefix, so the prefix must stay."
