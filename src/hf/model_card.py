@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from string import Template
 from typing import TYPE_CHECKING, cast
+from pathlib import Path
+
 from src.hf.license import read_license
-from config.model.quantization import HUB_SOURCE_KIND
 from config.model.publishing import EMPTY_METADATA_ITEMS, HUGGING_FACE_MODEL_URL, MODEL_CARD_TEMPLATE_DIR
+from config.model.quantization import HUB_SOURCE_KIND
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

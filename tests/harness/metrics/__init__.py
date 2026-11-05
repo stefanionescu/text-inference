@@ -4,9 +4,9 @@ This subpackage provides payload structures and utilities for tracking
 benchmark metrics, TTFB samples, and result formatting.
 """
 
+from .ttfb import record_ttfb, has_ttfb_samples, emit_ttfb_summary
 from .results import error_result, result_to_dict, success_result
 from .durations import round_milliseconds, seconds_to_milliseconds
-from .ttfb import emit_ttfb_summary, has_ttfb_samples, record_ttfb
 
 __all__ = [
     # ttfb

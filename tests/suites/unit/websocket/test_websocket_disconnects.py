@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 from fastapi import WebSocketDisconnect
+
 from src.websocket.disconnects import is_expected_websocket_disconnect
 
 

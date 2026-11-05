@@ -8,9 +8,10 @@ messages arrive and signal completion when done.
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING, Any, TypedDict
 from functools import partial
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypedDict
+
 from tests.harness.client.websocket import finalize_metrics
 
 if TYPE_CHECKING:

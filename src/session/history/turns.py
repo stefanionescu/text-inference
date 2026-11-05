@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from src.session.state import HistoryMessage
 
 if TYPE_CHECKING:

@@ -10,17 +10,18 @@ from __future__ import annotations
 import os
 import json
 import uuid
-import asyncio
-import websockets
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
-from tests.harness.client.errors import ServerError
-from tests.state import SessionContext, StreamState
-from tests.harness.client.prompt import select_prompt
+import asyncio
+from dataclasses import dataclass
+
+import websockets
+
+from tests.state import StreamState, SessionContext
 from config.tests.defaults import WARMUP_FALLBACK_MESSAGE
-from tests.harness.client.selection import choose_message
+from tests.harness.client.errors import ServerError
+from tests.harness.client.prompt import select_prompt
 from tests.harness.messages.warmup import WARMUP_DEFAULT_MESSAGES
-from tests.harness.logic.conversation.stream import stream_exchange
+from tests.harness.client.selection import choose_message
 from tests.harness.client.websocket import (
     open_websocket,
     send_end_frame,
@@ -50,9 +51,11 @@ from tests.harness.environment.settings import (
     DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
     DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
 )
+from tests.harness.logic.conversation.stream import stream_exchange
 
 if TYPE_CHECKING:
     import argparse
+
     from websockets import WebSocketClientProtocol
 
 

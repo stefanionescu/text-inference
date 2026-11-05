@@ -6,6 +6,7 @@ Provides Python utilities used by warmup profile selection.
 from __future__ import annotations
 
 import sys
+
 from config.prompt.profiles import WARMUP_PROMPT_PAIRS
 
 

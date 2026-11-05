@@ -7,12 +7,13 @@ remains a pure dataclass package without websocket helper dependencies.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+
 from tests.state.metrics import SessionContext
 from tests.harness.client.websocket.payloads import (
-    build_message_payload as build_websocket_message_payload,
+    build_start_payload as build_websocket_start_payload,
 )
 from tests.harness.client.websocket.payloads import (
-    build_start_payload as build_websocket_start_payload,
+    build_message_payload as build_websocket_message_payload,
 )
 
 if TYPE_CHECKING:

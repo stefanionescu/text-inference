@@ -1,8 +1,9 @@
 """Unit tests for model-aware vLLM quantization policy."""
 
 import pytest
+
 from config.model.vllm import MOE_WNA16_BACKEND
-from config.model.quantization import COMPRESSED_TENSORS_FORMAT, GPTQ_FORMAT
+from config.model.quantization import GPTQ_FORMAT, COMPRESSED_TENSORS_FORMAT
 from src.quantization.vllm.policy import (
     select_policy,
     validate_sequence_length,

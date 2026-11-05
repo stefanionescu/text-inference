@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import cast
+
 from config.model.quantization import (
     MODELOPT_METHOD,
     MODEL_CONFIG_FILENAME,

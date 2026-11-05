@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from dataclasses import dataclass, field
+from dataclasses import field, dataclass
 
 if TYPE_CHECKING:
     from tests.harness.client.errors import ServerError

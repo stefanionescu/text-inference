@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import math
 from typing import TYPE_CHECKING, Any
-from tests.harness.reporting.terminal import bold, dim, section_header
+
+from tests.harness.reporting.terminal import dim, bold, section_header
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Callable, Sequence
+
     from tests.state.metrics import TTFBSamples
-    from collections.abc import Callable, Mapping, Sequence
 
 # ============================================================================
 # Internal Helpers

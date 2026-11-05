@@ -3,25 +3,29 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING, Any
 import logging
 import contextlib
-from .errors import send_error
 from dataclasses import dataclass
-from .transport import safe_send_flat
-from typing import TYPE_CHECKING, Any
+
+from src.session.requests import has_running_task, abort_session_requests
+from config.runtime.websocket import WEBSOCKET_STATUS_OK, WEBSOCKET_CLIENT_CLOSE_CODE, WEBSOCKET_ERROR_INVALID_MESSAGE
+
+from .errors import send_error
 from .parser import parse_client_message
-from ..telemetry.instruments import get_metrics
+from .transport import safe_send_flat
 from .disconnects import is_expected_websocket_disconnect
 from ..messages.turn import TurnMessageRequest, handle_turn_message
+from ..telemetry.instruments import get_metrics
 from .rate_limiting.messages import consume_limiter, select_rate_limiter
-from src.session.requests import abort_session_requests, has_running_task
-from config.runtime.websocket import WEBSOCKET_STATUS_OK, WEBSOCKET_CLIENT_CLOSE_CODE, WEBSOCKET_ERROR_INVALID_MESSAGE
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
-    from .lifecycle import WebSocketLifecycle
+
     from src.session.state import SessionState
     from src.runtime.dependencies import RuntimeDependencies
+
+    from .lifecycle import WebSocketLifecycle
     from .rate_limiting.window import SlidingWindowRateLimiter
 
 logger = logging.getLogger(__name__)

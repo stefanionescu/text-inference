@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from anyio import EndOfStream, BrokenResourceError, ClosedResourceError
 from fastapi import WebSocketDisconnect
 from websockets.exceptions import ConnectionClosed
-from anyio import BrokenResourceError, ClosedResourceError, EndOfStream
 
 WEBSOCKET_DISCONNECT_ERRORS: tuple[type[BaseException], ...] = (
     WebSocketDisconnect,

@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Literal
 import logging
 from dataclasses import dataclass
-from .message import plan_message_turn
-from .start import bootstrap_start_turn
-from typing import TYPE_CHECKING, Literal
+
 from src.execution.turn import run_turn_execution
 from src.session.requests import spawn_session_task
 from src.websocket.supervision import supervise_turn
 
+from .start import bootstrap_start_turn
+from .message import plan_message_turn
+
 if TYPE_CHECKING:
     from fastapi import WebSocket
+
     from src.session.state import SessionState
     from src.runtime.dependencies import RuntimeDependencies
 

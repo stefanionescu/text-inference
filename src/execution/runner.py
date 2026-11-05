@@ -12,21 +12,25 @@ handling:
 from __future__ import annotations
 
 import uuid
-from opentelemetry import trace
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
+
+from opentelemetry import trace
+
 from src.text import StreamingSanitizer
-from src.telemetry.instruments import get_metrics
-from src.session.requests import is_request_cancelled
-from .controller import StreamConfig, StreamController
 from src.engines.protocol import SamplingParametersRequest
+from src.session.requests import is_request_cancelled
+from src.telemetry.instruments import get_metrics
+
+from .controller import StreamConfig, StreamController
 
 if TYPE_CHECKING:
-    from src.engines.protocol import Engine
     from collections.abc import AsyncGenerator
+
     from src.session.state import SessionState
+    from src.runtime.config import SessionSettings, TimeoutSettings, SamplingSettings
+    from src.engines.protocol import Engine
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.runtime.config import SamplingSettings, SessionSettings, TimeoutSettings
 
 
 @dataclass(frozen=True)

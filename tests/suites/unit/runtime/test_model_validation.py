@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from src.scripts import validate
 from typing import TYPE_CHECKING
+
+from src.scripts import validate
 from config.model.quantization import TRT_ENGINE, VLLM_ENGINE
 
 if TYPE_CHECKING:

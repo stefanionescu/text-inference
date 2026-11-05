@@ -22,10 +22,11 @@ import os
 import sys
 import asyncio
 import argparse
+
+from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
 from tests.harness.client.errors import ServerError
+from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
 from tests.harness.logic.history.runner import HistoryRunRequest, run_history_replay
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_PERSONALITY, DEFAULT_SERVER_URL
-from tests.harness.client.cli import add_connection_arguments, add_sampling_arguments, build_sampling_payload
 
 
 def _parse_arguments() -> argparse.Namespace:

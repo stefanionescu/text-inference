@@ -6,10 +6,12 @@ concurrent workers and managing the async task lifecycle.
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING, Any
-from .connection import execute_connection
+import asyncio
+
 from tests.harness.client.concurrency import distribute_requests
+
+from .connection import execute_connection
 
 if TYPE_CHECKING:
     from tests.state import BenchmarkConfig

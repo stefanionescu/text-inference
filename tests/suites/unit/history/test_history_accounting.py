@@ -1,17 +1,20 @@
 """Unit tests for session history accounting invariants."""
 
 from __future__ import annotations
-import pytest
+
 from dataclasses import replace
 from unittest.mock import AsyncMock
+
+import pytest
+
+from src.session.state import SessionState, HistoryMessage
 from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
 from src.tokens.tokenizer import ThreadSafeTokenizer
-from src.session.state import HistoryMessage, SessionState
+from tests.harness.messages.unit import MESSAGES, ASSISTANT_FIRST_MESSAGES
 import src.session.history.transcript as history_transcript
-from tests.harness.environment.tokenizer import use_local_tokenizers
-from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, MESSAGES
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
+from tests.harness.environment.tokenizer import use_local_tokenizers
 
 EXPECTED_MESSAGE_COUNT = 4
 TURN_MESSAGE_COUNT = 2

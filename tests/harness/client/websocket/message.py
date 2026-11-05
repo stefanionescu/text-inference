@@ -8,14 +8,16 @@ async callbacks and gracefully handles malformed JSON.
 from __future__ import annotations
 
 import json
-import inspect
 from typing import TYPE_CHECKING, cast
-from .connection import receive_raw_frame
+import inspect
+
+from tests.harness.client.errors import StreamError, MessageParseError
+
 from .payloads import build_message_payload
-from tests.harness.client.errors import MessageParseError, StreamError
+from .connection import receive_raw_frame
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+    from collections.abc import Mapping, Callable, Awaitable, AsyncIterator
 
 
 def parse_message(raw_frame: str) -> dict[str, object]:

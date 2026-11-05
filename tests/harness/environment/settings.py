@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+
 from src.runtime.settings import read_settings
-from tests.harness.environment.variables import read_environment_float, read_environment_integer
 from config.tests.defaults import (
     GENDER_DEFAULT,
     SERVER_URL_DEFAULT,
@@ -15,6 +15,7 @@ from config.tests.defaults import (
     WEBSOCKET_PING_TIMEOUT_SECONDS_DEFAULT,
     WEBSOCKET_PING_INTERVAL_SECONDS_DEFAULT,
 )
+from tests.harness.environment.variables import read_environment_float, read_environment_integer
 
 DEFAULT_APPLICATION_SETTINGS = read_settings(environment={})
 

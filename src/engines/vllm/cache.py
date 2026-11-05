@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import time
+from typing import Protocol
 import asyncio
 import logging
-from typing import Protocol
+
 from config.runtime.cache import CACHE_RESET_RETRY_SECONDS
 
 logger = logging.getLogger(__name__)

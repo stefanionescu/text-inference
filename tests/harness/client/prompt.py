@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from config.tests.prompts.detailed import PROMPT_PROFILES
 from tests.harness.client.errors import PromptSelectionError
+from config.tests.prompts.detailed import PROMPT_PROFILES
 
 
 def normalize_gender(value: str | None) -> str:

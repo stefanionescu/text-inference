@@ -3,33 +3,37 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING, Any, Literal, cast
 import logging
-from src.websocket.errors import send_error
+
 from src.session.state import HistoryMessage
-from src.telemetry.sentry import capture_error
-from .sampling import extract_sampling_overrides
-from src.telemetry.instruments import get_metrics
-from src.websocket.transport import safe_send_flat
 from src.session.config import update_session_config
-from typing import Literal, cast, TYPE_CHECKING, Any
-from .validators import (
-    PromptLimit,
-    require_prompt,
-    ValidationError,
-    sanitize_prompt_limit,
-    validate_required_gender,
-    validate_required_personality,
-)
+from src.telemetry.sentry import capture_error
+from src.websocket.errors import send_error
+from src.websocket.transport import safe_send_flat
 from config.runtime.websocket import (
     WEBSOCKET_STATUS_OK,
     TEXT_LENGTH_ERROR_CODE,
     WEBSOCKET_ERROR_INVALID_PAYLOAD,
     WEBSOCKET_ERROR_INVALID_SETTINGS,
 )
+from src.telemetry.instruments import get_metrics
+
+from .sampling import extract_sampling_overrides
+from .validators import (
+    PromptLimit,
+    ValidationError,
+    require_prompt,
+    sanitize_prompt_limit,
+    validate_required_gender,
+    validate_required_personality,
+)
 
 if TYPE_CHECKING:
-    from fastapi import WebSocket
     from collections.abc import Callable
+
+    from fastapi import WebSocket
+
     from src.session.state import SessionState
     from src.session.runtime import SessionRuntime
 

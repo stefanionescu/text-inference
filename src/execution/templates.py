@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING
+
 from config.prompt.templates import IS_TEMPLATE_THINKING_ENABLED
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
     from src.session.state import HistoryMessage
     from src.tokens.tokenizer import ThreadSafeTokenizer
 

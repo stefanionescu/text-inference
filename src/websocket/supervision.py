@@ -3,22 +3,25 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING
 import asyncio
 import logging
 import contextlib
-from typing import TYPE_CHECKING
-from src.websocket.errors import send_error
+
 from src.telemetry.sentry import capture_error
-from src.telemetry.instruments import get_metrics
-from config.runtime.websocket import WEBSOCKET_ERROR_INTERNAL
-from src.telemetry.error_classification import classify_error
 from src.telemetry.traces import RequestSpanAttributes, request_span
+from src.websocket.errors import send_error
+from config.runtime.websocket import WEBSOCKET_ERROR_INTERNAL
+from src.telemetry.instruments import get_metrics
 from src.websocket.disconnects import is_expected_websocket_disconnect
+from src.telemetry.error_classification import classify_error
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Awaitable
+
     from fastapi import WebSocket
+
     from src.session.state import SessionState
-    from collections.abc import Awaitable, Callable
 
 logger = logging.getLogger(__name__)
 

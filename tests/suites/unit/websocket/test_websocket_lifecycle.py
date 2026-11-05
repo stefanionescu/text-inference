@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
-import asyncio
 from typing import TYPE_CHECKING, cast
+import asyncio
+
+import pytest
+
 from src.websocket.lifecycle import WebSocketLifecycle
 from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_REASON
 

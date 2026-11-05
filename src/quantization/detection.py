@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import sys
 import json
-import argparse
-from pathlib import Path
 from typing import TYPE_CHECKING
+from pathlib import Path
+import argparse
+
 from src.quantization.policy import validate_engine
-from src.quantization.inspection import inspect_metadata
-from src.quantization.metadata import detect_payload_formats
 from config.model.quantization import DEFAULT_MODEL_REVISION, QUANTIZATION_CONFIG_FILENAMES
+from src.quantization.metadata import detect_payload_formats
+from src.quantization.inspection import inspect_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import json
-import hashlib
-import contextlib
-from pathlib import Path
-from dataclasses import dataclass
-from datetime import UTC, datetime
 from typing import TYPE_CHECKING, cast
+import hashlib
+from pathlib import Path
+from datetime import UTC, datetime
 from tempfile import NamedTemporaryFile
+import contextlib
+from dataclasses import dataclass
+
 from config.model.quantization import (
     METADATA_FILENAME,
     MODEL_CONFIG_FILENAME,
@@ -19,6 +20,7 @@ from config.model.quantization import (
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+
     from src.quantization.source import SourceIdentity
 
 _JSON_INDENT = 2

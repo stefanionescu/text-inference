@@ -8,12 +8,13 @@ the first exchange. It maintains conversation history across multiple turns.
 from __future__ import annotations
 
 from typing import Any
-from tests.state import ConversationSession, SessionContext
-from tests.harness.client.websocket import (
-    build_message_payload as build_websocket_message_payload,
-)
+
+from tests.state import SessionContext, ConversationSession
 from tests.harness.client.websocket import (
     build_start_payload as build_websocket_start_payload,
+)
+from tests.harness.client.websocket import (
+    build_message_payload as build_websocket_message_payload,
 )
 
 

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
-import pytest
 from typing import TYPE_CHECKING
+
+import pytest
+
+from config.model.quantization import QUANTIZATIONS_BY_ENGINE
 from src.quantization.detection import detect_format
 from src.quantization.checkpoint import validate_checkpoint
-from config.model.quantization import QUANTIZATIONS_BY_ENGINE
 
 if TYPE_CHECKING:
     from pathlib import Path

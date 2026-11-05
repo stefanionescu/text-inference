@@ -1,11 +1,14 @@
 """Unit tests for websocket client message parsing."""
 
 from __future__ import annotations
+
 import json
+
 import pytest
+
 from src.websocket.parser import parse_client_message
+from config.runtime.websocket import WEBSOCKET_PROTOCOL_VERSION, WEBSOCKET_MAX_MESSAGE_BYTES
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
-from config.runtime.websocket import WEBSOCKET_MAX_MESSAGE_BYTES, WEBSOCKET_PROTOCOL_VERSION
 
 
 def _valid_start(**overrides: object) -> str:

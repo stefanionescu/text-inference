@@ -10,14 +10,14 @@ from __future__ import annotations
 
 import json
 import time
+from typing import TYPE_CHECKING, Any
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+
 from websockets.exceptions import ConnectionClosed
-from tests.harness.reporting.terminal import dim, write_line
-from .handlers import build_cancel_handlers, build_recovery_handlers
-from tests.state import CancelPhaseResult, DrainPhaseResult, RecoveryPhaseResult, SessionContext, StreamState
+
+from tests.state import StreamState, SessionContext, DrainPhaseResult, CancelPhaseResult, RecoveryPhaseResult
 from tests.harness.client.websocket import (
     iter_messages,
     dispatch_message,
@@ -27,6 +27,9 @@ from tests.harness.client.websocket import (
     build_message_payload,
     send_initial_user_turn,
 )
+from tests.harness.reporting.terminal import dim, write_line
+
+from .handlers import build_cancel_handlers, build_recovery_handlers
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol

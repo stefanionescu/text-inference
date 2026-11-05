@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from src.errors import RateLimitError, ValidationError, StreamCancelledError
 from src.telemetry.error_classification import classify_error
-from src.errors import RateLimitError, StreamCancelledError, ValidationError
 
 
 def test_error_known_categories() -> None:

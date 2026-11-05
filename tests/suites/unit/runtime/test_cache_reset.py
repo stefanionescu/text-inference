@@ -2,27 +2,30 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, cast
 import asyncio
 from functools import partial
-from types import SimpleNamespace
+from dataclasses import field, dataclass
 from unittest.mock import AsyncMock
-from typing import TYPE_CHECKING, cast
-from dataclasses import dataclass, field
-from src.engines.vllm.engine import VLLMEngine
+
 from src.engines.vllm import cache as cache_module
 from src.engines.vllm.cache import CacheResetCoordinator
-from src.runtime.dependencies import RuntimeDependencies
 from src.websocket.endpoint import ConnectionFinalization, clear_after_last_disconnect
+from src.engines.vllm.engine import VLLMEngine
+from src.runtime.dependencies import RuntimeDependencies
 
 if TYPE_CHECKING:
-    import pytest
     from typing import Any
+
+    import pytest
     from fastapi import WebSocket
-    from src.engines.protocol import Engine
-    from src.session.runtime import SessionRuntime
+
     from src.runtime.config import ApplicationSettings
-    from src.engines.vllm.cache import CacheResetEngine
+    from src.session.runtime import SessionRuntime
+    from src.engines.protocol import Engine
     from src.tokens.tokenizer import ThreadSafeTokenizer
+    from src.engines.vllm.cache import CacheResetEngine
     from src.runtime.dependencies import ConnectionRegistryProtocol
 
 

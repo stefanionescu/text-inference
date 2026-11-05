@@ -20,14 +20,15 @@ and proper cleanup when connections close.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 import asyncio
 import contextlib
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.engines.protocol import Engine
+    from collections.abc import Callable, Awaitable
+
     from src.session.state import SessionState
-    from collections.abc import Awaitable, Callable
+    from src.engines.protocol import Engine
 
 
 def is_request_cancelled(state: SessionState | None, request_id: str) -> bool:

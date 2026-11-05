@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-import pytest
 from typing import cast
+
+import pytest
+
 from src.text.prompt import sanitize_prompt
 
 

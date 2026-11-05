@@ -2,19 +2,22 @@
 
 from __future__ import annotations
 
-import pytest
+from typing import TYPE_CHECKING, cast
 import asyncio
 from dataclasses import dataclass
+from unittest.mock import Mock, AsyncMock
+
+import pytest
+
 from src.runtime import bootstrap
-from typing import TYPE_CHECKING, cast
-from unittest.mock import AsyncMock, Mock
-from src.engines.trt.engine import TRTEngine
 from src.engines.protocol import SamplingParametersRequest
-from tests.harness.environment.tokenizer import build_local_tokenizer
+from src.engines.trt.engine import TRTEngine
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
+from tests.harness.environment.tokenizer import build_local_tokenizer
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+
     from src.engines.protocol import EngineOutput
 
 

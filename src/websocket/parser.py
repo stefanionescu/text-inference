@@ -13,9 +13,11 @@ Validation is strict:
 from __future__ import annotations
 
 import json
-from typing import Annotated, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, cast
+
 from pydantic import Field, TypeAdapter, ValidationError
-from src.websocket.schemas import EndMessage, PingMessage, PongMessage, StartMessage, TurnMessage, CancelMessage
+
+from src.websocket.schemas import EndMessage, PingMessage, PongMessage, TurnMessage, StartMessage, CancelMessage
 
 if TYPE_CHECKING:
     from src.runtime.config import WebSocketSettings

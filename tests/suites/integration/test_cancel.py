@@ -1,30 +1,35 @@
 """Integration tests for websocket cancel and recovery behavior."""
 
 from __future__ import annotations
+
 import json
-import asyncio
-from dataclasses import replace
 from typing import TYPE_CHECKING
-from tests.state import SessionContext
-from fastapi.testclient import TestClient
+import asyncio
+from contextlib import AbstractContextManager, contextmanager
+from dataclasses import replace
 from unittest.mock import AsyncMock, patch
+
+from fastapi.testclient import TestClient
+
+from src.server import create_public_application
+from tests.state import SessionContext
+from src.execution.turn import StreamResponseRequest, stream_response
 from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from src.server import create_public_application
 from src.runtime.dependencies import RuntimeDependencies
 from src.websocket.connections import ConnectionRegistry
-from contextlib import AbstractContextManager, contextmanager
-from tests.harness.environment.tokenizer import use_local_tokenizers
-from src.execution.turn import StreamResponseRequest, stream_response
+from tests.harness.client.websocket import build_start_payload, build_cancel_payload, build_message_payload
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
-from tests.harness.client.websocket import build_cancel_payload, build_message_payload, build_start_payload
+from tests.harness.environment.tokenizer import use_local_tokenizers
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, AsyncIterator
+
     from fastapi import WebSocket
+    from starlette.testclient import WebSocketTestSession
+
     from src.execution.turn import TurnRequest
     from src.runtime.config import ApplicationSettings
-    from collections.abc import AsyncIterator, Generator
-    from starlette.testclient import WebSocketTestSession
 
 TEST_API_KEY = "integration-test-key"
 

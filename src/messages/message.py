@@ -6,17 +6,21 @@ import copy
 import time
 import uuid
 from typing import TYPE_CHECKING
-from .validators import ValidationError
+
 from src.execution.turn import TurnRequest
-from src.websocket.errors import send_error
-from .sampling import extract_sampling_overrides
-from src.telemetry.instruments import get_metrics
 from src.session.config import update_session_config
+from src.websocket.errors import send_error
 from config.runtime.websocket import WEBSOCKET_ERROR_INVALID_MESSAGE, WEBSOCKET_ERROR_INVALID_PAYLOAD
+from src.telemetry.instruments import get_metrics
+
+from .sampling import extract_sampling_overrides
+from .validators import ValidationError
 
 if TYPE_CHECKING:
-    from fastapi import WebSocket
     from collections.abc import Mapping
+
+    from fastapi import WebSocket
+
     from src.session.state import SessionState
     from src.session.runtime import SessionRuntime
 

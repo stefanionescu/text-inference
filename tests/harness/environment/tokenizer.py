@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import re
-from functools import lru_cache
 from typing import TYPE_CHECKING
+from functools import lru_cache
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import field, dataclass
+
 from src.tokens.tokenizer import ThreadSafeTokenizer
 from config.tests.tokenizer import TEST_TOKENIZER_VOCAB
 

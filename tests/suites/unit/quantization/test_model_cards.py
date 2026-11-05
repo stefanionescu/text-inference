@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.hf.license import LicenseMetadata
+
 from src.hf.trt import build_model_card as build_trt_card
 from src.hf.vllm import build_model_card as build_vllm_card
+from src.hf.license import LicenseMetadata
 
 if TYPE_CHECKING:
     import pytest

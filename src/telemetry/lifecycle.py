@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import logging
-from .sentry import initialize_sentry, shutdown_sentry
+
 from src.runtime.environment import read_environment_text
-from config.runtime.telemetry import AXIOM_API_TOKEN, SENTRY_DSN
-from .open_telemetry import initialize_open_telemetry, shutdown_open_telemetry
+from config.runtime.telemetry import SENTRY_DSN, AXIOM_API_TOKEN
+
+from .sentry import shutdown_sentry, initialize_sentry
+from .open_telemetry import shutdown_open_telemetry, initialize_open_telemetry
 
 logger = logging.getLogger(__name__)
 

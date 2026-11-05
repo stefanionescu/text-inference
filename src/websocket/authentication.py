@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import hmac
 import time
+from typing import TYPE_CHECKING
 import logging
 from collections import deque
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
 if TYPE_CHECKING:
-    from fastapi import WebSocket
     from collections.abc import Callable
-    from src.runtime.config import AuthenticationSettings, WebSocketSettings
+
+    from fastapi import WebSocket
+
+    from src.runtime.config import WebSocketSettings, AuthenticationSettings
 
 logger = logging.getLogger(__name__)
 

@@ -3,21 +3,24 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from typing import TYPE_CHECKING
+from contextlib import AbstractContextManager, contextmanager
+from dataclasses import replace
 from unittest.mock import AsyncMock
+
 from fastapi.testclient import TestClient
+
 from src.server import create_public_application
 import src.session.runtime as session_runtime_module
+from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_CODE, WEBSOCKET_PROTOCOL_VERSION, WEBSOCKET_CLOSE_IDLE_REASON
 from src.runtime.dependencies import RuntimeDependencies
 from src.websocket.connections import ConnectionRegistry
-from contextlib import AbstractContextManager, contextmanager
-from tests.harness.environment.tokenizer import use_local_tokenizers
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
-from config.runtime.websocket import WEBSOCKET_CLOSE_IDLE_CODE, WEBSOCKET_CLOSE_IDLE_REASON, WEBSOCKET_PROTOCOL_VERSION
+from tests.harness.environment.tokenizer import use_local_tokenizers
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
     from src.runtime.config import ApplicationSettings
 
 TEST_API_KEY = "integration-test-key"

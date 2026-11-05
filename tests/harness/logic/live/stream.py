@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from dataclasses import dataclass, field
+from dataclasses import field, dataclass
+
 from tests.harness.client.websocket import record_token
 from tests.harness.reporting.terminal import magenta, write_line, write_text
 

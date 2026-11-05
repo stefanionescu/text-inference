@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
-from collections.abc import Awaitable, Callable
-from tests.harness.reporting.terminal import bold, dim, write_line
+import logging
+from collections.abc import Callable, Awaitable
+
+from tests.harness.reporting.terminal import dim, bold, write_line
 
 if TYPE_CHECKING:
     from .client import LiveClient

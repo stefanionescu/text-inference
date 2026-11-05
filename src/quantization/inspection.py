@@ -5,17 +5,16 @@ from __future__ import annotations
 import os
 import re
 import sys
-import json
-import hashlib
-import argparse
-from pathlib import Path
 from http import HTTPStatus
-from urllib.parse import quote
-from dataclasses import dataclass
+import json
 from typing import TYPE_CHECKING, cast
+import hashlib
+from pathlib import Path
+import argparse
+from dataclasses import dataclass
 from http.client import HTTPSConnection
-from src.quantization.metadata import detect_payload_formats
-from src.quantization.policy import QuantizationPlan, build_quantization_plan
+from urllib.parse import quote
+
 from config.model.allowlists import (
     ALLOWED_TRT_MOE_MODELS,
     ALLOWED_TRT_BASE_MODELS,
@@ -24,6 +23,7 @@ from config.model.allowlists import (
     ALLOWED_TRT_QUANTIZED_MODELS,
     ALLOWED_VLLM_QUANTIZED_MODELS,
 )
+from src.quantization.policy import QuantizationPlan, build_quantization_plan
 from config.model.quantization import (
     TRT_ENGINE,
     DEFAULT_MODEL_REVISION,
@@ -32,6 +32,7 @@ from config.model.quantization import (
     SOURCE_FINGERPRINT_SUFFIXES,
     QUANTIZATION_CONFIG_FILENAMES,
 )
+from src.quantization.metadata import detect_payload_formats
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

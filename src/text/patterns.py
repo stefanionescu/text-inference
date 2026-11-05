@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+
 from config.text.filters import (
     EMAIL_PATTERN_TEXT,
     EMOJI_PATTERN_TEXT,

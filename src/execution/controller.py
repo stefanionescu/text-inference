@@ -37,22 +37,24 @@ from __future__ import annotations
 
 import math
 import time
+from typing import TYPE_CHECKING
 import asyncio
 import logging
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
+from collections.abc import Callable, Awaitable
+
 from src.errors import StreamCancelledError
 from src.telemetry.sentry import capture_error
-from collections.abc import Awaitable, Callable
-from config.runtime.logging import STREAM_LABEL
 from src.telemetry.traces import generation_span
-from src.telemetry.instruments import get_metrics
+from config.runtime.logging import STREAM_LABEL
 from config.runtime.numerics import FLOAT_ZERO_ABS_TOL
+from src.telemetry.instruments import get_metrics
 from src.telemetry.error_classification import classify_error
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, AsyncGenerator
+
     from src.engines.protocol import Engine, EngineOutput
-    from collections.abc import AsyncGenerator, AsyncIterator
 
 logger = logging.getLogger(__name__)
 

@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
+from dataclasses import dataclass
+
 from src.telemetry.instruments import get_metrics
 
 if TYPE_CHECKING:
     from fastapi import WebSocket
-    from src.engines.protocol import Engine
-    from src.session.runtime import SessionRuntime
+
     from src.runtime.config import ApplicationSettings
+    from src.session.runtime import SessionRuntime
+    from src.engines.protocol import Engine
     from src.tokens.tokenizer import ThreadSafeTokenizer
     from src.engines.vllm.cache import CacheResetCoordinator
 

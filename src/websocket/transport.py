@@ -5,9 +5,10 @@ from __future__ import annotations
 import json
 import time
 import logging
-from src.telemetry.instruments import get_metrics
+
 from fastapi import WebSocket, WebSocketDisconnect
 
+from src.telemetry.instruments import get_metrics
 
 logger = logging.getLogger(__name__)
 

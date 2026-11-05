@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
-from config.model.quantization import GPTQ_FORMAT, NVFP4_FORMAT
+
 from config.model.vllm import (
     MOE_SCHEME,
     DENSE_SCHEME,
@@ -23,6 +23,7 @@ from config.model.vllm import (
     QUANTIZATION_WEIGHT_BITS,
     MODEL_POSITION_LIMIT_FIELD,
 )
+from config.model.quantization import GPTQ_FORMAT, NVFP4_FORMAT
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

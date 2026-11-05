@@ -32,7 +32,9 @@ Example:
 import time
 import asyncio
 import logging
+
 from fastapi import WebSocket
+
 from ..telemetry.instruments import get_metrics
 
 logger = logging.getLogger(__name__)

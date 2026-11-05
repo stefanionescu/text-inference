@@ -5,9 +5,10 @@ from __future__ import annotations
 import os
 import re
 import sys
-import huggingface_hub
-from pathlib import Path
 from typing import TYPE_CHECKING, cast
+from pathlib import Path
+
+import huggingface_hub
 
 if TYPE_CHECKING:
     from collections.abc import Callable

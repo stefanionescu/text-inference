@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
-import pytest
 from typing import TYPE_CHECKING
+
+import pytest
+
 from src.text.stream import StreamingSanitizer
 from tests.harness.messages import STREAMING_SANITIZER_CASES
 from tests.harness.environment.repository import configure_repository_path

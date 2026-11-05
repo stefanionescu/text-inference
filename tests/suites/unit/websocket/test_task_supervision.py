@@ -3,19 +3,22 @@
 from __future__ import annotations
 
 import json
-import pytest
+from typing import TYPE_CHECKING, cast
 import asyncio
 from unittest.mock import AsyncMock
-from typing import TYPE_CHECKING, cast
+
+import pytest
 from fastapi import WebSocketDisconnect
+
 from src.session.state import SessionState
-from src.websocket.supervision import supervise_turn
+from src.session.requests import spawn_session_task, abort_session_requests
 from config.runtime.websocket import WEBSOCKET_ERROR_INTERNAL
-from src.session.requests import abort_session_requests, spawn_session_task
+from src.websocket.supervision import supervise_turn
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Awaitable
+
     from fastapi import WebSocket
-    from collections.abc import Awaitable, Callable
 
 
 async def _spawn_task(

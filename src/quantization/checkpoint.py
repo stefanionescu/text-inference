@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 import shutil
-import argparse
-from pathlib import Path
-from transformers import AutoTokenizer
 from typing import TYPE_CHECKING, cast
+from pathlib import Path
+import argparse
+
+from transformers import AutoTokenizer
+
 from src.tokens.validation import validate_tokenizer_exists
-from src.quantization.detection import detect_format, validate_engine
 from config.model.quantization import (
     MODEL_CONFIG_FILENAME,
     QUANTIZATIONS_BY_ENGINE,
     CHECKPOINT_ASSET_FILENAMES,
 )
+from src.quantization.detection import detect_format, validate_engine
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence

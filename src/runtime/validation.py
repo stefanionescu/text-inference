@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from config.runtime.gpu import KV_DTYPES
+
 from config.model.trt import TRT_MODEL_DTYPES
+from config.runtime.gpu import KV_DTYPES
 from src.tokens.validation import validate_tokenizer_exists
 from config.model.quantization import QUANTIZATIONS_BY_ENGINE
 

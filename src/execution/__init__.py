@@ -1,7 +1,7 @@
 """Execution helpers."""
 
-from .templates import build_prefixed_prompt
 from .runner import GenerationRequest, run_generation
+from .templates import build_prefixed_prompt
 from .controller import StreamConfig, StreamController
 
 __all__ = [

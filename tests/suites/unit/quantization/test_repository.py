@@ -1,7 +1,9 @@
 """Tests for repository provenance reads."""
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from src.quantization.repository import read_repository_revision
 
 

@@ -8,10 +8,10 @@ override arguments (temperature, top_p, and related values).
 from __future__ import annotations
 
 import os
-from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
+from collections.abc import Mapping
+
 from config.tests.defaults import TRANSACTION_TIMEOUT_SECONDS
-from tests.harness.environment.settings import DEFAULT_SERVER_URL
 from config.prompt.sampling import (
     TOP_K,
     TOP_P,
@@ -20,9 +20,10 @@ from config.prompt.sampling import (
     FREQUENCY_PENALTY,
     REPETITION_PENALTY,
 )
+from tests.harness.environment.settings import DEFAULT_SERVER_URL
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser, Namespace
+    from argparse import Namespace, ArgumentParser
 
 
 def add_connection_arguments(

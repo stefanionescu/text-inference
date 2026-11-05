@@ -4,21 +4,24 @@ from __future__ import annotations
 
 import uuid
 import logging
-import websockets
-from .client import LiveClient
-from .commands import print_help
 from dataclasses import dataclass
-from .cli import run_interactive_loop
-from .profiles import PromptProfileRegistry
+
+import websockets
+
 from tests.state import LiveSession, PromptProfile
 from config.tests.defaults import WEBSOCKET_IDLE_CLOSE_CODE
-from tests.harness.reporting.terminal import dim, section_header, write_line
-from tests.harness.client.errors import ConnectionClosedError, IdleTimeoutError, ServerError
-from tests.harness.client.websocket import build_websocket_url, build_api_key_headers, open_websocket, connect_websocket
+from tests.harness.client.errors import ServerError, IdleTimeoutError, ConnectionClosedError
+from tests.harness.client.websocket import open_websocket, connect_websocket, build_websocket_url, build_api_key_headers
+from tests.harness.reporting.terminal import dim, write_line, section_header
 from tests.harness.environment.settings import (
     DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
     DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
 )
+
+from .cli import run_interactive_loop
+from .client import LiveClient
+from .commands import print_help
+from .profiles import PromptProfileRegistry
 
 logger = logging.getLogger("live")
 

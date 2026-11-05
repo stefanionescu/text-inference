@@ -1,8 +1,10 @@
 """Strict schemas for the WebSocket message contract."""
 
 from __future__ import annotations
+
 from typing import Literal
-from pydantic import BaseModel, ConfigDict, field_validator, Field
+
+from pydantic import Field, BaseModel, ConfigDict, field_validator
 
 
 class VersionedMessage(BaseModel):

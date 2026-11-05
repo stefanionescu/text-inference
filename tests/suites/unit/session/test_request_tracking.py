@@ -1,11 +1,14 @@
 """Unit tests for session request tracking utilities."""
 
 from __future__ import annotations
-import pytest
+
+from typing import TYPE_CHECKING, cast
 import asyncio
+from dataclasses import field, dataclass
 from unittest.mock import Mock
-from typing import cast, TYPE_CHECKING
-from dataclasses import dataclass, field
+
+import pytest
+
 from src.session.state import SessionState
 from src.session.requests import (
     is_request_cancelled,

@@ -19,15 +19,16 @@ import sys
 import asyncio
 import logging
 import argparse
+
+from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
 from tests.harness.client.errors import ServerError
-from tests.harness.messages.conversation import CONVERSATION_HISTORY_MESSAGES
 from tests.harness.logic.conversation import ConversationRunRequest, run_conversation
-from tests.harness.client.cli import add_connection_arguments, add_sampling_arguments, build_sampling_payload
 from tests.harness.environment.settings import (
     DEFAULT_GENDER,
     DEFAULT_SERVER_URL,
     DEFAULT_PERSONALITY,
 )
+from tests.harness.messages.conversation import CONVERSATION_HISTORY_MESSAGES
 
 
 def _parse_arguments() -> argparse.Namespace:

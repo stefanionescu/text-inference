@@ -34,6 +34,7 @@ from __future__ import annotations
 import time
 import collections
 from collections.abc import Callable
+
 from src.errors import RateLimitError
 
 # Type alias for injectable time functions (used in testing)

@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import sys
 import shutil
-import argparse
-from pathlib import Path
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
-from src.quantization.detection import detect_local_format
-from src.quantization.source import SourceSnapshot, acquire_source
-from src.quantization.vllm.policy import QuantizationPolicy, select_policy, validate_sequence_length
+from pathlib import Path
+import argparse
+from dataclasses import dataclass
+
 from config.model.vllm import (
     LLM_COMPRESSOR_NAME,
     CALIBRATION_PIPELINES,
@@ -20,24 +18,27 @@ from config.model.vllm import (
     DEFAULT_CALIBRATION_BATCH_SIZE,
     DEFAULT_CALIBRATION_SEQUENCE_LENGTH,
 )
+from src.quantization.source import SourceSnapshot, acquire_source
 from config.model.quantization import (
     VLLM_ENGINE,
     BINARY_FLAG_VALUES,
     DEFAULT_MODEL_REVISION,
     COMPRESSED_TENSORS_FORMAT,
 )
+from src.quantization.detection import detect_local_format
 from src.quantization.checkpoint import (
+    CHECKPOINT_VALIDATION_ERRORS,
     copy_source_assets,
     validate_checkpoint,
     validate_tokenizer_assets,
-    CHECKPOINT_VALIDATION_ERRORS,
 )
 from src.quantization.provenance import (
+    QuantizationRequest,
     cache_matches,
     write_provenance,
-    QuantizationRequest,
     read_export_quantization,
 )
+from src.quantization.vllm.policy import QuantizationPolicy, select_policy, validate_sequence_length
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

@@ -11,6 +11,7 @@ This module performs a one-shot cleanup of inbound prompts:
 from __future__ import annotations
 
 import unicodedata
+
 from .patterns import BIDI_CHAR_PATTERN, CTRL_CHAR_PATTERN, _strip_escaped_quotes
 
 try:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from src.quantization.source import SourceIdentity
 from src.quantization.provenance import QuantizationRequest, cache_matches, write_provenance
 

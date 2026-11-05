@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import os
 import sys
-import subprocess
 from typing import TYPE_CHECKING
+import subprocess
 
 if TYPE_CHECKING:
     from pathlib import Path

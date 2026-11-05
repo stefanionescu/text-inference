@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-import pytest
-import asyncio
 from typing import TYPE_CHECKING
+import asyncio
+from unittest.mock import Mock, AsyncMock
+
+import pytest
+
 from src.websocket import endpoint
-from unittest.mock import AsyncMock, Mock
 from src.runtime.dependencies import RuntimeDependencies
 
 if TYPE_CHECKING:

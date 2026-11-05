@@ -28,13 +28,14 @@ import os
 import sys
 import asyncio
 import argparse
-from tests.harness.logic.benchmark.runner import run_benchmark
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_PERSONALITY, DEFAULT_SERVER_URL
-from tests.harness.client.cli import add_connection_arguments, add_sampling_arguments, build_sampling_payload
+
 from config.tests.defaults import (
     BENCHMARK_DEFAULT_REQUESTS,
     BENCHMARK_DEFAULT_CONCURRENCY,
 )
+from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
+from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
+from tests.harness.logic.benchmark.runner import run_benchmark
 
 
 def _parse_arguments() -> argparse.Namespace:

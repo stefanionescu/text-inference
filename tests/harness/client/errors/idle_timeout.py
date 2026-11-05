@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from .closed_connection import ConnectionClosedError
 from config.tests.defaults import WEBSOCKET_IDLE_CLOSE_CODE, WEBSOCKET_IDLE_CLOSE_REASON
+
+from .closed_connection import ConnectionClosedError
 
 
 class IdleTimeoutError(ConnectionClosedError):

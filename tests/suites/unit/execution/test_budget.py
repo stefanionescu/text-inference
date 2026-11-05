@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import pytest
+
 from src.execution.budget import PromptBudgetRequest, fit_prompt_to_budget
-from tests.harness.messages.unit import ASSISTANT_FIRST_MESSAGES, MESSAGES
+from tests.harness.messages.unit import MESSAGES, ASSISTANT_FIRST_MESSAGES
 from tests.harness.environment.tokenizer import use_local_tokenizers, use_punctuation_aware_tokenizers
 
 HISTORY_FIT_LIMIT = 70

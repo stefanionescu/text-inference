@@ -5,13 +5,15 @@ from __future__ import annotations
 import os
 import re
 import sys
-import hashlib
-import argparse
-import huggingface_hub
-from pathlib import Path
-from dataclasses import dataclass
-from huggingface_hub import HfApi
 from typing import TYPE_CHECKING, cast
+import hashlib
+from pathlib import Path
+import argparse
+from dataclasses import dataclass
+
+import huggingface_hub
+from huggingface_hub import HfApi
+
 from config.model.quantization import (
     HUB_SOURCE_KIND,
     LOCAL_SOURCE_KIND,

@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from opentelemetry import trace
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
 from contextlib import contextmanager
+from dataclasses import dataclass
+
+from opentelemetry import trace
+
 from src.runtime.environment import read_environment_text
-from config.runtime.telemetry import OTEL_RESOURCE_NAME, SPAN_GENERATION, SPAN_REQUEST, SPAN_SESSION
+from config.runtime.telemetry import SPAN_REQUEST, SPAN_SESSION, SPAN_GENERATION, OTEL_RESOURCE_NAME
 
 if TYPE_CHECKING:
     from collections.abc import Generator

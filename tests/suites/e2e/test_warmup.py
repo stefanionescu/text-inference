@@ -32,9 +32,10 @@ import sys
 import asyncio
 import logging
 import argparse
+
+from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
 from tests.harness.client.errors import ServerError
 from tests.harness.logic.warmup.runner import run_warmup
-from tests.harness.client.cli import add_connection_arguments, add_sampling_arguments, build_sampling_payload
 
 
 def _parse_arguments() -> argparse.Namespace:

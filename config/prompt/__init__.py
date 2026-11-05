@@ -1,7 +1,6 @@
 """Prompt and sampling configuration."""
 
 from .profiles import WARMUP_PROMPT_PAIRS
-from .templates import IS_TEMPLATE_THINKING_ENABLED
 from .sampling import (
     MIN_P,
     TOP_K,
@@ -13,6 +12,7 @@ from .sampling import (
     FREQUENCY_PENALTY,
     REPETITION_PENALTY,
 )
+from .templates import IS_TEMPLATE_THINKING_ENABLED
 
 __all__ = [
     "FREQUENCY_PENALTY",

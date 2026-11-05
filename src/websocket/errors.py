@@ -9,8 +9,10 @@ connections. All error responses use the flat format:
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from .transport import safe_send_flat
+
 from config.runtime.websocket import ERROR_CODE_TO_STATUS, WEBSOCKET_STATUS_INTERNAL
+
+from .transport import safe_send_flat
 
 if TYPE_CHECKING:
     from fastapi import WebSocket

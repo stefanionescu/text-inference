@@ -1,11 +1,12 @@
 """vLLM ASGI application."""
 
-from .listeners import run_applications
 from src.telemetry.cuda import GPU_PROVIDER
 from src.runtime.settings import read_settings
 from src.server.readiness import ReadinessState
-from config.model.quantization import VLLM_ENGINE
 from src.engines.vllm.factory import create_vllm_engine
+from config.model.quantization import VLLM_ENGINE
+
+from .listeners import run_applications
 from .applications import create_probe_application, create_public_application
 
 settings = read_settings()

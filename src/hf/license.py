@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 from huggingface_hub import HfApi
 from huggingface_hub.errors import HfHubHTTPError
-from config.model.quantization import HUB_SOURCE_KIND
+
 from config.model.publishing import (
     FALLBACK_LICENSE,
     LICENSE_ID_FIELD,
@@ -14,6 +15,7 @@ from config.model.publishing import (
     LOCAL_LICENSE_PATH,
     HUGGING_FACE_MODEL_URL,
 )
+from config.model.quantization import HUB_SOURCE_KIND
 
 
 @dataclass(frozen=True, slots=True)

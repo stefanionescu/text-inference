@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from src.text.verbalize import (
     verbalize_email,
     verbalize_emails,

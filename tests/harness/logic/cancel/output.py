@@ -7,6 +7,7 @@ to the console using the standard test output formatting helpers.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from tests.harness.reporting.terminal import (
     red,
     green,

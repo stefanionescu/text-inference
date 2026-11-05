@@ -5,9 +5,10 @@ from __future__ import annotations
 import os
 import logging
 import contextlib
+from contextvars import Token, ContextVar
 from dataclasses import dataclass
-from contextvars import ContextVar, Token
-from config.runtime.logging import APPLICATION_LOG_DATE_FORMAT, APPLICATION_LOG_FORMAT, APPLICATION_LOG_LEVEL
+
+from config.runtime.logging import APPLICATION_LOG_LEVEL, APPLICATION_LOG_FORMAT, APPLICATION_LOG_DATE_FORMAT
 
 _SESSION_ID: ContextVar[str] = ContextVar("session_id", default="-")
 _REQUEST_ID: ContextVar[str] = ContextVar("request_id", default="-")

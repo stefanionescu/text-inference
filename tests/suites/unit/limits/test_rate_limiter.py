@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from src.errors import RateLimitError
 from src.websocket.rate_limiting.window import SlidingWindowRateLimiter
 

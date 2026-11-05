@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
-import pytest
 from typing import TYPE_CHECKING
-from src.quantization.inspection import inspect_model
+
+import pytest
+
 from src.quantization.policy import (
     EXPORT_ACTION,
     ONLINE_ACTION,
@@ -21,6 +22,7 @@ from config.model.quantization import (
     INT4_AWQ_FORMAT,
     COMPRESSED_TENSORS_FORMAT,
 )
+from src.quantization.inspection import inspect_model
 
 if TYPE_CHECKING:
     from pathlib import Path

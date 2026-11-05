@@ -8,13 +8,12 @@ of each client type:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
 import asyncio
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
-from .handlers import build_recovery_handlers
-from tests.harness.reporting.terminal import dim, write_line
+
 from websockets.exceptions import ConnectionClosed, WebSocketException
-from .phases import run_cancel_phase, run_drain_phase, run_recovery_phase
+
 from tests.state import (
     StreamState,
     SessionContext,
@@ -34,10 +33,14 @@ from tests.harness.client.websocket import (
     build_start_payload,
     send_initial_user_turn,
 )
+from tests.harness.reporting.terminal import dim, write_line
 from tests.harness.environment.settings import (
     DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
     DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
 )
+
+from .phases import run_drain_phase, run_cancel_phase, run_recovery_phase
+from .handlers import build_recovery_handlers
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol

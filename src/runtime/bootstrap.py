@@ -7,17 +7,20 @@ lazy singleton initialization at request time.
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING
-from .dependencies import RuntimeDependencies
+import asyncio
+
 from src.session.runtime import SessionRuntime
 from src.tokens.tokenizer import ThreadSafeTokenizer
 from src.engines.vllm.cache import CacheResetCoordinator
 
+from .dependencies import RuntimeDependencies
+
 if TYPE_CHECKING:
-    from src.engines.protocol import Engine
-    from collections.abc import Awaitable, Callable
+    from collections.abc import Callable, Awaitable
+
     from src.runtime.config import ApplicationSettings
+    from src.engines.protocol import Engine
     from src.runtime.dependencies import ConnectionRegistryProtocol
 
     type EngineBuilder = Callable[[ApplicationSettings], Awaitable[Engine]]

@@ -13,9 +13,12 @@ format numbers (+XX country code required).
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from .patterns import EMAIL_PATTERN
+
 from phonenumbers import PhoneNumberMatcher
+
 from config.text.verbalization import DIGIT_WORDS
+
+from .patterns import EMAIL_PATTERN
 
 if TYPE_CHECKING:
     import re

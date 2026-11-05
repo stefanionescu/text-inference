@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import json
 import uuid
+from typing import TYPE_CHECKING, Any
 import asyncio
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
-from tests.harness.client.prompt import select_prompt
+
+from tests.state import StreamState, TTFBSamples, SessionContext
+from tests.harness.metrics import record_ttfb, has_ttfb_samples, emit_ttfb_summary
 from tests.harness.client.errors import ServerError, StreamError
-from tests.state import SessionContext, StreamState, TTFBSamples
-from tests.harness.messages.history import HISTORY_RECALL_MESSAGES, WARM_HISTORY
-from tests.harness.metrics import emit_ttfb_summary, has_ttfb_samples, record_ttfb
+from tests.harness.client.prompt import select_prompt
 from tests.harness.client.websocket import (
     consume_stream,
     send_end_frame,
@@ -28,6 +28,7 @@ from tests.harness.client.websocket import (
     build_message_payload,
     send_initial_user_turn,
 )
+from tests.harness.messages.history import WARM_HISTORY, HISTORY_RECALL_MESSAGES
 from tests.harness.reporting.terminal import (
     dim,
     write_line,

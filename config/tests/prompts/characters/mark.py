@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from ..blocks import dislikes
 from typing import TYPE_CHECKING
+
+from ..blocks import dislikes
+from .builder import personality_blocks, build_character_prompt
 from ..blocks.shared import MARK_IDENTITY_BLOCK
-from .builder import build_character_prompt, personality_blocks
 from ..personalities import (
     ex,
     kpop,

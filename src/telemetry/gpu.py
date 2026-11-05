@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING, Protocol
+import logging
+
 from opentelemetry.metrics import Observation
+
 from config.runtime.telemetry import (
     METRIC_GPU_MEMORY_FREE,
     METRIC_GPU_MEMORY_USED,

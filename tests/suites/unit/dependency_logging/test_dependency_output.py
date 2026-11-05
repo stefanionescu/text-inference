@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import os
-import pytest
+from typing import TYPE_CHECKING
 import logging
 import importlib
+
+import pytest
+
 from src.logging import output
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path

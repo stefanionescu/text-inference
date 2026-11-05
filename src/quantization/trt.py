@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 import sys
+from typing import TYPE_CHECKING
+from pathlib import Path
 import argparse
 import platform
-from pathlib import Path
 import importlib.metadata
-from typing import TYPE_CHECKING
+
+from config.model.trt import MODELOPT_QUANTIZER_NAME, MODELOPT_CALIBRATION_BATCH_SIZE
 from src.quantization.source import derive_source_identity
-from src.quantization.repository import read_repository_revision
-from config.model.trt import MODELOPT_CALIBRATION_BATCH_SIZE, MODELOPT_QUANTIZER_NAME
-from src.quantization.checkpoint import copy_source_assets, validate_checkpoint, CHECKPOINT_VALIDATION_ERRORS
 from config.model.quantization import TRT_ENGINE, INT4_AWQ_FORMAT, BINARY_FLAG_VALUES, QUANTIZATIONS_BY_ENGINE
-from src.quantization.provenance import cache_matches, write_provenance, QuantizationRequest, read_export_quantization
+from src.quantization.checkpoint import CHECKPOINT_VALIDATION_ERRORS, copy_source_assets, validate_checkpoint
+from src.quantization.provenance import QuantizationRequest, cache_matches, write_provenance, read_export_quantization
+from src.quantization.repository import read_repository_revision
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

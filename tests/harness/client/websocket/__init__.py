@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from .stream import consume_stream, finalize_metrics, record_token
-from .payloads import build_cancel_payload, build_end_payload, build_message_payload, build_start_payload
+from .stream import record_token, consume_stream, finalize_metrics
 from .message import (
     message_text,
     iter_messages,
@@ -12,6 +11,7 @@ from .message import (
     bootstrap_session,
     send_initial_user_turn,
 )
+from .payloads import build_end_payload, build_start_payload, build_cancel_payload, build_message_payload
 from .connection import (
     read_api_key,
     open_websocket,

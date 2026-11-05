@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import re
 import html
-from .suffix import compute_tail_lengths
-from .verbalize import verbalize_emails, verbalize_phone_numbers
+
 from config.text.verbalization import OH_MAX_H_COUNT, OH_MAX_O_COUNT
+
+from .suffix import compute_tail_lengths
 from .patterns import (
     EMOJI_PATTERN,
     EMDASH_PATTERN,
@@ -30,7 +31,6 @@ from .patterns import (
     WORD_HYPHEN_PATTERN,
     ACTION_EMOTE_PATTERN,
     TEMP_CELSIUS_PATTERN,
-    _strip_escaped_quotes,
     DEGREE_SYMBOL_PATTERN,
     NEWLINE_TOKEN_PATTERN,
     EXAGGERATED_OH_PATTERN,
@@ -45,7 +45,9 @@ from .patterns import (
     ELLIPSIS_TRAILING_DOT_PATTERN,
     LEADING_NEWLINE_TOKENS_PATTERN,
     ELLIPSIS_TRAILING_SPACE_PATTERN,
+    _strip_escaped_quotes,
 )
+from .verbalize import verbalize_emails, verbalize_phone_numbers
 
 
 class StreamingSanitizer:

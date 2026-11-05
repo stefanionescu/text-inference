@@ -3,17 +3,20 @@
 from __future__ import annotations
 
 import time
-import pytest
-import asyncio
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
+import asyncio
+
+import pytest
+
+from src.runtime.config import WebSocketSettings, AuthenticationSettings
 import src.websocket.authentication as authentication_module
-from src.runtime.config import AuthenticationSettings, WebSocketSettings
 
 if TYPE_CHECKING:
     from collections import deque
-    from fastapi import WebSocket
     from collections.abc import Callable
+
+    from fastapi import WebSocket
 
 
 class _FakeWebSocket:

@@ -9,14 +9,17 @@ from __future__ import annotations
 
 import time
 from typing import TYPE_CHECKING, Any
-from .message import iter_messages, message_text
-from tests.harness.client.errors import StreamError
+
 from tests.harness.metrics import round_milliseconds
-from tests.harness.client.text_detection import contains_complete_sentence, has_minimum_word_count
+from tests.harness.client.errors import StreamError
+from tests.harness.client.text_detection import has_minimum_word_count, contains_complete_sentence
+
+from .message import message_text, iter_messages
 
 if TYPE_CHECKING:
-    from tests.state.metrics import StreamState
     from websockets import WebSocketClientProtocol
+
+    from tests.state.metrics import StreamState
 
 
 # ============================================================================

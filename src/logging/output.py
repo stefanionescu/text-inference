@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 import logging
 import warnings
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
+
 from config.runtime.logging import DEPENDENCY_LOGGER_NAMES, DEPENDENCY_QUIET_ENVIRONMENT
 
 if TYPE_CHECKING:

@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
 import asyncio
-from .engine import VLLMEngine
+
 from vllm import SamplingParams
 from transformers import AutoConfig
-from typing import TYPE_CHECKING, cast
-from vllm.v1.engine.async_llm import AsyncLLM
 from vllm.engine.arg_utils import AsyncEngineArgs
+from vllm.v1.engine.async_llm import AsyncLLM
+
 from src.tokens.validation import require_local_model_directory
 from src.quantization.vllm.policy import choose_quantization_backend
+
+from .engine import VLLMEngine
 
 if TYPE_CHECKING:
     from src.runtime.config import ApplicationSettings

@@ -3,23 +3,26 @@
 from __future__ import annotations
 
 import os
-import torch
+from typing import TYPE_CHECKING, cast
 import platform
+
+import torch
+from transformers import AutoConfig, AutoModelForCausalLM
 import llmcompressor
 from llmcompressor import oneshot
-from typing import TYPE_CHECKING, cast
 from llmcompressor.utils import load_context
-from transformers import AutoConfig, AutoModelForCausalLM
-from llmcompressor.modifiers.transform.awq import AWQModifier
 from llmcompressor.modifiers.quantization import QuantizationModifier
+from llmcompressor.modifiers.transform.awq import AWQModifier
+
 from src.quantization.vllm.runner import (
-    run_quantization,
     QuantizationSettings,
+    run_quantization,
 )
 
 if TYPE_CHECKING:
     from pathlib import Path
     from collections.abc import Mapping, Sequence
+
     from src.quantization.source import SourceSnapshot
     from src.quantization.vllm.policy import QuantizationPolicy
 

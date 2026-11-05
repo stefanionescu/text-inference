@@ -9,17 +9,15 @@ from __future__ import annotations
 
 import json
 import uuid
+from typing import TYPE_CHECKING
 import asyncio
 import logging
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
-from .stream import stream_exchange
-from tests.harness.client.prompt import select_prompt
+
+from tests.state import StreamState, TTFBSamples, ConversationSession
+from tests.harness.metrics import record_ttfb, has_ttfb_samples, emit_ttfb_summary
 from tests.harness.client.rate import SlidingWindowPacer
-from .session import build_message_payload, build_start_payload
-from tests.state import ConversationSession, StreamState, TTFBSamples
-from tests.harness.metrics import emit_ttfb_summary, has_ttfb_samples, record_ttfb
-from tests.harness.environment.variables import read_environment_float, read_environment_integer
+from tests.harness.client.prompt import select_prompt
 from tests.harness.client.websocket import (
     send_end_frame,
     connect_websocket,
@@ -43,9 +41,14 @@ from tests.harness.environment.settings import (
     DEFAULT_WEBSOCKET_PING_TIMEOUT_SECONDS,
     DEFAULT_WEBSOCKET_PING_INTERVAL_SECONDS,
 )
+from tests.harness.environment.variables import read_environment_float, read_environment_integer
+
+from .stream import stream_exchange
+from .session import build_start_payload, build_message_payload
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
     from websockets import WebSocketClientProtocol
 
 logger = logging.getLogger(__name__)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 from config.model.quantization import (
     FP8_FORMAT,
     TRT_ENGINE,

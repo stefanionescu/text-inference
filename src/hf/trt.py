@@ -5,14 +5,13 @@ from __future__ import annotations
 import os
 import sys
 import json
-import argparse
-from pathlib import Path
 from typing import TYPE_CHECKING
+from pathlib import Path
+import argparse
+
 from huggingface_hub import HfApi
+
 from config.model.trt import TRT_VERSION
-from config.model.quantization import TRT_ENGINE
-from src.quantization.provenance import require_provenance
-from src.quantization.checkpoint import validate_checkpoint
 from src.hf.model_card import (
     format_model_card,
     read_metadata_text,
@@ -33,6 +32,9 @@ from config.model.publishing import (
     TRT_HF_IGNORE_PATTERNS,
     TRT_MODEL_CARD_TEMPLATE,
 )
+from config.model.quantization import TRT_ENGINE
+from src.quantization.checkpoint import validate_checkpoint
+from src.quantization.provenance import require_provenance
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

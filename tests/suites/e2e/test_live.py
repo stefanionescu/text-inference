@@ -5,9 +5,10 @@ from __future__ import annotations
 import asyncio
 import logging
 import argparse
+
+from tests.harness.client.cli import add_sampling_arguments, build_sampling_payload, add_connection_arguments
 from tests.harness.logic.live.runner import LiveRunRequest, run_live_session
-from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_PERSONALITY, DEFAULT_SERVER_URL
-from tests.harness.client.cli import add_connection_arguments, add_sampling_arguments, build_sampling_payload
+from tests.harness.environment.settings import DEFAULT_GENDER, DEFAULT_SERVER_URL, DEFAULT_PERSONALITY
 
 
 def _parse_arguments() -> argparse.Namespace:

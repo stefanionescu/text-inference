@@ -15,12 +15,8 @@ from __future__ import annotations
 import uuid
 import asyncio
 from dataclasses import dataclass
-from tests.harness.client.prompt import select_prompt
-from tests.harness.client.websocket import build_api_key_headers
-from tests.state import CancelClientResult, NormalClientResult, SessionContext
-from tests.harness.reporting.terminal import bold, dim, green, red, section_header, write_line
-from .output import CANCEL_TEST_MESSAGE, print_cancel_client_result, print_normal_client_results
-from .clients import CancelingClientRequest, NormalClientRequest, run_canceling_client, run_normal_client
+
+from tests.state import SessionContext, CancelClientResult, NormalClientResult
 from config.tests.defaults import (
     CANCEL_CLIENT_COUNT_DEFAULT,
     CANCEL_REQUEST_DELAY_SECONDS,
@@ -28,6 +24,12 @@ from config.tests.defaults import (
     CANCEL_DRAIN_TIMEOUT_SECONDS_DEFAULT,
     CANCEL_RECEIVE_TIMEOUT_SECONDS_DEFAULT,
 )
+from tests.harness.client.prompt import select_prompt
+from tests.harness.client.websocket import build_api_key_headers
+from tests.harness.reporting.terminal import dim, red, bold, green, write_line, section_header
+
+from .output import CANCEL_TEST_MESSAGE, print_cancel_client_result, print_normal_client_results
+from .clients import NormalClientRequest, CancelingClientRequest, run_normal_client, run_canceling_client
 
 
 @dataclass(frozen=True)

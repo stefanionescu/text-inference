@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from .client import TestClientError
 from typing import TYPE_CHECKING, ClassVar
+
+from .client import TestClientError
 
 if TYPE_CHECKING:
     from collections.abc import Callable

@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
-from .time import format_session_timestamp
-from .history.controller import HistoryController
+
 from src.execution.budget import PromptBudgetRequest, fit_prompt_to_budget
 
+from .time import format_session_timestamp
+from .history.controller import HistoryController
+
 if TYPE_CHECKING:
+    from src.session.state import SessionState, HistoryMessage
     from src.runtime.config import ApplicationSettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.session.state import HistoryMessage, SessionState
 
 
 class SessionRuntime:

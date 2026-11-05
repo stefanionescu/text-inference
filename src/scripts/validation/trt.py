@@ -5,11 +5,13 @@ from __future__ import annotations
 import sys
 import ctypes
 import ctypes.util
-import tensorrt_llm
-from mpi4py import MPI
 from importlib.metadata import version
-from config.model.trt import TRT_VERSION
+
+from mpi4py import MPI
+import tensorrt_llm
 from cuda.bindings import runtime as cuda_runtime
+
+from config.model.trt import TRT_VERSION
 from src.scripts.cuda import read_cuda_driver_version
 
 

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
+
 from src.execution.templates import build_prefixed_prompt
-from src.session.history.turns import copy_messages, flatten_turns, group_turns
+from src.session.history.turns import group_turns, copy_messages, flatten_turns
 
 if TYPE_CHECKING:
     from src.session.state import HistoryMessage

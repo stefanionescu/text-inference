@@ -8,16 +8,15 @@ It handles message parsing, error reporting, and stats logging.
 from __future__ import annotations
 
 import json
+from typing import TYPE_CHECKING, cast
 import asyncio
 import logging
 import contextlib
+
 import websockets
-from .stream import _StreamContext
-from typing import TYPE_CHECKING, cast
-from tests.state import LiveSession, StreamResult, StreamState
-from .session import build_message_payload, build_start_payload
-from tests.harness.reporting.terminal import cyan, dim, format_metrics_inline, write_line, write_text
-from tests.harness.client.errors import ConnectionClosedError, IdleTimeoutError, ServerError, TestClientError
+
+from tests.state import LiveSession, StreamState, StreamResult
+from tests.harness.client.errors import ServerError, TestClientError, IdleTimeoutError, ConnectionClosedError
 from tests.harness.client.websocket import (
     message_text,
     iter_messages,
@@ -25,6 +24,10 @@ from tests.harness.client.websocket import (
     finalize_metrics,
     send_initial_user_turn,
 )
+from tests.harness.reporting.terminal import dim, cyan, write_line, write_text, format_metrics_inline
+
+from .stream import _StreamContext
+from .session import build_start_payload, build_message_payload
 
 if TYPE_CHECKING:
     from websockets import WebSocketClientProtocol

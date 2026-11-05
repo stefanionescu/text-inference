@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import os
-from threading import Lock
-from transformers import AutoTokenizer
 from typing import TYPE_CHECKING, Protocol, cast
+from threading import Lock
+
+from transformers import AutoTokenizer
+
 from src.tokens.validation import require_local_model_directory
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping
+    from collections.abc import Mapping, Callable
 
 # Disable tokenizers parallelism before importing transformers/tokenizers.
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

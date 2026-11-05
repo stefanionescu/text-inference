@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Protocol
 import asyncio
 import logging
-from typing import TYPE_CHECKING, Protocol
+
 from src.engines.protocol import EngineOutput
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence, AsyncIterator, AsyncGenerator
+
     from src.engines.protocol import SamplingParametersRequest
-    from collections.abc import AsyncGenerator, AsyncIterator, Callable, Sequence
 
     type SamplingParametersFactory = Callable[..., object]
 

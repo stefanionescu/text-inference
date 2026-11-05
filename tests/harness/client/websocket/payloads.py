@@ -7,6 +7,7 @@ All messages use the flat format (no envelope wrapper).
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+
 from config.runtime.websocket import WEBSOCKET_PROTOCOL_VERSION
 
 if TYPE_CHECKING:

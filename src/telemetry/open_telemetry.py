@@ -6,15 +6,17 @@ import uuid
 import socket
 import logging
 from dataclasses import dataclass
-from opentelemetry import metrics, trace
-from opentelemetry.sdk.resources import Resource
+
+from opentelemetry import trace, metrics
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from src.runtime.environment import read_environment_integer, read_environment_text
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
+
+from src.runtime.environment import read_environment_text, read_environment_integer
 from config.runtime.telemetry import (
     AXIOM_DATASET,
     CLOUD_PLATFORM,

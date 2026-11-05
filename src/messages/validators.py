@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
+
 from src.errors import ValidationError
-from src.text.prompt import sanitize_prompt
 from config.limits import PERSONALITY_MAX_LENGTH
-from config.prompt.profiles import VALID_GENDERS
+from src.text.prompt import sanitize_prompt
 from src.text.patterns import LETTERS_ONLY_PATTERN
+from config.prompt.profiles import VALID_GENDERS
 
 if TYPE_CHECKING:
     from collections.abc import Callable

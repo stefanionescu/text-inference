@@ -6,13 +6,15 @@ This module orchestrates bounded concurrent runs and reports response latency.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from .reporting import print_report
+
 from tests.state import BenchmarkConfig
-from .workers import run_benchmark_workers
+from config.tests.defaults import BENCHMARK_FALLBACK_MESSAGE
 from tests.harness.client.prompt import select_prompt
 from tests.harness.client.selection import choose_message
-from config.tests.defaults import BENCHMARK_FALLBACK_MESSAGE
 from tests.harness.client.concurrency import sanitize_concurrency
+
+from .workers import run_benchmark_workers
+from .reporting import print_report
 
 if TYPE_CHECKING:
     import argparse

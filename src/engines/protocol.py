@@ -1,9 +1,9 @@
 """Engine interface and backend-independent sampling and output records."""
 
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol
 
+from typing import TYPE_CHECKING, Protocol
+from dataclasses import dataclass
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator

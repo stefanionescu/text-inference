@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
-from .transcript import format_history, trim_history
-from src.session.state import HistoryMessage, SessionState
+
+from src.session.state import SessionState, HistoryMessage
+
+from .transcript import trim_history, format_history
 
 if TYPE_CHECKING:
     from src.runtime.config import HistorySettings

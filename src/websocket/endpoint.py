@@ -8,23 +8,14 @@ receiver dispatch, and cleanup on disconnect.
 from __future__ import annotations
 
 import time
-import contextlib
-from logging import getLogger
 from typing import TYPE_CHECKING
+from logging import getLogger
+import contextlib
 from dataclasses import dataclass
-from .receiver import run_receiver
-from ..logging import set_log_context
-from .lifecycle import WebSocketLifecycle
-from src.session.state import SessionState
-from ..telemetry.traces import session_span
-from ..telemetry.instruments import get_metrics
-from .errors import reject_connection, send_error
+
 from fastapi import WebSocket, WebSocketDisconnect
-from .disconnects import is_expected_websocket_disconnect
-from .rate_limiting.window import SlidingWindowRateLimiter
-from ..telemetry.error_classification import classify_error
-from ..telemetry.sentry import add_breadcrumb, capture_error
-from .authentication import authenticate_websocket, build_authentication_policy
+
+from src.session.state import SessionState
 from src.session.requests import abort_session_requests, close_session_requests
 from config.runtime.websocket import (
     WEBSOCKET_ERROR_INTERNAL,
@@ -33,6 +24,18 @@ from config.runtime.websocket import (
     WEBSOCKET_ERROR_SERVER_BUSY,
     WEBSOCKET_CLOSE_UNAUTHORIZED_CODE,
 )
+
+from .errors import send_error, reject_connection
+from ..logging import set_log_context
+from .receiver import run_receiver
+from .lifecycle import WebSocketLifecycle
+from .disconnects import is_expected_websocket_disconnect
+from .authentication import authenticate_websocket, build_authentication_policy
+from ..telemetry.sentry import capture_error, add_breadcrumb
+from ..telemetry.traces import session_span
+from .rate_limiting.window import SlidingWindowRateLimiter
+from ..telemetry.instruments import get_metrics
+from ..telemetry.error_classification import classify_error
 
 if TYPE_CHECKING:
     from src.runtime.dependencies import RuntimeDependencies

@@ -4,18 +4,20 @@ from __future__ import annotations
 
 import os
 import signal
+from typing import TYPE_CHECKING
 import asyncio
 import logging
 import contextlib
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
-from tests.harness.logic.live.commands import dispatch_command, print_help
-from tests.harness.reporting.terminal import cyan, write_line, write_text, yellow
-from tests.harness.client.errors import ConnectionClosedError, IdleTimeoutError, InputClosedError, TestClientError
+
+from tests.harness.client.errors import TestClientError, IdleTimeoutError, InputClosedError, ConnectionClosedError
+from tests.harness.reporting.terminal import cyan, yellow, write_line, write_text
+from tests.harness.logic.live.commands import print_help, dispatch_command
 
 if TYPE_CHECKING:
-    from .client import LiveClient
     from tests.state import StreamResult
+
+    from .client import LiveClient
     from .profiles import PromptProfileRegistry
 
 

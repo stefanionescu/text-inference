@@ -2,22 +2,26 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
+import logging
 from dataclasses import dataclass
+
 from src.websocket.errors import send_error
-from src.telemetry.instruments import get_metrics
 from src.websocket.transport import safe_send_flat
-from .runner import GenerationRequest, run_generation
-from .budget import PromptBudgetRequest, fit_prompt_to_budget
 from config.runtime.websocket import WEBSOCKET_STATUS_OK, TEXT_LENGTH_ERROR_CODE
+from src.telemetry.instruments import get_metrics
+
+from .budget import PromptBudgetRequest, fit_prompt_to_budget
+from .runner import GenerationRequest, run_generation
 
 if TYPE_CHECKING:
-    from fastapi import WebSocket
     from collections.abc import AsyncIterator
+
+    from fastapi import WebSocket
+
+    from src.session.state import SessionState, HistoryMessage
     from src.session.runtime import SessionRuntime
     from src.runtime.dependencies import RuntimeDependencies
-    from src.session.state import HistoryMessage, SessionState
 
 
 logger = logging.getLogger(__name__)

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
+import logging
 from dataclasses import dataclass
+
 from opentelemetry import metrics
-from .gpu import register_gpu_observables
+
 from src.runtime.environment import read_environment_text
 from config.runtime.telemetry import (
     METRIC_TTFT,
@@ -41,6 +42,8 @@ from config.runtime.telemetry import (
     METRIC_RATE_LIMIT_VIOLATIONS_TOTAL,
     METRIC_ENGINE_ABORT_RETRYABLE_TOTAL,
 )
+
+from .gpu import register_gpu_observables
 
 logger = logging.getLogger(__name__)
 

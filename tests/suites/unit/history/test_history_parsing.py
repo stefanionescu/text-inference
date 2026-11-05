@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import json
+
 import pytest
-from src.session.runtime import SessionRuntime
-from src.messages.start import history_messages
-from src.websocket.parser import parse_client_message
+
 from src.session.state import SessionState, HistoryMessage
-from tests.harness.environment.tokenizer import build_local_tokenizer
+from src.messages.start import history_messages
+from src.session.runtime import SessionRuntime
+from src.websocket.parser import parse_client_message
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
+from tests.harness.environment.tokenizer import build_local_tokenizer
 
 
 def test_history_normalization() -> None:

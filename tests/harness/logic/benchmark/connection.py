@@ -9,13 +9,15 @@ from __future__ import annotations
 
 import json
 import uuid
-import asyncio
 from typing import TYPE_CHECKING, Any
+import asyncio
+
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+
+from tests.state import StreamState, SessionContext, BenchmarkConfig
+from config.tests.defaults import WEBSOCKET_MAX_QUEUE
 from tests.harness.metrics import error_result
 from tests.harness.client.errors import ServerError
-from config.tests.defaults import WEBSOCKET_MAX_QUEUE
-from tests.state import BenchmarkConfig, SessionContext, StreamState
-from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from tests.harness.client.websocket import (
     record_token,
     iter_messages,

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING, Any
-from collections.abc import Awaitable, Callable
+import logging
+from collections.abc import Callable, Awaitable
+
 from tests.harness.client.errors import ServerError
-from tests.harness.client.websocket import dispatch_message, finalize_metrics, iter_messages, record_token
+from tests.harness.client.websocket import record_token, iter_messages, dispatch_message, finalize_metrics
 
 if TYPE_CHECKING:
     from tests.state import StreamState

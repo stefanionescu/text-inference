@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from src.session.history.turns import flatten_turns, group_turns
+
+from src.session.history.turns import group_turns, flatten_turns
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from src.session.state import SessionState, HistoryMessage
     from src.runtime.config import HistorySettings
     from src.tokens.tokenizer import ThreadSafeTokenizer
-    from src.session.state import HistoryMessage, SessionState
 
 
 def _trim_oldest_turns(

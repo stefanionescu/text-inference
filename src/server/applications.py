@@ -3,27 +3,30 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING
 import logging
 import contextlib
-from typing import TYPE_CHECKING
-from src.logging import configure_logging
-from fastapi.responses import JSONResponse
-from src.telemetry.sentry import capture_error
+
 from fastapi import FastAPI, Request, WebSocket
+from fastapi.responses import JSONResponse
+
+from src.logging import configure_logging
 from src.server.readiness import ReadinessState
-from src.runtime.validation import validate_settings
-from src.websocket.connections import ConnectionRegistry
+from src.telemetry.sentry import capture_error
 from src.runtime.bootstrap import build_runtime_dependencies
+from src.runtime.validation import validate_settings
 from src.websocket.endpoint import handle_websocket_connection
+from src.telemetry.lifecycle import shutdown_telemetry, initialize_telemetry
 from src.telemetry.instruments import get_metrics, initialize_metrics
-from src.telemetry.lifecycle import initialize_telemetry, shutdown_telemetry
+from src.websocket.connections import ConnectionRegistry
 
 if TYPE_CHECKING:
-    from src.telemetry.gpu import GPUProvider
-    from src.runtime.bootstrap import EngineBuilder
     from contextlib import AbstractAsyncContextManager
+    from collections.abc import Callable, AsyncGenerator
+
+    from src.telemetry.gpu import GPUProvider
     from src.runtime.config import ApplicationSettings
-    from collections.abc import AsyncGenerator, Callable
+    from src.runtime.bootstrap import EngineBuilder
 
 logger = logging.getLogger(__name__)
 

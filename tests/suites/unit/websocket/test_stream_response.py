@@ -1,21 +1,25 @@
 """Unit tests for stream history commit behavior."""
 
 from __future__ import annotations
-import pytest
-import asyncio
+
 from typing import TYPE_CHECKING, cast
+import asyncio
+from dataclasses import field, replace, dataclass
+
+import pytest
 from fastapi import WebSocketDisconnect
+
 from src.session.state import SessionState
+from src.execution.turn import StreamResponseRequest, stream_response
 from src.runtime.config import HistorySettings
 from src.session.runtime import SessionRuntime
-from dataclasses import replace, dataclass, field
-from src.execution.turn import StreamResponseRequest, stream_response
-from tests.harness.environment.tokenizer import build_local_tokenizer
 from tests.harness.environment.settings import DEFAULT_APPLICATION_SETTINGS
+from tests.harness.environment.tokenizer import build_local_tokenizer
 
 if TYPE_CHECKING:
-    from fastapi import WebSocket
     from collections.abc import AsyncIterator
+
+    from fastapi import WebSocket
 
 SECOND_SEND = 2
 

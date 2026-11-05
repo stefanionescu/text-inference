@@ -1,12 +1,14 @@
 """Public and loopback ASGI listeners with shared signal ownership."""
 
 from __future__ import annotations
-import asyncio
-import uvicorn
-import contextlib
-from typing import TYPE_CHECKING
-from config.runtime import listeners
 
+from typing import TYPE_CHECKING
+import asyncio
+import contextlib
+
+import uvicorn
+
+from config.runtime import listeners
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -26,7 +28,9 @@ class ProbeServer(uvicorn.Server):
 
 if TYPE_CHECKING:
     import socket
+
     from fastapi import FastAPI
+
     from src.server.readiness import ReadinessState
 
 

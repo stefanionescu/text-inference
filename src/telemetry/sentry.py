@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import time
-import sentry_sdk
 from logging import getLogger
-from dataclasses import dataclass, field
-from ..logging import current_log_context
-from src.runtime.environment import read_environment_float, read_environment_text
+from dataclasses import field, dataclass
+
+import sentry_sdk
+
+from src.runtime.environment import read_environment_text, read_environment_float
 from config.runtime.telemetry import (
     SENTRY_DSN,
     SENTRY_RELEASE,
@@ -18,6 +19,8 @@ from config.runtime.telemetry import (
     SENTRY_TAG_SESSION_ID,
     SENTRY_RATE_LIMIT_SECONDS,
 )
+
+from ..logging import current_log_context
 
 logger = getLogger(__name__)
 

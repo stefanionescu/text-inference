@@ -4,20 +4,23 @@ from __future__ import annotations
 
 import os
 import json
+from typing import TYPE_CHECKING, cast
 import asyncio
 import inspect
 import contextlib
-import websockets
-from importlib.metadata import version
-from typing import TYPE_CHECKING, cast
 from urllib.parse import urlsplit, urlunsplit
+from importlib.metadata import version
+
+import websockets
+
 from config.tests.defaults import DEFAULT_WEBSOCKET_PATH
 from config.runtime.websocket import WEBSOCKET_PROTOCOL_VERSION
 
 if TYPE_CHECKING:
-    from websockets.legacy.client import Connect
     from contextlib import AbstractAsyncContextManager
-    from collections.abc import AsyncGenerator, Awaitable, Callable
+    from collections.abc import Callable, Awaitable, AsyncGenerator
+
+    from websockets.legacy.client import Connect
 
 _HTTP_TO_WEBSOCKET = {"http": "ws", "https": "wss"}
 WEBSOCKETS_HEADERS_VERSION = 13

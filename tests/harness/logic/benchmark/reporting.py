@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING, Any
-from tests.harness.reporting.terminal import bold, dim, green, red, section_header, write_line
+
+from tests.harness.reporting.terminal import dim, red, bold, green, write_line, section_header
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
