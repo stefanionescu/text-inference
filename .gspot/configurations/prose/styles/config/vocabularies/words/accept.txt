@@ -5,9 +5,6 @@ CSRF
 DOM
 DTO
 Docker
-Face
-GPU
-Hugging
 JSON
 LLM
 Linux
@@ -24,7 +21,6 @@ TOML
 TensorRT
 Trivy
 Vale
-WebSocket
 Windows
 YAML
 ajv

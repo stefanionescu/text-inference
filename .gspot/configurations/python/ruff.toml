@@ -35,7 +35,7 @@ runtime-evaluated-decorators = ["fastapi.FastAPI.get", "fastapi.FastAPI.post", "
 
 [lint.pylint]
 max-statements = 30
-max-args = 7
+max-args = 5
 max-branches = 8
 max-returns = 4
 

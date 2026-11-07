@@ -3,13 +3,9 @@ locale = "en"
 extend-ignore-re = ["\\b[0-9a-f]{7,40}\\b", "\\b[A-Za-z0-9+/]{40,}={0,2}\\b"]
 
 [default.extend-words]
-Face = "Face"
-GPU = "GPU"
-Hugging = "Hugging"
 LLM = "LLM"
 NVIDIA = "NVIDIA"
 TensorRT = "TensorRT"
-WebSocket = "WebSocket"
 vLLM = "vLLM"
 
 [files]

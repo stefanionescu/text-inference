@@ -9,8 +9,30 @@ print_width = 80
 quotes = "double"
 override = [{ paths = ["**/*.py"], indent_width = 4, print_width = 120 }]
 
+[limits]
+max_function_parameters = 5
+
+[structure]
+environment_readers = [
+  "docker/base/download/snapshot.py",
+  "src/execution/templates.py",
+  "src/hf/trt.py",
+  "src/hf/vllm.py",
+  "src/logs/context.py",
+  "src/logs/output.py",
+  "src/quantization/inspection.py",
+  "src/quantization/source.py",
+  "src/quantization/vllm/quantize.py",
+  "src/runtime/environment.py",
+  "src/runtime/limits.py",
+  "src/runtime/settings.py",
+  "src/scripts/validate.py",
+  "src/tokens/tokenizer.py",
+  "tests/**",
+]
+
 [spelling]
-allowed_words = { NVIDIA = "Real product and company names that the prose rules cannot spell out or lowercase.", TensorRT = "Real product and company names that the prose rules cannot spell out or lowercase.", LLM = "Real product and company names that the prose rules cannot spell out or lowercase.", vLLM = "Real product and company names that the prose rules cannot spell out or lowercase.", WebSocket = "Real product and company names that the prose rules cannot spell out or lowercase.", GPU = "Real product and company names that the prose rules cannot spell out or lowercase.", Hugging = "Real product and company names that the prose rules cannot spell out or lowercase.", Face = "Real product and company names that the prose rules cannot spell out or lowercase." }
+allowed_words = { NVIDIA = "Product and company names that the prose rules cannot spell out or lowercase.", TensorRT = "Product and company names that the prose rules cannot spell out or lowercase.", LLM = "Product and company names that the prose rules cannot spell out or lowercase.", vLLM = "Product and company names that the prose rules cannot spell out or lowercase." }
 
 [python]
 docstring_convention = "google"
@@ -218,17 +240,12 @@ can_import = ["config-runtime", "config-prompt", "config-tests", "tokens", "runt
 [[import_rule]]
 name = "tests-suites"
 paths = ["tests/suites/**"]
-can_import = ["config-model", "config-runtime", "config-tests", "errors", "tokens", "text", "logs", "runtime-records", "telemetry", "quantization-trt", "quantization-vllm", "quantization-core", "hf-trt", "hf-vllm", "hf-core", "scripts", "engine-trt", "engine-vllm", "engine-protocol", "session-runtime", "session-state", "execution-turn", "execution-pipeline", "runtime-composition", "websocket-endpoint", "websocket-transport", "messages", "server-core", "tests-errors", "tests-state", "tests-harness"]
+can_import = ["config-model", "config-runtime", "config-tests", "errors", "tokens", "text", "logs", "runtime-records", "telemetry", "quantization-trt", "quantization-vllm", "quantization-core", "hf-trt", "hf-vllm", "hf-core", "scripts", "engine-trt", "engine-vllm", "engine-protocol", "session-runtime", "session-state", "execution-turn", "execution-pipeline", "runtime-composition", "websocket-endpoint", "websocket-transport", "messages", "server-core", "tests-state", "tests-harness"]
 
 [[import_rule]]
 name = "tests-package"
 paths = ["tests/**"]
 can_import = []
-
-[[ignore]]
-check = "bash/shellcheck"
-rule = "SC2310"
-reason = "Scripts call functions in if and || conditions on purpose and handle each failure explicitly; the previous shellcheckrc turned this off too."
 
 [[ignore]]
 check = "bash/safety"
@@ -243,117 +260,9 @@ paths = ["scripts/lib/runtime/cleanup/reset.sh"]
 reason = "The host reset stops helper processes by pattern because it runs after their PID records may be gone."
 
 [[ignore]]
-check = "python/pip-installs"
-paths = ["docker/vllm/Dockerfile"]
-reason = "flashinfer ships from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
-
-[[ignore]]
-check = "python/pip-installs"
-paths = ["scripts/lib/deps/uv/environment.sh"]
-reason = "This helper installs flashinfer from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
-
-[[ignore]]
 check = "prose/vale"
 paths = ["src/hf/templates/**"]
 reason = "These are string.Template model cards; the ${...} fields and published wording render into Hugging Face model pages."
-
-[[ignore]]
-check = "markdown/fences"
-paths = ["src/hf/templates/**"]
-reason = "The JSON fences hold a ${quantization_summary} field that becomes valid JSON only when the template renders."
-
-[[ignore]]
-check = "structure/shared-prefixes"
-paths = ["tests/suites/**"]
-reason = "pytest discovers test modules by the test_ prefix, so the prefix must stay."
-
-[[ignore]]
-check = "python/vulture"
-paths = ["src/server/listeners.py"]
-reason = "uvicorn calls these Server overrides and reads should_exit by name."
-
-[[ignore]]
-check = "python/vulture"
-paths = ["src/websocket/schemas.py"]
-reason = "Pydantic calls the field validators by decorator, not by name."
-
-[[ignore]]
-check = "python/vulture"
-paths = ["tests/harness/logic/live/client.py"]
-reason = "The _close_task attribute keeps a strong reference so the close task is not garbage collected."
-
-[[ignore]]
-check = "python/vulture"
-paths = ["tests/suites/unit/session/test_request_tracking.py"]
-reason = "The test sets return_value on a Mock, which vulture reads as an unused attribute."
-
-[[ignore]]
-check = "secrets/environment-examples"
-paths = ["tests/suites/unit/dependency_logging/test_dependency_output.py"]
-reason = "The test asserts a variable the code sets for a dependency; nobody configures it."
-
-[[ignore]]
-check = "python/basedpyright"
-paths = [
-  "src/engines/trt/factory.py",
-  "src/engines/vllm/factory.py",
-  "src/quantization/vllm/quantize.py",
-  "src/scripts/guard.py",
-  "src/scripts/validation/trt.py",
-  "src/server/listeners.py",
-  "src/telemetry/cuda.py",
-]
-reason = "These modules import GPU-only or engine-only packages that no single environment installs alongside the local extra, the same files the previous pyrightconfig excluded."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = [
-  "src/engines/trt/engine.py",
-  "src/engines/vllm/engine.py",
-  "src/engines/vllm/cache.py",
-  "src/quantization/vllm/runner.py",
-  "src/quantization/vllm/quantize.py",
-  "src/telemetry/gpu.py",
-  "src/telemetry/cuda.py",
-  "src/scripts/cuda.py",
-  "src/tokens/tokenizer.py",
-]
-reason = "These are Protocol stubs and the thin adapters that implement them, so each method must exist by name."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["src/execution/controller.py"]
-reason = "The async for statement calls __aiter__ by name, so it cannot be inlined."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["src/server/listeners.py"]
-reason = "install_signal_handlers overrides a uvicorn method on purpose so the process owns signal handling."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["src/text/verbalize.py"]
-reason = "replace_email is the callback that re.sub calls for each match."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["scripts/lib/runtime/warmup/main.sh"]
-reason = "A trap calls _warmup_clear_lock by name as well as one direct caller."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["src/websocket/endpoint.py"]
-reason = "test_connection_cleanup patches _create_rate_limiters by name to inject limiters."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["src/runtime/settings.py"]
-reason = "Inlining these builders would push read_settings over the function size limit."
-
-[[ignore]]
-check = "structure/trivial-functions"
-paths = ["scripts/lib/runtime/cleanup/artifacts.sh"]
-reason = "runtime_clear_model_transition keeps the destructive path list inside the library that owns cleanup."
 
 [[ignore]]
 check = "dependencies/osv-scanner"
@@ -1354,6 +1263,196 @@ reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which n
 check = "prose/vale"
 paths = ["README.md"]
 reason = "The owner keeps this README in their own wording."
+
+[[ignore]]
+check = "python/vulture"
+rule = "unused-method"
+paths = ["src/server/listeners.py"]
+reason = "uvicorn calls these Server overrides and reads should_exit by name."
+
+[[ignore]]
+check = "python/vulture"
+rule = "unused-attribute"
+paths = ["src/server/listeners.py"]
+reason = "uvicorn calls these Server overrides and reads should_exit by name."
+
+[[ignore]]
+check = "python/vulture"
+rule = "unused-method"
+paths = ["src/websocket/schemas.py"]
+reason = "Pydantic calls the field validators by decorator, not by name."
+
+[[ignore]]
+check = "python/vulture"
+rule = "unused-attribute"
+paths = ["tests/harness/logic/live/client.py"]
+reason = "The _close_task attribute keeps a strong reference so the close task is not garbage collected."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportMissingImports"
+paths = [
+  "src/engines/trt/factory.py",
+  "src/engines/vllm/factory.py",
+  "src/quantization/vllm/quantize.py",
+  "src/scripts/guard.py",
+  "src/scripts/validation/trt.py",
+  "src/server/listeners.py",
+  "src/telemetry/cuda.py",
+]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportUnknownMemberType"
+paths = [
+  "src/engines/trt/factory.py",
+  "src/engines/vllm/factory.py",
+  "src/quantization/vllm/quantize.py",
+  "src/scripts/guard.py",
+  "src/scripts/validation/trt.py",
+  "src/server/listeners.py",
+  "src/telemetry/cuda.py",
+]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportUnknownArgumentType"
+paths = [
+  "src/engines/trt/factory.py",
+  "src/engines/vllm/factory.py",
+  "src/quantization/vllm/quantize.py",
+  "src/scripts/guard.py",
+  "src/scripts/validation/trt.py",
+  "src/server/listeners.py",
+  "src/telemetry/cuda.py",
+]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportUnknownVariableType"
+paths = [
+  "src/engines/trt/factory.py",
+  "src/engines/vllm/factory.py",
+  "src/quantization/vllm/quantize.py",
+  "src/scripts/validation/trt.py",
+  "src/server/listeners.py",
+]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportUntypedBaseClass"
+paths = ["src/server/listeners.py"]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportUnknownParameterType"
+paths = ["src/server/listeners.py"]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "python/basedpyright"
+rule = "reportAttributeAccessIssue"
+paths = ["src/engines/vllm/factory.py"]
+reason = "These modules import GPU-only packages that the local extra does not install, so their types read as unknown here."
+
+[[ignore]]
+check = "bash/shellcheck"
+rule = "SC2310"
+paths = [
+  "docker/base/scripts/server.sh",
+  "docker/trt/scripts/main.sh",
+  "scripts/deploy/main.sh",
+  "scripts/main.sh",
+  "scripts/restart.sh",
+  "scripts/steps/start_server.sh",
+  "scripts/stop.sh",
+]
+reason = "Scripts call functions in if and || conditions on purpose and handle each failure explicitly; the previous shellcheckrc turned this off too."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = [
+  "src/engines/trt/engine.py",
+  "src/engines/vllm/engine.py",
+  "src/engines/vllm/cache.py",
+  "src/quantization/vllm/runner.py",
+  "src/quantization/vllm/quantize.py",
+  "src/telemetry/gpu.py",
+  "src/telemetry/cuda.py",
+  "src/scripts/cuda.py",
+  "src/tokens/tokenizer.py",
+]
+reason = "These are Protocol stubs and the thin adapters that implement them, so each method must exist by name."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["src/execution/controller.py"]
+reason = "The async for statement calls __aiter__ by name, so it cannot be inlined."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["src/server/listeners.py"]
+reason = "install_signal_handlers overrides a uvicorn method on purpose so the process owns signal handling."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["src/text/verbalize.py"]
+reason = "replace_email is the callback that re.sub calls for each match."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["scripts/lib/runtime/warmup/main.sh"]
+reason = "A trap calls _warmup_clear_lock by name as well as one direct caller."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["src/websocket/endpoint.py"]
+reason = "test_connection_cleanup patches _create_rate_limiters by name to inject limiters."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["src/runtime/settings.py"]
+reason = "Inlining these builders would push read_settings over the function size limit."
+
+[[ignore]]
+check = "structure/trivial-functions"
+rule = "trivial-function"
+paths = ["scripts/lib/runtime/cleanup/artifacts.sh"]
+reason = "runtime_clear_model_transition keeps the destructive path list inside the library that owns cleanup."
+
+[[ignore]]
+check = "python/pip-installs"
+rule = "pip-install"
+paths = ["docker/vllm/Dockerfile"]
+reason = "flashinfer ships from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
+
+[[ignore]]
+check = "python/pip-installs"
+rule = "pip-install"
+paths = ["scripts/lib/deps/uv/environment.sh"]
+reason = "This helper installs flashinfer from its own wheel index for each CUDA and Torch pair, so it cannot live in the shared lockfile."
+
+[[ignore]]
+check = "secrets/environment-examples"
+paths = ["tests/suites/unit/dependency_logging/test_dependency_output.py"]
+reason = "The test asserts a variable the code sets for a dependency; nobody configures it."
+
+[[ignore]]
+check = "markdown/fences"
+paths = ["src/hf/templates/**"]
+reason = "The JSON fences hold a ${quantization_summary} field that becomes valid JSON only when the template renders."
 
 [[naming.exception]]
 languages = ["bash"]
