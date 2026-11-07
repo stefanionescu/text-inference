@@ -10,7 +10,7 @@ source "${_GPU_ENVIRONMENT_FOLDER}/query.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_GPU_ENVIRONMENT_FOLDER}/../log.sh"
 
-# _gpu_architecture_values: Print build values for one supported architecture.
+# _gpu_architecture_values - Print build values for one supported architecture.
 _gpu_architecture_values() {
   case "$1" in
     sm80) printf '8.0+PTX|80|1\n' ;;
@@ -24,7 +24,7 @@ _gpu_architecture_values() {
   esac
 }
 
-# gpu_detect: Detect and export the GPU identity.
+# gpu_detect - Detect and export the GPU identity.
 # Globals:
 #   DETECTED_GPU_NAME
 #   GPU_SM_ARCH
@@ -40,7 +40,7 @@ gpu_detect() {
   export DETECTED_GPU_NAME GPU_SM_ARCH
 }
 
-# gpu_apply_environment: Export build values for the detected architecture.
+# gpu_apply_environment - Export build values for the detected architecture.
 # Globals:
 #   CUDAARCHS
 #   CUDA_DEVICE_MAX_CONNECTIONS

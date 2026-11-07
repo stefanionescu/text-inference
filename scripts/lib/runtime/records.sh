@@ -9,7 +9,7 @@ _RUNTIME_STATE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && 
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_RUNTIME_STATE_FOLDER}/../../config/values/runtime.sh"
 
-# _runtime_state_key: Validate one state key.
+# _runtime_state_key - Validate one state key.
 _runtime_state_key() {
   local key="$1"
 
@@ -24,7 +24,7 @@ _runtime_state_key() {
   esac
 }
 
-# _runtime_state_value: Validate one state value for the TSV format.
+# _runtime_state_value - Validate one state value for the TSV format.
 _runtime_state_value() {
   local value="$1"
 
@@ -33,7 +33,7 @@ _runtime_state_value() {
   [[ ${value} != *$'\r'* ]]
 }
 
-# runtime_state_read: Print one value from the persisted runtime state.
+# runtime_state_read - Print one value from the persisted runtime state.
 # Globals:
 #   RUNTIME_STATE_FILE
 # Arguments:
@@ -71,7 +71,7 @@ runtime_state_read() {
   printf '%s\n' "${requested_value}"
 }
 
-# runtime_state_write: Atomically persist the active runtime configuration.
+# runtime_state_write - Atomically persist the active runtime configuration.
 # Globals:
 #   RUNTIME_RUN_FOLDER
 #   RUNTIME_STATE_FILE

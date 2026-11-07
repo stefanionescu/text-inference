@@ -6,7 +6,7 @@ SCRIPT_FOLDER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_FOLDER="$(cd "${SCRIPT_FOLDER}/../.." && pwd)"
 BASE_FOLDER="${SCRIPT_FOLDER}/../base"
 
-# usage: Print TensorRT Docker build help.
+# usage - Print TensorRT Docker build help.
 usage() {
   cat <<'EOF'
 Usage: docker/trt/build.sh
@@ -35,7 +35,7 @@ source "${BASE_FOLDER}/scripts/logs.sh"
 # shellcheck source=docker/base/scripts/build/driver.sh
 source "${BASE_FOLDER}/scripts/build/driver.sh"
 
-# main: Reject unexpected arguments, then build the TensorRT image.
+# main - Reject unexpected arguments, then build the TensorRT image.
 main() {
   if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
     usage

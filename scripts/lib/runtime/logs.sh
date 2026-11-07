@@ -9,7 +9,7 @@ _RUNTIME_LOGS_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && p
 source "${_RUNTIME_LOGS_FOLDER}/warmup/capture.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_RUNTIME_LOGS_FOLDER}/../foundation/log.sh"
-# _runtime_log_stream_start: Start tail through a private FIFO.
+# _runtime_log_stream_start - Start tail through a private FIFO.
 _runtime_log_stream_start() {
   local log_file="$1"
   local temporary_root="${TMPDIR-}"
@@ -23,7 +23,7 @@ _runtime_log_stream_start() {
   _RUNTIME_LOG_STREAM_PID=$!
 }
 
-# _runtime_log_route_captured: Route one line while warmup output is being captured.
+# _runtime_log_route_captured - Route one line while warmup output is being captured.
 # Globals:
 #   is_filter_active: Cleared in runtime_follow_log when warmup ends.
 #   LOGS_ENABLED
@@ -54,7 +54,7 @@ _runtime_log_route_captured() {
   fi
 }
 
-# _runtime_log_stream_stop: Stop tail and remove its private FIFO.
+# _runtime_log_stream_stop - Stop tail and remove its private FIFO.
 # Globals:
 #   _RUNTIME_LOG_STREAM_FOLDER
 #   _RUNTIME_LOG_STREAM_FIFO
@@ -85,7 +85,7 @@ _runtime_log_stream_stop() {
   return "${status}"
 }
 
-# runtime_follow_log: Follow deployment output with warmup-aware filtering.
+# runtime_follow_log - Follow deployment output with warmup-aware filtering.
 # Globals:
 #   _RUNTIME_LOG_SIGNAL_STATUS
 # Arguments:

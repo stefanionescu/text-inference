@@ -20,21 +20,21 @@ source "${SCRIPTS_FOLDER}/lib/foundation/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${SCRIPTS_FOLDER}/lib/foundation/log.sh"
 
-# _server_report_started: Print server ownership and health details.
+# _server_report_started - Print server ownership and health details.
 _server_report_started() {
   log_write "[server] Server started with PID ${SERVER_PID}"
   log_write "[server] Readiness: http://127.0.0.1:8001/readyz"
   log_write "[server] Logs: ${ROOT_FOLDER}/server.log"
 }
 
-# _server_run_warmup: Run warmup without turning probe failures into startup failure.
+# _server_run_warmup - Run warmup without turning probe failures into startup failure.
 _server_run_warmup() {
   if ! "${SCRIPTS_FOLDER}/warmup.sh"; then
     log_write "[warmup] Warmup reported failures; inspect logs/warmup.log"
   fi
 }
 
-# main: Validate, start, persist, and warm the server.
+# main - Validate, start, persist, and warm the server.
 main() {
   deployment_validate_cuda "server"
   server_guard_start "${ROOT_FOLDER}"

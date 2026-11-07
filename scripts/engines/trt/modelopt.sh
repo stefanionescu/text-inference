@@ -13,7 +13,7 @@ source "${_TRT_MODELOPT_FOLDER}/../../lib/runtime/cleanup/paths.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_MODELOPT_FOLDER}/../../lib/foundation/log.sh"
 
-# trt_prepare_modelopt: Clone and verify the pinned Model Optimizer revision.
+# trt_prepare_modelopt - Clone and verify the pinned Model Optimizer revision.
 # Globals:
 #   MODELOPT_COMMIT
 #   MODELOPT_REPO_URL

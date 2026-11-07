@@ -2,9 +2,6 @@
 #
 # Write container build and runtime diagnostics to standard error.
 
-# log_write: Print one diagnostic line to standard error, or a blank line for no text.
-# Arguments:
-#   All arguments: Words of the message.
 log_write() {
   local message="$*"
 

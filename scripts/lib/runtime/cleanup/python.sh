@@ -9,7 +9,7 @@ _RUNTIME_CLEANUP_PYTHON_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
 source "${_RUNTIME_CLEANUP_PYTHON_FOLDER}/paths.sh"
 
-# runtime_cleanup_python_artifacts: Remove discovered Python cache directories.
+# runtime_cleanup_python_artifacts - Remove discovered Python cache directories.
 # Globals:
 #   None.
 # Arguments:

@@ -3,7 +3,7 @@
 # Write host deployment diagnostics to standard error.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-# log_write: Write one non-empty diagnostic line.
+# log_write - Write one non-empty diagnostic line.
 # Globals:
 #   None.
 # Arguments:
@@ -20,7 +20,7 @@ log_write() {
   return 0
 }
 
-# log_is_repository_line: Identify one repository-owned diagnostic line.
+# log_is_repository_line - Identify one repository-owned diagnostic line.
 # Globals:
 #   None.
 # Arguments:

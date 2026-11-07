@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-# main: Return success only while the inference service is ready.
+# main - Return success only while the inference service is ready.
 main() {
   (($# == 0)) || return 2
   command -v curl >/dev/null 2>&1 || return 127

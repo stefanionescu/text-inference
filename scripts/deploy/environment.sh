@@ -22,7 +22,7 @@ source "${_DEPLOY_ENVIRONMENT_FOLDER}/../lib/foundation/gpu/environment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_DEPLOY_ENVIRONMENT_FOLDER}/../lib/foundation/log.sh"
 
-# _deploy_python_cache_environment: Export Python and model cache locations.
+# _deploy_python_cache_environment - Export Python and model cache locations.
 _deploy_python_cache_environment() {
   local root_folder="$1"
 
@@ -33,7 +33,7 @@ _deploy_python_cache_environment() {
   export HF_HUB_ENABLE_HF_TRANSFER=0
 }
 
-# _deploy_engine_cache_environment: Export engine compilation cache locations.
+# _deploy_engine_cache_environment - Export engine compilation cache locations.
 _deploy_engine_cache_environment() {
   local root_folder="$1"
 
@@ -43,7 +43,7 @@ _deploy_engine_cache_environment() {
   export FLASHINFER_CACHE_DIR="${root_folder}/.flashinfer"
 }
 
-# _deploy_quantization_environment: Export GPU-specific quantization values.
+# _deploy_quantization_environment - Export GPU-specific quantization values.
 _deploy_quantization_environment() {
   local force_rebuild
 
@@ -64,7 +64,7 @@ _deploy_quantization_environment() {
   esac
 }
 
-# _deploy_engine_environment: Export engine-specific runtime values.
+# _deploy_engine_environment - Export engine-specific runtime values.
 _deploy_engine_environment() {
   case "${INFERENCE_ENGINE:?INFERENCE_ENGINE is required}" in
     trt)
@@ -81,7 +81,7 @@ _deploy_engine_environment() {
   esac
 }
 
-# deploy_initialize_environment: Initialize all host deployment paths and defaults.
+# deploy_initialize_environment - Initialize all host deployment paths and defaults.
 # Globals:
 #   INFERENCE_ENGINE
 #   MODEL

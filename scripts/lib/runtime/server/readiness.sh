@@ -13,7 +13,7 @@ source "${_SERVER_READINESS_FOLDER}/../../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_SERVER_READINESS_FOLDER}/../../foundation/log.sh"
 
-# server_wait_ready: Wait for the local readiness endpoint.
+# server_wait_ready - Wait for the local readiness endpoint.
 # Globals:
 #   SERVER_PID
 #   WARMUP_READINESS_SCRIPT

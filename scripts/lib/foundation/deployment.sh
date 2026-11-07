@@ -16,7 +16,7 @@ source "${_DEPLOYMENT_FOUNDATION_FOLDER}/../../engines/trt/detection.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_DEPLOYMENT_FOUNDATION_FOLDER}/log.sh"
 
-# deployment_require_environment: Validate required deployment environment values.
+# deployment_require_environment - Validate required deployment environment values.
 # Globals:
 #   HF_TOKEN
 #   MAX_CONCURRENT_CONNECTIONS
@@ -43,7 +43,7 @@ deployment_require_environment() {
   export HF_TOKEN MAX_CONCURRENT_CONNECTIONS API_KEY
 }
 
-# deployment_validate_model: Validate the configured model and quantization.
+# deployment_validate_model - Validate the configured model and quantization.
 # Globals:
 #   ROOT_FOLDER
 #   VENV_FOLDER
@@ -67,7 +67,7 @@ deployment_validate_model() {
   fi
 }
 
-# deployment_validate_cuda: Validate CUDA for the selected engine.
+# deployment_validate_cuda - Validate CUDA for the selected engine.
 # Globals:
 #   ENGINE_TRT
 #   ENGINE_VLLM

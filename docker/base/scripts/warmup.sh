@@ -10,10 +10,7 @@ source "${SCRIPT_FOLDER}/logs.sh"
 # shellcheck source=scripts/config/defaults.sh
 source "/app/scripts/config/defaults.sh"
 
-# wait_for_readiness: Poll the readiness script until it passes or the wait runs out.
-# Arguments:
-#   $1: Longest wait in seconds.
-#   $2: Seconds between attempts.
+# wait_for_readiness - Poll the readiness script until it passes or the wait runs out.
 wait_for_readiness() {
   local maximum_wait_seconds="$1"
   local wait_interval_seconds="$2"
@@ -32,7 +29,7 @@ wait_for_readiness() {
   return 1
 }
 
-# main: Read the wait settings, then wait for the server.
+# main - Read the wait settings, then wait for the server.
 main() {
   local maximum_wait_seconds="${WARMUP_MAX_WAIT_SECONDS-}"
   local wait_interval_seconds="${WARMUP_WAIT_INTERVAL_SECONDS-}"

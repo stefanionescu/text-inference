@@ -8,7 +8,7 @@ _WARMUP_SUITE_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && p
 # shellcheck source=scripts/lib/runtime/warmup/logging.sh
 source "${_WARMUP_SUITE_FOLDER}/logging.sh"
 
-# _warmup_run_retries: Run one Python integration client with bounded retries.
+# _warmup_run_retries - Run one Python integration client with bounded retries.
 _warmup_run_retries() {
   local label="$1"
   local prefix="$2"
@@ -32,7 +32,7 @@ _warmup_run_retries() {
   return 1
 }
 
-# _warmup_run_bench: Run the benchmark client for one profile with bounded retries.
+# _warmup_run_bench - Run the benchmark client for one profile with bounded retries.
 _warmup_run_bench() {
   local label="$1"
   local maximum_connections="$2"
@@ -48,7 +48,7 @@ _warmup_run_bench() {
     --requests "${maximum_connections}" --concurrency "${maximum_connections}" "$@"
 }
 
-# _warmup_run_profile: Run warmup and benchmark clients for one profile.
+# _warmup_run_profile - Run warmup and benchmark clients for one profile.
 _warmup_run_profile() {
   local profile="$1"
   local maximum_connections="$2"
@@ -77,7 +77,7 @@ _warmup_run_profile() {
   return "${status}"
 }
 
-# warmup_run_suite: Run all profile warmup and benchmark probes.
+# warmup_run_suite - Run all profile warmup and benchmark probes.
 # Globals:
 #   WARMUP_PROMPT_PAIRS
 #   WARMUP_RETRIES

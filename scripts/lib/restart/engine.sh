@@ -17,7 +17,7 @@ source "${_RESTART_ENGINE_FOLDER}/../runtime/records.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_RESTART_ENGINE_FOLDER}/../foundation/log.sh"
 
-# restart_transition_mode: Print cleanup mode for one requested deployment.
+# restart_transition_mode - Print cleanup mode for one requested deployment.
 # Globals:
 #   None.
 # Arguments:
@@ -61,7 +61,7 @@ restart_transition_mode() {
   fi
 }
 
-# restart_apply_transition: Stop processes and invalidate changed artifacts.
+# restart_apply_transition - Stop processes and invalidate changed artifacts.
 # Globals:
 #   None.
 # Arguments:

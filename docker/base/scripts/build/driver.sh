@@ -16,11 +16,7 @@ source "${ROOT_FOLDER:?ROOT_FOLDER is required}/scripts/config/values/deployment
 # shellcheck source=scripts/lib/deps/venv.sh
 source "${ROOT_FOLDER}/scripts/lib/deps/venv.sh"
 
-# run_stack_build: Validate, build, and push one concrete engine image.
-# Arguments:
-#   $1: Folder of the engine stack.
-#   $2: Prefix of the temporary build folder.
-#   $3: Engine name.
+# run_stack_build - Validate, build, and push one concrete engine image.
 run_stack_build() {
   local stack_folder="$1"
   local folder_prefix="$2"

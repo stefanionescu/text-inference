@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Shared model validation for Docker builds.
 
-# validate_model_revision: Require an immutable Hugging Face revision.
+# validate_model_revision - Require an immutable Hugging Face revision.
 validate_model_revision() {
   if [[ ! ${MODEL_REVISION:?MODEL_REVISION is required} =~ ^[0-9a-fA-F]{40}$ ]]; then
     log_write "[build] ✗ MODEL_REVISION must be a 40-character Hugging Face commit SHA."
@@ -9,13 +9,7 @@ validate_model_revision() {
   fi
 }
 
-# validate_models_for_engine: Validate Docker model inputs for an engine.
-# Globals:
-#   ROOT_FOLDER
-# Arguments:
-#   $1: Engine name.
-#   $2: Model name or path.
-#   $3: Model revision.
+# validate_models_for_engine - Validate Docker model inputs for an engine.
 validate_models_for_engine() {
   local engine="$1"
   local model="$2"

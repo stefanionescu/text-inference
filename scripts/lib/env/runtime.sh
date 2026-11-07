@@ -10,7 +10,7 @@ source "${_RUNTIME_ENV_FOLDER}/../../config/defaults.sh"
 # shellcheck source=scripts/config/values/runtime.sh
 source "${_RUNTIME_ENV_FOLDER}/../../config/values/runtime.sh"
 
-# runtime_initialize_paths: Create and export runtime directories.
+# runtime_initialize_paths - Create and export runtime directories.
 # Globals:
 #   LOG_FOLDER
 #   RUN_FOLDER

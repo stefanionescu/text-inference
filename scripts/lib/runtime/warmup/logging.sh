@@ -10,7 +10,7 @@ source "${_WARMUP_LOGGING_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_WARMUP_LOGGING_FOLDER}/../../foundation/log.sh"
 
-# warmup_log_prefix: Print a filesystem-safe probe label.
+# warmup_log_prefix - Print a filesystem-safe probe label.
 # Globals:
 #   None.
 # Arguments:
@@ -30,7 +30,7 @@ warmup_log_prefix() {
   printf '%s\n' "${cleaned}"
 }
 
-# warmup_phase_result: Report one probe result to operator and server logs.
+# warmup_phase_result - Report one probe result to operator and server logs.
 # Globals:
 #   RUNTIME_SERVER_LOG_FILE
 #   ROOT_FOLDER

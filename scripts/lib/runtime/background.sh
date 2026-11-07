@@ -17,7 +17,7 @@ source "${_RUNTIME_BACKGROUND_FOLDER}/logs.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_RUNTIME_BACKGROUND_FOLDER}/../foundation/log.sh"
 
-# _runtime_background_log: Prepare and print the runtime log path.
+# _runtime_background_log - Prepare and print the runtime log path.
 # Globals:
 #   MAX_SERVER_LOG_BYTES
 #   RUNTIME_RUN_FOLDER
@@ -46,7 +46,7 @@ _runtime_background_log() {
   printf '%s\n' "${server_log}"
 }
 
-# runtime_start_background: Start a detached command and follow its log.
+# runtime_start_background - Start a detached command and follow its log.
 # Globals:
 #   RUNTIME_DEPLOYMENT_PID_FILE
 # Arguments:

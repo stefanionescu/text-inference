@@ -12,7 +12,7 @@ source "${_PUBLISHING_FOUNDATION_FOLDER}/../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_PUBLISHING_FOUNDATION_FOLDER}/log.sh"
 
-# publishing_validate: Validate upload credentials and destination policy.
+# publishing_validate - Validate upload credentials and destination policy.
 # Globals:
 #   HF_PUSH_PRIVATE, HF_PUSH_REPO_ID, PUSH_REQUESTED.
 # Arguments:

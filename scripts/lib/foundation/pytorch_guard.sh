@@ -9,7 +9,7 @@ _PYTORCH_GUARD_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && 
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_PYTORCH_GUARD_FOLDER}/log.sh"
 
-# pytorch_guard_check: Detect mismatched Torch packages.
+# pytorch_guard_check - Detect mismatched Torch packages.
 # Globals:
 #   ROOT_FOLDER
 #   VENV_FOLDER

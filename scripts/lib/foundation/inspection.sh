@@ -14,7 +14,7 @@ source "${_INSPECTION_FOUNDATION_FOLDER}/../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_INSPECTION_FOUNDATION_FOLDER}/log.sh"
 
-# _inspection_run: Run the standard-library-only metadata inspector.
+# _inspection_run - Run the standard-library-only metadata inspector.
 _inspection_run() {
   local root_folder="$1"
   local model="$2"
@@ -33,7 +33,7 @@ _inspection_run() {
     >"${output_file}" 2>"${diagnostics_file}"
 }
 
-# _inspection_read_fields: Read the exact inspector TSV protocol.
+# _inspection_read_fields - Read the exact inspector TSV protocol.
 _inspection_read_fields() {
   local output_file="$1"
   local key
@@ -54,7 +54,7 @@ _inspection_read_fields() {
   done <"${output_file}"
 }
 
-# _inspection_report: Export and report a complete inspection result.
+# _inspection_report - Export and report a complete inspection result.
 _inspection_report() {
   if [[ -z ${SOURCE_MODEL-} || -z ${SOURCE_REVISION-} || -z ${CHECKPOINT_ACTION-} ]]; then
     log_write "[inspect] Model inspection returned incomplete identity"
@@ -71,7 +71,7 @@ _inspection_report() {
   fi
 }
 
-# deployment_inspect_model: Resolve model identity and quantization before mutation.
+# deployment_inspect_model - Resolve model identity and quantization before mutation.
 # Globals:
 #   HF_TOKEN, MODEL_REVISION, TMPDIR.
 # Arguments:

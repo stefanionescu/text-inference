@@ -11,7 +11,7 @@ source "${_RUNTIME_ARTIFACTS_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/runtime/cleanup/paths.sh
 source "${_RUNTIME_ARTIFACTS_FOLDER}/paths.sh"
 
-# _runtime_clear_owned_paths: Remove repository-relative paths.
+# _runtime_clear_owned_paths - Remove repository-relative paths.
 _runtime_clear_owned_paths() {
   local root_folder="$1"
   local relative_path
@@ -25,7 +25,7 @@ _runtime_clear_owned_paths() {
   return "${status}"
 }
 
-# runtime_clear_model_transition: Clear runtime caches while retaining
+# runtime_clear_model_transition - Clear runtime caches while retaining
 # repository exports long enough for their provenance validator to decide reuse.
 # Globals:
 #   None.
@@ -50,7 +50,7 @@ runtime_clear_model_transition() {
     "models"
 }
 
-# runtime_clear_engine_artifacts: Clear model data and incompatible environments.
+# runtime_clear_engine_artifacts - Clear model data and incompatible environments.
 # Globals:
 #   None.
 # Arguments:
@@ -83,7 +83,7 @@ runtime_clear_engine_artifacts() {
   return "${status}"
 }
 
-# runtime_clear_reset_artifacts: Clear all repository deployment state.
+# runtime_clear_reset_artifacts - Clear all repository deployment state.
 # Globals:
 #   RUNTIME_LOG_FOLDER and runtime path constants.
 # Arguments:

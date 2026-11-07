@@ -14,7 +14,7 @@ source "${_WARMUP_ENV_FOLDER}/../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_WARMUP_ENV_FOLDER}/../foundation/log.sh"
 
-# _warmup_positive_integer: Validate and export one positive integer.
+# _warmup_positive_integer - Validate and export one positive integer.
 _warmup_positive_integer() {
   local variable_name="$1"
   local default_value="$2"
@@ -31,7 +31,7 @@ _warmup_positive_integer() {
   export "${variable_name?}"
 }
 
-# warmup_initialize_environment: Export warmup paths, timeouts, and retries.
+# warmup_initialize_environment - Export warmup paths, timeouts, and retries.
 # Globals:
 #   WARMUP_READINESS_SCRIPT
 #   WARMUP_HEALTH_POLL_INTERVAL_SECONDS

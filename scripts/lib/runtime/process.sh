@@ -3,7 +3,7 @@
 # Read and atomically persist repository-owned process identifiers.
 # Runtime: Bash 3.2+, macOS and Linux.
 
-# runtime_read_pid: Print a syntactically valid process identifier.
+# runtime_read_pid - Print a syntactically valid process identifier.
 # Globals:
 #   None.
 # Arguments:
@@ -22,7 +22,7 @@ runtime_read_pid() {
   printf '%s\n' "${pid}"
 }
 
-# runtime_write_pid: Atomically persist one process identifier.
+# runtime_write_pid - Atomically persist one process identifier.
 # Globals:
 #   None.
 # Arguments:

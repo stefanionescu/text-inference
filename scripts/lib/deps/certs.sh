@@ -11,7 +11,7 @@ source "${_CERTS_DEPS_FOLDER}/../../config/defaults.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_CERTS_DEPS_FOLDER}/../foundation/log.sh"
 
-# _certs_bundle: Print the installed distribution CA bundle path.
+# _certs_bundle - Print the installed distribution CA bundle path.
 _certs_bundle() {
   local bundle
   local -a bundles=(
@@ -29,7 +29,7 @@ _certs_bundle() {
   return 1
 }
 
-# certs_install: Install the system CA bundle when it is absent.
+# certs_install - Install the system CA bundle when it is absent.
 # Globals:
 #   EUID
 # Arguments:
@@ -65,7 +65,7 @@ certs_install() {
   _certs_bundle >/dev/null
 }
 
-# certs_export_environment: Export the installed CA bundle path.
+# certs_export_environment - Export the installed CA bundle path.
 # Globals:
 #   CURL_CA_BUNDLE
 #   GIT_SSL_CAINFO

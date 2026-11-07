@@ -11,7 +11,7 @@ readonly STEP_FOLDER
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${STEP_FOLDER}/../lib/foundation/log.sh"
 
-# main: Probe the NVIDIA management interface.
+# main - Probe the NVIDIA management interface.
 main() {
   if ! command -v nvidia-smi >/dev/null 2>&1; then
     log_write "[gpu] nvidia-smi is required"

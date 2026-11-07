@@ -12,7 +12,7 @@ source "${_UV_ENVIRONMENT_FOLDER}/../../../config/defaults.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_UV_ENVIRONMENT_FOLDER}/../../foundation/log.sh"
 
-# uv_export_environment: Export deterministic uv install settings.
+# uv_export_environment - Export deterministic uv install settings.
 # Globals:
 #   FLASHINFER_ENABLE_AOT
 #   UV_LINK_MODE
@@ -31,7 +31,7 @@ uv_export_environment() {
   config_export_default FLASHINFER_ENABLE_AOT "1"
 }
 
-# uv_apply_lock: Apply locked extras to one virtual environment.
+# uv_apply_lock - Apply locked extras to one virtual environment.
 # Globals:
 #   ROOT_FOLDER
 # Arguments:
@@ -61,7 +61,7 @@ uv_apply_lock() {
   )
 }
 
-# uv_install_packages: Install special packages into the runtime environment.
+# uv_install_packages - Install special packages into the runtime environment.
 # Globals:
 #   VENV_FOLDER
 # Arguments:

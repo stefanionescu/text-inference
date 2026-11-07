@@ -15,7 +15,7 @@ source "${_SERVER_PROCESS_FOLDER}/../process.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_SERVER_PROCESS_FOLDER}/../../foundation/log.sh"
 
-# _server_module: Print the selected server process module.
+# _server_module - Print the selected server process module.
 _server_module() {
   case "${INFERENCE_ENGINE:?INFERENCE_ENGINE is required}" in
     trt) printf 'src.server.trt\n' ;;
@@ -27,7 +27,7 @@ _server_module() {
   esac
 }
 
-# _server_build_command: Assign the managed uvicorn command array.
+# _server_build_command - Assign the managed uvicorn command array.
 _server_build_command() {
   local server_module
   local python_bin="${VENV_FOLDER:?VENV_FOLDER is required}/bin/python"
@@ -42,7 +42,7 @@ _server_build_command() {
   SERVER_COMMAND=("${python_bin}" -m "${server_module}")
 }
 
-# server_guard_start: Reject startup while an owned server process is active.
+# server_guard_start - Reject startup while an owned server process is active.
 # Globals:
 #   RUNTIME_SERVER_PID_FILE
 # Arguments:
@@ -68,7 +68,7 @@ server_guard_start() {
   rm -f -- "${pid_file}"
 }
 
-# server_start: Start uvicorn in a detached process group.
+# server_start - Start uvicorn in a detached process group.
 # Globals:
 #   RUNTIME_SERVER_LOG_FILE
 #   SERVER_PID

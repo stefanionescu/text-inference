@@ -28,7 +28,7 @@ source "${SCRIPTS_FOLDER}/lib/foundation/publishing.sh"
 # shellcheck source=scripts/lib/foundation/pytorch_guard.sh
 source "${SCRIPTS_FOLDER}/lib/foundation/pytorch_guard.sh"
 
-# _deploy_report_exit: Report the captured diagnostics for a failed workflow.
+# _deploy_report_exit - Report the captured diagnostics for a failed workflow.
 _deploy_report_exit() {
   local status=$?
 
@@ -39,7 +39,7 @@ _deploy_report_exit() {
   exit "${status}"
 }
 
-# _deploy_existing_torch_status: Check an existing runtime environment.
+# _deploy_existing_torch_status - Check an existing runtime environment.
 _deploy_existing_torch_status() {
   if [[ ! -x ${VENV_FOLDER:?VENV_FOLDER is required}/bin/python ]]; then
     return 0
@@ -47,7 +47,7 @@ _deploy_existing_torch_status() {
   pytorch_guard_check "[deploy]"
 }
 
-# _deploy_clear_environments: Remove both managed Python environments.
+# _deploy_clear_environments - Remove both managed Python environments.
 _deploy_clear_environments() {
   runtime_remove_owned_path \
     "${ROOT_FOLDER}" "${VENV_FOLDER:?VENV_FOLDER is required}" || return 1
@@ -55,7 +55,7 @@ _deploy_clear_environments() {
     "${ROOT_FOLDER}" "${QUANT_VENV_FOLDER:?QUANT_VENV_FOLDER is required}"
 }
 
-# _deploy_prepare_dependencies: Install dependencies, repairing Torch mismatch.
+# _deploy_prepare_dependencies - Install dependencies, repairing Torch mismatch.
 _deploy_prepare_dependencies() {
   local torch_status=0
 
@@ -76,7 +76,7 @@ _deploy_prepare_dependencies() {
   return "${torch_status}"
 }
 
-# _deploy_prepare_checkpoint: Dispatch checkpoint preparation to the selected engine.
+# _deploy_prepare_checkpoint - Dispatch checkpoint preparation to the selected engine.
 _deploy_prepare_checkpoint() {
   case "${INFERENCE_ENGINE:?INFERENCE_ENGINE is required}" in
     trt) trt_prepare_checkpoint ;;
@@ -88,7 +88,7 @@ _deploy_prepare_checkpoint() {
   esac
 }
 
-# main: Execute dependency, checkpoint, and server startup stages.
+# main - Execute dependency, checkpoint, and server startup stages.
 main() {
   export VENV_FOLDER="${ROOT_FOLDER}/${RUNTIME_VENV_RELATIVE_PATH}"
   export QUANT_VENV_FOLDER="${ROOT_FOLDER}/${QUANT_VENV_RELATIVE_PATH}"

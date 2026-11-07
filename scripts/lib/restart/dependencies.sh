@@ -15,7 +15,7 @@ source "${_RESTART_DEPENDENCIES_FOLDER}/../foundation/log.sh"
 # shellcheck source=scripts/lib/foundation/pytorch_guard.sh
 source "${_RESTART_DEPENDENCIES_FOLDER}/../foundation/pytorch_guard.sh"
 
-# _restart_rebuild_dependencies: Replace both managed environments.
+# _restart_rebuild_dependencies - Replace both managed environments.
 _restart_rebuild_dependencies() {
   local scripts_folder="$1"
 
@@ -28,7 +28,7 @@ _restart_rebuild_dependencies() {
   bash "${scripts_folder}/steps/install_deps.sh"
 }
 
-# _restart_torch_status: Return the managed environment compatibility status.
+# _restart_torch_status - Return the managed environment compatibility status.
 _restart_torch_status() {
   if [[ ! -x ${VENV_FOLDER:?VENV_FOLDER is required}/bin/python ]]; then
     return 0
@@ -36,7 +36,7 @@ _restart_torch_status() {
   pytorch_guard_check "[restart]"
 }
 
-# _restart_apply_transition: Request a rebuild for the transitions that need one.
+# _restart_apply_transition - Request a rebuild for the transitions that need one.
 _restart_apply_transition() {
   case "$1" in
     engine | reset)
@@ -48,7 +48,7 @@ _restart_apply_transition() {
   esac
 }
 
-# restart_prepare_dependencies: Rebuild dependencies when requested or required.
+# restart_prepare_dependencies - Rebuild dependencies when requested or required.
 # Globals:
 #   REINSTALL_REQUESTED, ROOT_FOLDER, QUANT_VENV_FOLDER, VENV_FOLDER.
 # Arguments:

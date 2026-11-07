@@ -9,7 +9,7 @@ _UV_COMMAND_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_UV_COMMAND_FOLDER}/../../foundation/log.sh"
 
-# _uv_log_path: Print the persistent uv failure log path.
+# _uv_log_path - Print the persistent uv failure log path.
 _uv_log_path() {
   local base_folder="${ROOT_FOLDER-}"
 
@@ -21,7 +21,7 @@ _uv_log_path() {
   fi
 }
 
-# _uv_report_failure: Append one uv failure and print its final lines.
+# _uv_report_failure - Append one uv failure and print its final lines.
 # Globals:
 #   None.
 # Arguments:
@@ -56,7 +56,7 @@ _uv_report_failure() {
   tail -n 60 "${temporary_log}" >&2
 }
 
-# uv_run: Run one uv command with captured failure output.
+# uv_run - Run one uv command with captured failure output.
 # Globals:
 #   None.
 # Arguments:

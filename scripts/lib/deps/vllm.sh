@@ -13,7 +13,7 @@ source "${_VLLM_DEPS_FOLDER}/venv.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_VLLM_DEPS_FOLDER}/../foundation/log.sh"
 
-# vllm_install_dependencies: Install runtime and compressor dependencies.
+# vllm_install_dependencies - Install runtime and compressor dependencies.
 # Globals:
 #   QUANT_VENV_FOLDER
 #   VENV_FOLDER

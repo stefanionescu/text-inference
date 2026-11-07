@@ -26,7 +26,7 @@ source "${SCRIPTS_FOLDER}/lib/foundation/inspection.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${SCRIPTS_FOLDER}/lib/foundation/log.sh"
 
-# _main_usage: Print deployment command help and terminate.
+# _main_usage - Print deployment command help and terminate.
 _main_usage() {
   local status="$1"
   local line
@@ -37,7 +37,7 @@ _main_usage() {
   exit "${status}"
 }
 
-# _main_export_args: Export one validated deployment argument set.
+# _main_export_args - Export one validated deployment argument set.
 _main_export_args() {
   INFERENCE_ENGINE="$1"
   LOGS_ENABLED="$2"
@@ -49,7 +49,7 @@ _main_export_args() {
   export REQUESTED_QUANTIZATION SOURCE_MODEL
 }
 
-# _main_validate_args: Validate the named deployment arguments.
+# _main_validate_args - Validate the named deployment arguments.
 _main_validate_args() {
   local engine="$1"
   local model="$2"
@@ -58,7 +58,7 @@ _main_validate_args() {
   [[ -n ${model} ]]
 }
 
-# _main_read_value_flag: Store one flag's value in the variables of _main_parse_args.
+# _main_read_value_flag - Store one flag's value in the variables of _main_parse_args.
 _main_read_value_flag() {
   case "$1" in
     --engine) engine="$2" ;;
@@ -68,7 +68,7 @@ _main_read_value_flag() {
   esac
 }
 
-# _main_parse_args: Parse the host deployment command contract.
+# _main_parse_args - Parse the host deployment command contract.
 _main_parse_args() {
   local engine="${DEFAULT_ENGINE}"
   local model=""
@@ -105,7 +105,7 @@ _main_parse_args() {
     "${quantization}" "${model}"
 }
 
-# main: Validate configuration and start the deployment pipeline.
+# main - Validate configuration and start the deployment pipeline.
 main() {
   local transition
 

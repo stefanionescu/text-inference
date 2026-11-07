@@ -11,7 +11,7 @@ source "${_VENV_DEPS_FOLDER}/../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_VENV_DEPS_FOLDER}/../foundation/log.sh"
 
-# _venv_python_version: Print one interpreter's major and minor version.
+# _venv_python_version - Print one interpreter's major and minor version.
 _venv_python_version() {
   local python_bin="$1"
   local version_output
@@ -23,7 +23,7 @@ _venv_python_version() {
   printf '%s\n' "${version}"
 }
 
-# _venv_install_python: Install the configured Python interpreter with apt.
+# _venv_install_python - Install the configured Python interpreter with apt.
 # Globals:
 #   DEPLOY_PYTHON_VERSION
 #   EUID
@@ -51,7 +51,7 @@ _venv_install_python() {
     "${package_name}-venv"
 }
 
-# venv_prepare: Create or validate a managed Python environment.
+# venv_prepare - Create or validate a managed Python environment.
 # Globals:
 #   DEPLOY_PYTHON_VERSION
 # Arguments:

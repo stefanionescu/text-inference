@@ -4,7 +4,7 @@ source "/app/scripts/lib/foundation/gpu/environment.sh"
 # shellcheck source=scripts/config/defaults.sh
 source "/app/scripts/config/defaults.sh"
 
-# vllm_configure_gpu: Detect the GPU and export the vLLM settings for its architecture.
+# vllm_configure_gpu - Detect the GPU and export the vLLM settings for its architecture.
 vllm_configure_gpu() {
   gpu_detect
   gpu_apply_environment

@@ -15,7 +15,7 @@ source "${_TRT_INSTALL_FOLDER}/../venv.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_INSTALL_FOLDER}/../../foundation/log.sh"
 
-# trt_install_dependencies: Install runtime and Model Optimizer dependencies.
+# trt_install_dependencies - Install runtime and Model Optimizer dependencies.
 # Globals:
 #   QUANT_VENV_FOLDER
 #   ROOT_FOLDER

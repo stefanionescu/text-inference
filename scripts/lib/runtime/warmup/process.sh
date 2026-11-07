@@ -11,7 +11,7 @@ source "${_WARMUP_PROCESS_FOLDER}/../../../config/values/runtime.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_WARMUP_PROCESS_FOLDER}/../../foundation/log.sh"
 
-# warmup_stop_existing: Stop the warmup process recorded by the repository.
+# warmup_stop_existing - Stop the warmup process recorded by the repository.
 # Globals:
 #   RUNTIME_WARMUP_LOCK_FILE
 # Arguments:

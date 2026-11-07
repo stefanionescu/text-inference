@@ -5,7 +5,7 @@
 
 # shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
 
-# config_set_default: Assign a default when a variable is unset or empty.
+# config_set_default - Assign a default when a variable is unset or empty.
 # Globals:
 #   Variable named by the first argument.
 # Arguments:
@@ -26,7 +26,7 @@ config_set_default() {
   printf -v "${name}" '%s' "${default_value}"
 }
 
-# config_assign_value: Assign a configured value or its declared default.
+# config_assign_value - Assign a configured value or its declared default.
 # Globals:
 #   Variable named by the second argument.
 # Arguments:
@@ -50,7 +50,7 @@ config_assign_value() {
   printf -v "${output_name}" '%s' "${default_value}"
 }
 
-# config_export_default: Export a default when a variable is unset or empty.
+# config_export_default - Export a default when a variable is unset or empty.
 # Globals:
 #   Variable named by the first argument.
 # Arguments:

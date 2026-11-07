@@ -10,7 +10,7 @@ source "${_TRT_DETECTION_FOLDER}/../../config/values/trt.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_DETECTION_FOLDER}/../../lib/foundation/log.sh"
 
-# _trt_version_number: Convert a CUDA major.minor version for comparison.
+# _trt_version_number - Convert a CUDA major.minor version for comparison.
 _trt_version_number() {
   local version="$1"
 
@@ -21,7 +21,7 @@ _trt_version_number() {
   printf '%d%02d\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
 }
 
-# trt_cuda_version: Print the installed CUDA toolkit version.
+# trt_cuda_version - Print the installed CUDA toolkit version.
 # Globals:
 #   None.
 # Arguments:
@@ -41,7 +41,7 @@ trt_cuda_version() {
   printf '%s\n' "${BASH_REMATCH[1]}"
 }
 
-# trt_validate_cuda: Validate CUDA toolkit and driver minimum versions.
+# trt_validate_cuda - Validate CUDA toolkit and driver minimum versions.
 # Globals:
 #   TRT_MIN_CUDA_VERSION
 # Arguments:

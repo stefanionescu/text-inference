@@ -14,7 +14,7 @@ source "${_TRT_ENV_FOLDER}/../../config/values/trt.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_ENV_FOLDER}/../foundation/log.sh"
 
-# trt_initialize_environment: Export TensorRT and Model Optimizer paths.
+# trt_initialize_environment - Export TensorRT and Model Optimizer paths.
 # Globals:
 #   MODELOPT_REPO_FOLDER
 #   MPI_VERSION_PIN
@@ -44,7 +44,7 @@ trt_initialize_environment() {
     "${TRT_DEFAULT_SEQUENTIAL_MAP}"
 }
 
-# trt_validate_calibration: Validate Model Optimizer calibration settings.
+# trt_validate_calibration - Validate Model Optimizer calibration settings.
 # Globals:
 #   TRT_AWQ_BLOCK_SIZE
 #   TRT_CALIBRATION_MEMORY_FRACTION
@@ -80,7 +80,7 @@ trt_validate_calibration() {
   fi
 }
 
-# trt_validate_format: Validate one Model Optimizer format for the GPU.
+# trt_validate_format - Validate one Model Optimizer format for the GPU.
 # Globals:
 #   TRT_FP8_SM_ARCHS
 #   TRT_NVFP4_SM_ARCHS

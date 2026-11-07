@@ -10,7 +10,7 @@ source "${_TRT_CACHE_FOLDER}/../../config/values/trt.sh"
 # shellcheck source=scripts/engines/trt/detection.sh
 source "${_TRT_CACHE_FOLDER}/detection.sh"
 
-# trt_cache_action: Print whether a ModelOpt checkpoint can be reused.
+# trt_cache_action - Print whether a ModelOpt checkpoint can be reused.
 # Globals:
 #   ModelOpt calibration and repository runtime variables.
 # Arguments:
@@ -49,7 +49,7 @@ trt_cache_action() {
     "${python_bin}" -m src.quantization.trt cache "${arguments[@]}"
 }
 
-# trt_finalize_checkpoint: Validate an export and persist exact provenance.
+# trt_finalize_checkpoint - Validate an export and persist exact provenance.
 # Globals:
 #   ModelOpt, GPU, and repository runtime variables.
 # Arguments:

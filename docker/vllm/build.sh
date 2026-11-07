@@ -7,7 +7,7 @@ SCRIPT_FOLDER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_FOLDER="$(cd "${SCRIPT_FOLDER}/../.." && pwd)"
 BASE_FOLDER="${SCRIPT_FOLDER}/../base"
 
-# usage: Print vLLM Docker build help.
+# usage - Print vLLM Docker build help.
 usage() {
   cat <<'EOF'
 Usage: docker/vllm/build.sh
@@ -39,7 +39,7 @@ source "${BASE_FOLDER}/scripts/logs.sh"
 source "${BASE_FOLDER}/scripts/build/driver.sh"
 
 # No command-line flags supported except --help
-# main: Reject unexpected arguments, then build the vLLM image.
+# main - Reject unexpected arguments, then build the vLLM image.
 main() {
   if [[ ${1-} == "--help" ]] || [[ ${1-} == "-h" ]]; then
     usage

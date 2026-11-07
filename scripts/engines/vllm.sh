@@ -11,14 +11,14 @@ source "${_VLLM_ENGINE_FOLDER}/checkpoint.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_VLLM_ENGINE_FOLDER}/../lib/foundation/log.sh"
 
-# _vllm_select_online: Select one raw checkpoint for online FP8.
+# _vllm_select_online - Select one raw checkpoint for online FP8.
 _vllm_select_online() {
   [[ ${REQUESTED_QUANTIZATION-} == "fp8" && -z $2 ]] || return 1
   log_write "[quant] vLLM will apply online FP8 quantization"
   MODEL="$1"
 }
 
-# _vllm_export_checkpoint: Export one raw source to compressed-tensors.
+# _vllm_export_checkpoint - Export one raw source to compressed-tensors.
 _vllm_export_checkpoint() {
   local source_model="$1"
   local detected_format="$2"
@@ -33,7 +33,7 @@ _vllm_export_checkpoint() {
   EXPORT_PROVENANCE="${checkpoint_folder}"
 }
 
-# _vllm_apply_checkpoint_action: Select or export the requested checkpoint.
+# _vllm_apply_checkpoint_action - Select or export the requested checkpoint.
 _vllm_apply_checkpoint_action() {
   local source_model="$1"
   local source_folder="$2"
@@ -54,7 +54,7 @@ _vllm_apply_checkpoint_action() {
   esac
 }
 
-# _vllm_publish_requested: Publish only a validated local export when requested.
+# _vllm_publish_requested - Publish only a validated local export when requested.
 _vllm_publish_requested() {
   if [[ ${PUSH_REQUESTED:?PUSH_REQUESTED is required} == "0" ]]; then
     return 0
@@ -66,7 +66,7 @@ _vllm_publish_requested() {
   vllm_publish_checkpoint "${EXPORT_PROVENANCE}"
 }
 
-# vllm_publish_checkpoint: Upload one local compressed-tensors checkpoint.
+# vllm_publish_checkpoint - Upload one local compressed-tensors checkpoint.
 # Globals:
 #   HF_PUSH_PRIVATE, HF_PUSH_REPO_ID, ROOT_FOLDER, VENV_FOLDER.
 # Arguments:
@@ -89,7 +89,7 @@ vllm_publish_checkpoint() {
     "${python_bin}" -m src.hf.vllm "${arguments[@]}"
 }
 
-# vllm_prepare_checkpoint: Resolve, optionally export, and publish a checkpoint.
+# vllm_prepare_checkpoint - Resolve, optionally export, and publish a checkpoint.
 # Globals:
 #   Deployment model, quantization, environment, and publishing state.
 # Arguments:

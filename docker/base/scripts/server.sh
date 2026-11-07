@@ -7,7 +7,7 @@ source "/app/base/scripts/logs.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "/app/scripts/lib/foundation/log.sh"
 
-# container_show_usage: Print the fixed Docker runtime interface.
+# container_show_usage - Print the fixed Docker runtime interface.
 # Globals:
 #   None.
 # Arguments:
@@ -25,9 +25,7 @@ WebSocket service on port 8000, and keeps readiness on loopback port 8001.
 EOF
 }
 
-# container_read_arguments: Export LOGS_ENABLED from the command line, or print usage and exit.
-# Arguments:
-#   All arguments: The container command line.
+# container_read_arguments - Export LOGS_ENABLED from the command line, or print usage and exit.
 container_read_arguments() {
   local is_logging_enabled=0
 
@@ -55,7 +53,6 @@ container_read_arguments() {
   export LOGS_ENABLED
 }
 
-# _container_follow_log: Print the server log through a private FIFO until the server stops.
 _container_follow_log() {
   local log_file="$1"
   local server_pid="$2"
@@ -81,10 +78,7 @@ _container_follow_log() {
   return "${tail_status}"
 }
 
-# start_warmup_server: Start one dual-listener engine server and warmup probe.
-# Arguments:
-#   $1: Engine name.
-#   $2: Python module that runs the server.
+# start_warmup_server - Start one dual-listener engine server and warmup probe.
 start_warmup_server() {
   local engine="$1"
   local server_module="$2"

@@ -9,7 +9,7 @@ _GPU_QUERY_FOLDER="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd 
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_GPU_QUERY_FOLDER}/../log.sh"
 
-# gpu_architecture: Print the supported GPU compute architecture.
+# gpu_architecture - Print the supported GPU compute architecture.
 # Globals:
 #   GPU_SM_ARCH
 # Arguments:
@@ -47,7 +47,7 @@ gpu_architecture() {
   esac
 }
 
-# gpu_name: Print the first GPU name reported by nvidia-smi.
+# gpu_name - Print the first GPU name reported by nvidia-smi.
 # Globals:
 #   None.
 # Arguments:

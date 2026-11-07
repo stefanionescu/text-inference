@@ -23,7 +23,7 @@ source "${_TRT_MAIN_FOLDER}/../checkpoint.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_MAIN_FOLDER}/../../lib/foundation/log.sh"
 
-# _trt_publish_requested: Publish only a validated local export when requested.
+# _trt_publish_requested - Publish only a validated local export when requested.
 _trt_publish_requested() {
   if [[ ${PUSH_REQUESTED:?PUSH_REQUESTED is required} == "0" ]]; then
     return 0
@@ -35,7 +35,7 @@ _trt_publish_requested() {
   trt_publish_checkpoint "${EXPORT_PROVENANCE}" "${RUNTIME_QUANTIZATION-}"
 }
 
-# trt_prepare_checkpoint: Resolve, optionally export, validate, and publish.
+# trt_prepare_checkpoint - Resolve, optionally export, validate, and publish.
 # Globals:
 #   Deployment model, quantization, GPU, and publishing state.
 # Arguments:

@@ -11,7 +11,7 @@ source "${_TRT_SYSTEM_FOLDER}/../../../config/values/deployment.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_TRT_SYSTEM_FOLDER}/../../foundation/log.sh"
 
-# _trt_install_mpi: Install the pinned MPI development packages.
+# _trt_install_mpi - Install the pinned MPI development packages.
 # Globals:
 #   DEPLOY_PYTHON_VERSION
 #   EUID
@@ -45,7 +45,7 @@ _trt_install_mpi() {
   "${mark_command[@]}" hold libopenmpi3t64 openmpi-bin openmpi-common
 }
 
-# trt_install_system_dependencies: Install MPI when the compiler is absent.
+# trt_install_system_dependencies - Install MPI when the compiler is absent.
 # Globals:
 #   MPI_VERSION_PIN
 # Arguments:

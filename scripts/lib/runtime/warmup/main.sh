@@ -16,7 +16,7 @@ source "${_WARMUP_MAIN_FOLDER}/suite.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_WARMUP_MAIN_FOLDER}/../../foundation/log.sh"
 
-# _warmup_connection_limit: Print the validated benchmark connection limit.
+# _warmup_connection_limit - Print the validated benchmark connection limit.
 _warmup_connection_limit() {
   if [[ ! ${MAX_CONCURRENT_CONNECTIONS-} =~ ^[1-9][0-9]*$ ]]; then
     log_write "[warmup] MAX_CONCURRENT_CONNECTIONS must be a positive integer"
@@ -25,7 +25,7 @@ _warmup_connection_limit() {
   printf '%s\n' "${MAX_CONCURRENT_CONNECTIONS}"
 }
 
-# _warmup_clear_lock: Remove the lock owned by the active warmup process.
+# _warmup_clear_lock - Remove the lock owned by the active warmup process.
 # Globals:
 #   WARMUP_ACTIVE_LOCK_FILE
 # Arguments:
@@ -40,7 +40,7 @@ _warmup_clear_lock() {
   fi
 }
 
-# _warmup_report: Append the final suite result.
+# _warmup_report - Append the final suite result.
 _warmup_report() {
   local status="$1"
   local message="[warmup] Warmup complete"
@@ -52,7 +52,7 @@ _warmup_report() {
   printf '%s\n' "${message}" >>"${ROOT_FOLDER:?ROOT_FOLDER is required}/${RUNTIME_SERVER_LOG_FILE}"
 }
 
-# warmup_run: Own the warmup lock and execute all configured probes.
+# warmup_run - Own the warmup lock and execute all configured probes.
 # Globals:
 #   LOG_FOLDER
 #   VENV_FOLDER

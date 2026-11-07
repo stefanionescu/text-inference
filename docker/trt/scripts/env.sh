@@ -4,7 +4,7 @@
 # shellcheck source=scripts/config/defaults.sh
 source "/app/scripts/config/defaults.sh"
 
-# trt_export_defaults: Export the TensorRT settings that the container left unset.
+# trt_export_defaults - Export the TensorRT settings that the container left unset.
 trt_export_defaults() {
   config_export_default MAXIMUM_OUTPUT_TOKENS "150"
   # Runtime settings aligned with config/model/trt.py.

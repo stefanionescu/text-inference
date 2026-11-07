@@ -6,7 +6,7 @@
 # file. Repo Docker builds are always linux/amd64.
 
 # shellcheck disable=SC2034 # reason: sourced configuration exports variables consumed by parent scripts
-# init_build_args: Initialize build args.
+# init_build_args - Initialize build args.
 init_build_args() {
   local dockerfile="${DOCKERFILE:?DOCKERFILE is required before init_build_args}"
   local full_image_name="${FULL_IMAGE_NAME:?FULL_IMAGE_NAME is required before init_build_args}"
@@ -26,7 +26,7 @@ init_build_args() {
   esac
 }
 
-# append_model_build_args: Add immutable model inputs to a build.
+# append_model_build_args - Add immutable model inputs to a build.
 append_model_build_args() {
   BUILD_ARGS+=(--build-arg "MODEL=${MODEL:?MODEL is required}")
   BUILD_ARGS+=(--build-arg "MODEL_REVISION=${MODEL_REVISION:?MODEL_REVISION is required}")

@@ -27,7 +27,7 @@ source "${_RESTART_WORKFLOW_FOLDER}/../foundation/log.sh"
 # shellcheck source=scripts/lib/foundation/publishing.sh
 source "${_RESTART_WORKFLOW_FOLDER}/../foundation/publishing.sh"
 
-# _restart_transition: Print the requested restart transition.
+# _restart_transition - Print the requested restart transition.
 _restart_transition() {
   local root_folder="$1"
 
@@ -43,7 +43,7 @@ _restart_transition() {
     "${REQUESTED_QUANTIZATION-}"
 }
 
-# _restart_checkpoint_mode: Print whether checkpoint preparation is required.
+# _restart_checkpoint_mode - Print whether checkpoint preparation is required.
 _restart_checkpoint_mode() {
   case "$1" in
     same) printf 'reuse\n' ;;
@@ -52,7 +52,7 @@ _restart_checkpoint_mode() {
   esac
 }
 
-# restart_execute_selected: Apply one inspected restart selection.
+# restart_execute_selected - Apply one inspected restart selection.
 # Globals:
 #   Inspected restart state and action flags.
 # Arguments:
@@ -84,7 +84,7 @@ restart_execute_selected() {
   log_write "[restart] Restart completed for ${INFERENCE_ENGINE}"
 }
 
-# restart_run: Inspect a restart request and start its captured workflow.
+# restart_run - Inspect a restart request and start its captured workflow.
 # Globals:
 #   Restart flags and deployment environment variables.
 # Arguments:

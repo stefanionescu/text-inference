@@ -19,7 +19,7 @@ source "${SCRIPT_FOLDER}/lib/runtime/cleanup/reset.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${SCRIPT_FOLDER}/lib/foundation/log.sh"
 
-# _stop_usage: Print the stop command contract.
+# _stop_usage - Print the stop command contract.
 _stop_usage() {
   local status="$1"
   local line
@@ -30,7 +30,7 @@ _stop_usage() {
   exit "${status}"
 }
 
-# _stop_parse_args: Parse the exact stop command contract.
+# _stop_parse_args - Parse the exact stop command contract.
 _stop_parse_args() {
   STOP_RESET_REQUESTED=0
   case "$#" in
@@ -46,7 +46,7 @@ _stop_parse_args() {
   esac
 }
 
-# main: Stop owned processes or run the explicit reset.
+# main - Stop owned processes or run the explicit reset.
 main() {
   _stop_parse_args "$@" || _stop_usage 2
   if [[ ${STOP_RESET_REQUESTED} == "1" ]]; then

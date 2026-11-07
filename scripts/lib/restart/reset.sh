@@ -13,7 +13,7 @@ source "${_RESTART_RESET_FOLDER}/../runtime/cleanup/reset.sh"
 # shellcheck source=scripts/lib/foundation/log.sh
 source "${_RESTART_RESET_FOLDER}/../foundation/log.sh"
 
-# restart_capture_reset: Run the host reset while retaining raw diagnostics.
+# restart_capture_reset - Run the host reset while retaining raw diagnostics.
 # Globals:
 #   LOGS_ENABLED, TMPDIR.
 # Arguments:
