@@ -22,18 +22,30 @@ Read this rule when you change an HTTP service.
   storage, unless the public interface explicitly exposes the provider format.
 - Escape HTML for its rendering context, and never pre-escape JSON field values.
 
+### Keep out of public responses
+
+- Schema names, table names, column names, or function names.
+- Internal identifiers such as row IDs, user IDs, or session tokens.
+- Stack traces or file paths.
+- Raw upstream, provider, or database errors.
+- Implementation details such as trigger and policy names, or internal state like "deleted" flags.
+
 ## Sessions and transport
 
 - Terminate TLS at the proxy, and trust forwarding headers only from it.
 - When the service issues tokens, a revocation reaches every instance.
-
-## Wire names
-
-- Keep existing protocol header names. A new header carries no `X-` prefix, as
-  [Request for Comments (RFC) 6648](https://www.rfc-editor.org/rfc/rfc6648) recommends.
+- Cookies that carry sessions: `HttpOnly`, `Secure`, `SameSite`, explicit `Max-Age`, and a non-default name. Writes
+  never happen on `GET`. A cookie session needs cross-site request forgery (CSRF) protection on every state-changing
+  request.
+- Send security headers: HTTP Strict Transport Security (HSTS), `X-Content-Type-Options: nosniff`, frame policy,
+  referrer policy, and a Content Security Policy that the application's own scripts satisfy.
+- Never pair a wildcard Cross-Origin Resource Sharing (CORS) origin with credentials.
 
 ## Operations
 
+- A startup failure stops the process before it accepts work.
+- On shutdown, set readiness to false, stop accepting work, drain in-flight work for a bounded time, close resources,
+  and exit.
+- A fatal runtime error stops new work, reports the failure, and exits.
 - Keep health and readiness endpoints cheap. Call no provider from them.
 - Broad rate limits sit at the edge, application limits in middleware, and route limits beside the route.
-- Either the proxy or the application compresses responses, not both. Under heavy traffic, the reverse proxy does it.

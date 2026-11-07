@@ -38,13 +38,3 @@ database rows.
 
 Redaction lives in the logging module. When a new sensitive key can reach logs, update the redaction list; do not filter
 at one call site.
-
-```ts
-// Bad.
-logger.info({ headers: req.headers }, 'Incoming request');
-
-// Good.
-logger.info({ path: req.path, method: req.method, requestId }, 'Incoming request');
-```
-
-A logging test asserts the fields and redaction, not that the logger ran.

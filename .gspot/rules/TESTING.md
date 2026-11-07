@@ -2,13 +2,12 @@
 
 Read this rule when you write or change a test.
 
-Tests exist to catch bugs. A useful test fails when the behavior it covers breaks. A test proves a behavior that a user
-can observe, a security guarantee, a fixed bug, or a platform difference. One behavior gets one test, at the cheapest level that
-can fail.
+A useful test fails when the behavior it covers breaks. A test proves a behavior that a user can observe, a security
+guarantee, a fixed bug, or a platform difference. One behavior gets one test, at the cheapest level that can fail.
 
 ## Assertions
 
-- Use Arrange, Act, Assert. Test behavior, not private implementation details.
+- Test behavior, not private implementation details.
 - Assert the values a behavior produces: status codes, exit codes, error codes, IDs, and structured fields.
 - Compare message text only when the text itself is the output under test, such as the help of a command.
 - Do not pin incidental configuration or internal representation.
@@ -21,6 +20,9 @@ can fail.
 - No test pins a constant, a default, a message, a table, help text, or generated text that no behavior depends on. A
   test runs code and checks its result.
 - No test checks a library, the language, a wrapper, or the test setup.
+- Before you keep a new test, break the code it covers and see the test fail. A test that expects no finding needs a
+  break that makes the check report.
+- Add a table row only when you can name a bug that fails it and no other row. A table with one case is a plain test.
 - Do not export a function only so that a test can call it. Test it through the public function that uses it.
 - Test the behavior that exists. Never write a test that proves the absence of a feature, option, setting, export, or
   file that the project removed or decided against. When you remove a feature, delete its tests.
@@ -37,14 +39,11 @@ can fail.
 
 ## Placement and names
 
-- Follow the test layout of the framework or runner, and keep one per repository.
 - Put builders, fakes, servers, and database code in one folder beside the tests, named for what it holds, such as
   builders. Never name it `mocks/`, `helpers/`, `utils/`, `support/`, or `shared/`. These files hold no
   assertions or test blocks.
 - A test name states the scenario and expected result. Never use `test1`, `works`, `edge cases`, or `happy path`. Group
   tests by unit, then scenario.
-- Prefer role and label queries. Use a test ID last; name it in camelCase for its control, such as `submitButton`. Never
-  put visible text, user data, or record IDs in it.
 
 ## Test data
 
@@ -53,11 +52,8 @@ can fail.
 - Use fixed, descriptive names, emails, IDs, and references. Add a per-run suffix only for rows in a shared database.
 - Do not share mutable IDs between tests or count unrelated data. Add unrelated records when a test must prove that the
   code leaves them unchanged.
-- Use unique queue names and event, operation, or correlation IDs for event-driven tests. Never purge shared queues or
-  tables as a substitute for isolated data.
+- Test data does not copy the version of the project or of a tool.
 - Do not use fixed sleeps. Use bounded polling, fake timers, or a signal that proves completion.
-- Test data does not copy the current version of the project or of a tool. Read the version from the dependency file, or
-  use a value outside real releases, such as `0.0.0-test`.
 
 ## Network and providers
 

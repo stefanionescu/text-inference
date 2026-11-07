@@ -5,12 +5,12 @@
     "": {
       "name": "text-inference",
       "devDependencies": {
-        "@gspothq/cli": "0.3.9",
+        "@gspothq/cli": "0.4.0",
       },
     },
   },
   "packages": {
-    "@gspothq/cli": ["@gspothq/cli@0.3.9", "", { "dependencies": { "@pgsql/types": "18.0.0", "libpg-query": "18.1.4", "typescript": "5.9.3", "web-tree-sitter": "0.27.1" }, "bin": { "gspot": "dist/gspot.js" } }, "sha512-6KerzDBsjarpLmK0Hk5ABP+O52jTJb2pqSo88Oa4pNpfDvHRAIDn+nVecgZeV13esRnsW1o4H62e7LEwEMWHPw=="],
+    "@gspothq/cli": ["@gspothq/cli@0.4.0", "", { "dependencies": { "@pgsql/types": "18.0.0", "libpg-query": "18.1.4", "typescript": "5.9.3", "web-tree-sitter": "0.27.1" }, "bin": { "gspot": "dist/gspot.js" } }, "sha512-HJP2aAy6yrzUTKbbkVwVl/WBr7n9O3RlX1d8SBKHOfaxC4+LvizVjvhuUVV7PuCHJ9RI92zAQXkrSVbnZZCLGQ=="],
 
     "@pgsql/types": ["@pgsql/types@18.0.0", "", {}, "sha512-jtAY4JU7jdVYZ/Vv3zlZqVP+FRWZokyCLKPPCnAApiaJAElpyyiMC3HRiquBu29kSrVs+rkqZD50SUIb/zyEGw=="],
 

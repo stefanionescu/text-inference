@@ -19,7 +19,6 @@ extend-exclude = [
   # Files that gspot generates
   ".gspot/**",
   ".gspot-copies/**",
-  "**/gspot.baseline.json",
   ".editorconfig",
   ".markdownlint.jsonc",
   ".prettierignore",

@@ -1,6 +1,7 @@
 # >>> gspot managed >>>
 * text=auto eol=lf
 .gspot/** linguist-generated
+.gspot/hooks/** linguist-generated=false
 /.editorconfig linguist-generated
 /.markdownlint.jsonc linguist-generated
 /.prettierignore linguist-generated

@@ -9,39 +9,7 @@ These rules target FastAPI with Pydantic v2.
 Keep business logic out of path operations: a path operation turns HTTP input into an application call, and its result
 into a response. One main module creates the `FastAPI` object and wires routers, global dependencies, middleware,
 exception handlers, and startup. Routers group related operations under a prefix that does not end in `/`, and imports
-use their domain, `items.router` and `users.router`. Keep database, SDK, and service clients out of import-time work,
-and never patch `sys.path`.
-
-```python
-"""Expose a fixed catalog with validated identifiers and public responses."""
-
-from typing import Annotated
-
-from fastapi import Path, FastAPI, APIRouter, HTTPException, status
-from pydantic import BaseModel
-
-
-class Item(BaseModel):
-    """Public catalog item."""
-
-    name: str
-
-
-CATALOG = (Item(name="Notebook"), Item(name="Pencil"))
-router = APIRouter(prefix="/items", tags=["items"])
-
-
-@router.get("/{item_id}")
-def get_item(item_id: Annotated[int, Path(ge=0)]) -> Item:
-    """Return one catalog item or a public not-found response."""
-    if item_id >= len(CATALOG):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
-    return CATALOG[item_id]
-
-
-app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
-app.include_router(router)
-```
+use their domain, `items.router` and `users.router`.
 
 ## Parameters
 
@@ -89,11 +57,8 @@ validation failure.
   cross-cutting HTTP behavior in middleware; the one added last runs outermost.
 - Turn OpenAPI and the interactive docs off unless a typed setting turns them on, and the schema exposes no internal or
   admin routes.
-- Read `debug` from a typed setting that defaults to off.
-- List the allowed origins of `CORSMiddleware`. Never allow `["*"]` together with `allow_credentials=True`.
 
 ## Testing
 
 Tests cover the HTTP contract through the test client: status codes, bodies, headers, and authentication. Replace
-external systems with dependency overrides at the application boundary. Tests cover the application, not the routing
-implementation of FastAPI.
+external systems with dependency overrides at the application boundary.

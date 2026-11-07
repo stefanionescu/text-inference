@@ -4,9 +4,6 @@ Read this rule before you write a plan.
 
 ## Complete changes
 
-Settle every open question with the user before you write the plan. A plan holds no open question and no choice that
-you made for the user.
-
 A plan says what each step changes, so another agent can carry it out without inventing anything.
 
 - Name every command that creates, moves, renames, regenerates, or deletes a file. List each generated file the change
@@ -26,5 +23,4 @@ only when it belongs to the requested work.
 
 ## Verification steps
 
-End the plan with the commands that prove the change works, and what each one prints when it passes. Run only the checks
-that cover the change, as WORKING.md says.
+End the plan with the commands that prove the change works, and what each one prints when it passes.

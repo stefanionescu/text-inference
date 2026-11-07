@@ -5,31 +5,13 @@ YAML.
 
 ## Calling commands
 
-Use fixed command names with argument arrays, never strings built from input. Never pass untrusted input to a shell.
-Never use `bash -lc` in repository scripts. A function that runs a caller-supplied command takes it and its arguments
-after `shift` and invokes `"$@"`.
+Use fixed command names with argument arrays, never strings built from input. Never pass untrusted input to a shell. A
+function that runs a caller-supplied command takes it and its arguments after `shift` and invokes `"$@"`.
 
 Check uncommon commands with `command -v` before a long-running, destructive, publishing, or error-handling path depends
-on them. Prefer builtins and parameter expansion to external commands for string and arithmetic work. Never run `su -c`
-without the target user.
-
-```bash
-# require_command: Ensures a command exists on PATH.
-# Arguments:
-#   Command name.
-require_command() {
-    local command_name="$1"
-
-    if ! command -v "${command_name}" >/dev/null 2>&1; then
-        printf 'error: required command not found: %s\n' "${command_name}" >&2
-        return 1
-    fi
-}
-```
+on them.
 
 ## Processes and privilege
-
-Never run `killall` or `pkill`, which stop every process that matches a name.
 
 Treat process names as advisory information, never authorization. Stop and restart paths kill only process ids that the
 owning script family recorded, found through the service manager, a `PID` file, or `pgrep -x`, never `ps | grep`. A
@@ -39,12 +21,9 @@ redirects as the current user, and a glob in `sudo command /path/*` expands befo
 through `sudo tee`, and keep the shell string you pass to `sudo` a fixed literal with no input.
 
 ```bash
-# shellcheck disable=SC2312 # The script runs with pipefail, so a failed generator stops it here.
-generate_config | sudo tee /etc/service/config >/dev/null
-
 # run_remote_checks: Runs remote checks and returns non-zero on any failure.
 # Globals:
-#   work_dir
+#   work_folder
 #   child_pids
 # Arguments:
 #   Small, already bounded host list to check.
@@ -58,7 +37,7 @@ run_remote_checks() {
     trap 'cleanup_children; exit 143' TERM
 
     for host in "$@"; do
-        check_host "${host}" >"${work_dir}/${host}.log" 2>&1 &
+        check_host "${host}" >"${work_folder}/${host}.log" 2>&1 &
         child_pids+=("$!")
     done
 
@@ -79,27 +58,15 @@ input and the format has no complex structure. Prefer machine output modes such 
 and never parse process lists, pretty tables, progress bars, or localized text by fixed field numbers. Quote `tr`
 character classes and pin `LC_ALL=C` when converting case.
 
-```bash
-# read_service_url: Prints a required nonempty service URL from JSON configuration.
-# Arguments:
-#   $1: the configuration file.
-read_service_url() {
-    local config_file="${1:?Configuration file is required}"
-    local service_url
-
-    service_url="$(jq -er '.service.url | select(type == "string" and length > 0)' "${config_file}")" || return 1
-    printf '%s\n' "${service_url}"
-}
-```
+Use `jq -er`. A plain `jq -r` prints `null` and exits 0 for a missing key.
 
 ## Network
 
 Download with `curl --fail --show-error --silent --location` into an explicit file. Set timeouts with the options of the
-tool, such as `--connect-timeout` plus `--max-time`, or SSH `ConnectTimeout`. Do not use GNU `timeout`, which macOS
-lacks.
+tool, such as `--connect-timeout` plus `--max-time`, or SSH `ConnectTimeout`.
 
 ```bash
-installer="${work_dir}/install.sh"
+installer="${work_folder}/install.sh"
 curl --fail --show-error --silent --location \
     --connect-timeout 10 \
     --max-time 60 \
@@ -107,32 +74,11 @@ curl --fail --show-error --silent --location \
     "${installer_url}" || exit 1
 printf '%s  %s\n' "${expected_sha256}" "${installer}" | shasum -a 256 -c - || exit 1
 bash "${installer}" --version "${tool_version}"
-
-ssh -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2 \
-    -- "${host}" systemctl is-active --quiet "${service_name}"
 ```
 
 ## Secrets and environment
 
 An indirect expansion `${!name}` takes only a validated name.
-
-```bash
-# require_env: Ensures an environment variable is set and non-empty.
-# Arguments:
-#   Environment variable name.
-require_env() {
-    local name="$1"
-
-    if [[ ! ${name} =~ ^[A-Z_][A-Z0-9_]*$ ]]; then
-        printf 'error: invalid env var name\n' >&2
-        return 1
-    fi
-    if [[ -z ${!name:-} ]]; then
-        printf 'error: %s is required\n' "${name}" >&2
-        return 1
-    fi
-}
-```
 
 ## Temporary files, locks, and cleanup
 
@@ -156,15 +102,15 @@ jq empty "${downloaded_file}" >/dev/null || exit 1
 mv -- "${downloaded_file}" "${config_file}" || exit 1
 trap - EXIT
 
-if ! mkdir "${lock_dir}"; then
-    printf 'error: lock is already held: %s\n' "${lock_dir}" >&2
+if ! mkdir "${lock_folder}"; then
+    printf 'error: lock is already held: %s\n' "${lock_folder}" >&2
     return 1
 fi
-printf '%s\n' "$$" >"${lock_dir}/pid" || {
-    rmdir "${lock_dir}"
+printf '%s\n' "$$" >"${lock_folder}/pid" || {
+    rmdir "${lock_folder}"
     return 1
 }
-trap 'rm -f -- "${lock_dir}/pid"; rmdir -- "${lock_dir}"' EXIT
+trap 'rm -f -- "${lock_folder}/pid"; rmdir -- "${lock_folder}"' EXIT
 ```
 
 Put recursive deletes in one script. To accept the `bash/safety` finding for that script, follow the suppression rules.
@@ -175,14 +121,14 @@ Validate its cleanup path against the approved root folder:
 # Arguments:
 #   $1: the approved root folder.
 delete_build_folder() {
-    local owner_root build_dir
+    local owner_root build_folder
 
     [[ -n ${1:-} ]] || return 1
     owner_root="$(cd -- "$1" && pwd -P)" || return 1
     [[ ${owner_root} != / ]] || return 1
-    build_dir="${owner_root}/build"
-    [[ -d ${build_dir} && ! -L ${build_dir} ]] || return 1
-    rm -rf -- "${build_dir}"
+    build_folder="${owner_root}/build"
+    [[ -d ${build_folder} && ! -L ${build_folder} ]] || return 1
+    rm -rf -- "${build_folder}"
 }
 ```
 

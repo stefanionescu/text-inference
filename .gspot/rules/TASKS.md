@@ -12,8 +12,7 @@ Read this rule when you change `mise` tasks, `package.json` scripts, a `Makefile
 
 - Use one declared task runner per project.
 - Name tasks in kebab-case with a colon namespace, such as `check:fix` or `deploy:staging`.
-- Use the runner's declarative commands and dependency ordering. Keep substantial parsing, branching, and process
-  control in the code that implements that behavior.
+- Use the runner's declarative commands and dependency ordering.
 - Give each task a concise description in the runner's list.
 - Do not compute an argument by running code inside the task definition, such as a template `exec()` that evaluates a
   source file. Put the value where the tool reads it, or in the task script.

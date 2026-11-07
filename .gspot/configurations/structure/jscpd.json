@@ -14,7 +14,6 @@
         "**/build/**",
         ".gspot/**",
         ".gspot-copies/**",
-        "**/gspot.baseline.json",
         ".editorconfig",
         ".markdownlint.jsonc",
         ".prettierignore",

@@ -6,7 +6,6 @@ Read this rule when you change a generated file, or the code that writes one.
 - Mark generated paths in `.gitattributes` with `linguist-generated`; for example, `output/** linguist-generated`. A
   folder named `generated/` does not make its files generated.
 - A generated file equals a fresh run of its command. A difference shows a defect in the change.
-- Do not add a config file for a tool that gspot configures. Change `gspot.toml`.
 - Do not commit build output (`dist/`, `coverage/`, compiled assets) unless the deployment reads it from the repository,
   and then declare it.
 

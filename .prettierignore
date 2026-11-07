@@ -11,7 +11,6 @@ build/
 /prettier.config.mjs
 /pyrightconfig.json
 /ruff.toml
-gspot.baseline.json
 
 # Paths that configurations leave out
 **/.dev.vars

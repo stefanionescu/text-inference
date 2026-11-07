@@ -16,23 +16,6 @@ checks, and cleanup.
 - Keep rollback and cleanup explicit, and delete no artifact or result as a side effect.
 - Log enough to reconstruct what happened, without secrets.
 
-```bash
-# confirm_exact: Requires the user to type the expected value.
-# Arguments:
-#   Prompt label.
-#   Expected response.
-confirm_exact() {
-    local label="$1"
-    local expected="$2"
-    local response
-
-    printf '%s Type %s to continue: ' "${label}" "${expected}" >&2
-    IFS= read -r response
-
-    [[ ${response} == "${expected}" ]]
-}
-```
-
 ## Remote commands
 
 Copy a reviewed script to the remote host and invoke it with arguments. SSH joins its arguments into one remote shell
