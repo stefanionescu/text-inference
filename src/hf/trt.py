@@ -18,6 +18,7 @@ from src.hf.model_card import (
 from config.model.publishing import (
     TRT_FORMAT_LABELS,
     TRT_UPLOAD_MESSAGE,
+    MODEL_CARD_FILENAME,
     NOT_APPLICABLE_LABEL,
     TRT_GPU_REQUIREMENTS,
     TRT_WEIGHT_PRECISIONS,
@@ -114,7 +115,8 @@ def main(argument_values: Sequence[str] | None = None) -> int:
     hf_token = os.environ["HF_TOKEN"]
     model_card = build_model_card(metadata, arguments.repo_id, hf_token=hf_token)
     commit_message = TRT_UPLOAD_MESSAGE.format(quantization_format=arguments.quantization_format)
-    publish_checkpoint(checkpoint_folder, model_card, arguments, hf_token, commit_message, TRT_HF_IGNORE_PATTERNS)
+    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
+    publish_checkpoint(checkpoint_folder, arguments, hf_token, commit_message, TRT_HF_IGNORE_PATTERNS)
     sys.stdout.write(f"[trt-hf] Upload complete: {arguments.repo_id}\n")
     return 0
 

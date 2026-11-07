@@ -54,8 +54,7 @@ def _start_session() -> tuple[SessionRuntime, SessionState]:
 
 
 def _run_stream(
-    session_runtime: SessionRuntime,
-    state: SessionState,
+    session: tuple[SessionRuntime, SessionState],
     stream: AsyncIterator[str],
     *,
     websocket: object | None = None,
@@ -65,8 +64,7 @@ def _run_stream(
     """Stream one response to a recording socket unless the test supplies its own.
 
     Args:
-        session_runtime: Session runtime.
-        state: State of the session or test run.
+        session: Runtime and state that `_start_session` returned.
         stream: Stream to read from.
         websocket: WebSocket connection of the client.
         user_utterance: User utterance.
@@ -76,6 +74,7 @@ def _run_stream(
         The resulting text.
 
     """
+    session_runtime, state = session
     return asyncio.run(
         stream_response(
             StreamResponseRequest(
@@ -114,7 +113,7 @@ def test_stream_empty_history() -> None:
     """Test stream response skips history for empty output."""
     session_runtime, state = _start_session()
 
-    out = _run_stream(session_runtime, state, _empty_stream())
+    out = _run_stream((session_runtime, state), _empty_stream())
 
     assert out == ""
     assert state.history_messages == []
@@ -125,7 +124,7 @@ def test_stream_error_history() -> None:
     session_runtime, state = _start_session()
 
     with pytest.raises(RuntimeError, match="boom"):
-        _run_stream(session_runtime, state, _error_stream())
+        _run_stream((session_runtime, state), _error_stream())
 
     assert state.history_messages == []
 
@@ -134,7 +133,7 @@ def test_stream_disconnect_history() -> None:
     """Test stream response commits partial history after disconnect with visible text."""
     session_runtime, state = _start_session()
 
-    out = _run_stream(session_runtime, state, _two_chunk_stream(), websocket=_DisconnectSecondSendWS())
+    out = _run_stream((session_runtime, state), _two_chunk_stream(), websocket=_DisconnectSecondSendWS())
 
     assert out == "alpha"
     assert state.history_messages is not None
@@ -148,7 +147,7 @@ def test_stream_empty_user() -> None:
     """Test stream response skips commit when history user is empty."""
     session_runtime, state = _start_session()
 
-    out = _run_stream(session_runtime, state, _two_chunk_stream(), user_utterance="", history_user_utterance="")
+    out = _run_stream((session_runtime, state), _two_chunk_stream(), user_utterance="", history_user_utterance="")
 
     assert out == "alphabeta"
     assert state.history_messages == []
@@ -159,8 +158,7 @@ def test_stream_history_user() -> None:
     session_runtime, state = _start_session()
 
     out = _run_stream(
-        session_runtime,
-        state,
+        (session_runtime, state),
         _two_chunk_stream(),
         user_utterance="short user text",
         history_user_utterance="expanded user text for committed history",

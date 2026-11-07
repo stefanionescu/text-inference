@@ -8,7 +8,7 @@ import argparse
 
 from huggingface_hub import HfApi
 
-from config.model.publishing import HF_MODEL_REPO_TYPE, HF_DEFAULT_REVISION, MODEL_CARD_FILENAME
+from config.model.publishing import HF_MODEL_REPO_TYPE, HF_DEFAULT_REVISION
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -62,7 +62,6 @@ def require_checkpoint_folder(checkpoint_folder: str) -> Path:
 
 def publish_checkpoint(
     checkpoint_folder: Path,
-    model_card: str,
     arguments: argparse.Namespace,
     hf_token: str,
     commit_message: str,
@@ -72,15 +71,12 @@ def publish_checkpoint(
 
     Args:
         checkpoint_folder: Folder of the checkpoint.
-        model_card: Model card.
         arguments: Parsed command-line arguments.
         hf_token: Hugging Face token.
         commit_message: Commit message.
         ignore_patterns: Ignore patterns.
 
     """
-    (checkpoint_folder / MODEL_CARD_FILENAME).write_text(model_card, encoding="utf-8")
-
     hf_client = HfApi(token=hf_token)
     hf_client.create_repo(
         repo_id=arguments.repo_id,

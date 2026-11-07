@@ -90,8 +90,7 @@ def test_cancel_marks_requested() -> None:
 
 def test_cancel_stops_task() -> None:
     """Test cancel cancels running task."""
-    task = Mock(spec=asyncio.Task)
-    task.done.return_value = False
+    task = Mock(spec=asyncio.Task, done=Mock(return_value=False))
     state = _make_state(active_request_task=cast("asyncio.Task[object]", task))
     cancel_session_requests(state)
     task.cancel.assert_called_once_with()
