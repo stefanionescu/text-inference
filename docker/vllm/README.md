@@ -1,10 +1,10 @@
-# vLLM Docker image
+# vLLM Docker Image
 
-The vLLM image serves one immutable Hugging Face large language model (LLM)
-snapshot through vLLM `0.25.1`. The runtime uses Python 3.12, PyTorch
-`2.11.0+cu130`, and the vLLM v1 asynchronous engine.
+The vLLM image serves one immutable Hugging Face snapshot through vLLM
+`0.25.1`. The runtime uses Python 3.12, PyTorch `2.11.0+cu130`, and the vLLM v1
+asynchronous engine.
 
-The image is text-only and currently uses one graphics processing unit (GPU).
+The image is text-only and currently uses one GPU.
 
 Complete the common requirements in the
 [Docker image guide](../README.md) before building.
@@ -39,20 +39,18 @@ The accepted formats are:
 - `nvfp4`
 
 An unquantized source is also valid. The image bakes `MODEL` unchanged and does
-not run LLM Compressor, apply online quantization, or convert a checkpoint.
-Validation inspects the checkpoint metadata during the build and again at
-runtime; it rejects an existing format only when that format is incompatible
-with vLLM.
+not run LLM Compressor, apply online quantization, or convert a checkpoint. Its
+metadata is inspected during the build and again at runtime; an existing format
+is rejected only when it is incompatible with vLLM.
 
 The runtime selects special quantization backends from checkpoint and model
 metadata:
 
 - ModelOpt NVFP4 checkpoints use `modelopt_fp4`.
-- Qwen 3.5 MoE checkpoints with
-  Generative Pre-trained Transformer Quantization (GPTQ) use `moe_wna16`.
+- Qwen 3.5 MoE GPTQ checkpoints use `moe_wna16`.
 
-The image includes FlashInfer `0.6.13` for compatible vLLM workloads. The image
-does not force FlashInfer for every model. vLLM selects a supported attention
+FlashInfer `0.6.13` is installed for compatible vLLM workloads. The image does
+not force FlashInfer for every model. vLLM selects a supported attention
 implementation for the loaded model and GPU.
 
 ## Run the image

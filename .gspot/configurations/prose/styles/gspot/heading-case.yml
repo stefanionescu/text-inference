@@ -33,12 +33,10 @@ exceptions:
   - INI
   - JSON
   - JSX
-  - LLM
   - Linux
   - MIME
   - MIT
   - Markdown
-  - NVIDIA
   - Node
   - POSIX
   - Prettier
@@ -58,7 +56,6 @@ exceptions:
   - TODO
   - TOML
   - TSX
-  - TensorRT
   - Trivy
   - UI
   - URL
@@ -72,6 +69,7 @@ exceptions:
   - YAML
   - ajv
   - basedpyright
+  - certifi
   - commitlint
   - deptry
   - docker
@@ -103,7 +101,6 @@ exceptions:
   - typos
   - uv
   - v8r
-  - vLLM
   - vale
   - vulture
   - xmllint

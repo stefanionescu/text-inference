@@ -1,8 +1,8 @@
-# Docker images
+# Docker Images
 
-The repository builds separate images for the vLLM and TensorRT-LLM large
-language model (LLM) engines. Each image contains one engine and one immutable
-Hugging Face model snapshot. The images include no runtime backend router.
+The repository builds separate images for vLLM and TensorRT-LLM. Each image
+contains one engine and one immutable Hugging Face model snapshot. There is no
+runtime backend router.
 
 The build scripts perform one transaction:
 
@@ -40,7 +40,7 @@ model snapshot inside the image reproducible.
 `TAG` must start with `vllm-` for vLLM or `trt-` for TensorRT-LLM. The pushed
 image is `<DOCKER_USERNAME>/<IMAGE_NAME>:<TAG>`.
 
-## Build a vLLM Docker image
+## Build a vLLM image
 
 ```shell
 DOCKER_USERNAME="<DOCKER_USERNAME>" \
@@ -57,7 +57,7 @@ builds never quantize models.
 
 See the [vLLM image contract](vllm/README.md) before selecting the checkpoint.
 
-## Build a TensorRT-LLM Docker image
+## Build a TensorRT-LLM image
 
 ```shell
 DOCKER_USERNAME="<DOCKER_USERNAME>" \
@@ -72,7 +72,7 @@ The image bakes the selected checkpoint unchanged. Validation detects its
 existing format and rejects it only when TensorRT-LLM cannot serve that format.
 
 See the [TensorRT-LLM image contract](trt/README.md) for checkpoint metadata
-and graphics processing unit (GPU) compatibility.
+and GPU compatibility.
 
 ## Run an image
 
@@ -87,9 +87,8 @@ docker run --gpus all --detach \
   <IMAGE>
 ```
 
-The build sets the model and detected checkpoint format, and they do not change
-at runtime. Runtime configuration remains available through the same environment
-variables documented in the
+The model and detected checkpoint format are fixed at build time. Runtime configuration
+remains available through the same environment variables documented in the
 [host runtime guide](../README.md#configure-the-runtime).
 
 Replace `<IMAGE>` with the image name printed by the build script.
@@ -101,10 +100,9 @@ docker exec text-inference \
   curl --fail http://127.0.0.1:8001/readyz
 ```
 
-Running the image publishes only port 8000, and that port serves `/ws` only.
-The liveness and readiness listener stays inside the container on loopback
-port 8001. Append `--logs` after `<IMAGE>` to stream otherwise-suppressed
-dependency output.
+Only port 8000 is published, and it serves `/ws` only. The liveness and
+readiness listener stays inside the container on loopback port 8001. Append
+`--logs` after `<IMAGE>` to stream otherwise-suppressed dependency output.
 
 ## Troubleshoot a build or container
 

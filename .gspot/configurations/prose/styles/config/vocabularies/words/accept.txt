@@ -6,10 +6,8 @@ DOM
 DTO
 Docker
 JSON
-LLM
 Linux
 Markdown
-NVIDIA
 Node
 Prettier
 Python
@@ -18,13 +16,13 @@ Ruff
 Semgrep
 ShellCheck
 TOML
-TensorRT
 Trivy
 Vale
 Windows
 YAML
 ajv
 basedpyright
+certifi
 commitlint
 deptry
 docker
@@ -56,7 +54,6 @@ trivy
 typos
 uv
 v8r
-vLLM
 vale
 vulture
 xmllint

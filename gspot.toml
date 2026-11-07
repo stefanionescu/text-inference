@@ -1,7 +1,15 @@
 # Change these settings with `gspot set`, `unset`, or `unignore`, and the configurations with `gspot add` or `remove`.
 # Write the [[scope]], [[command_check]], [[import_rule]], [[format.override]], [[naming.exception]], [[coverage.swift_target]], [[licenses.allowed_package]], [[tools.eslint.override]], and [[data_files.schemas]] records by hand.
 level = "all"
-configurations = ["bash", "docker", "fastapi", "markdown", "pytest", "python"]
+configurations = [
+  "bash",
+  "docker",
+  "fastapi",
+  "markdown",
+  "pytest",
+  "python",
+  "licenses",
+]
 
 [format]
 indent_width = 2
@@ -31,11 +39,29 @@ environment_readers = [
   "tests/**",
 ]
 
+[licenses]
+allowed = [
+  "0BSD",
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "CNRI-Python",
+  "ISC",
+  "MIT",
+  "MIT-CMU",
+  "PSF-2.0",
+  "Python-2.0",
+  "Unlicense",
+]
+
 [spelling]
-allowed_words = { NVIDIA = "Product and company names that the prose rules cannot spell out or lowercase.", TensorRT = "Product and company names that the prose rules cannot spell out or lowercase.", LLM = "Product and company names that the prose rules cannot spell out or lowercase.", vLLM = "Product and company names that the prose rules cannot spell out or lowercase." }
+allowed_words = { certifi = "The name of a Python package in the license records." }
 
 [python]
 docstring_convention = "google"
+
+[tools]
+ruff = { rules = ["D102", "D103"] }
 
 [[import_rule]]
 name = "config-limits"
@@ -1260,11 +1286,6 @@ rule = "PYSEC-2026-4362"
 reason = "vllm 0.25.1 is held by the vllm==0.25.1 pin in the vllm extra, which needs validation on GPU hardware before it moves; fixed in 0.31.0. The owner accepted this for now."
 
 [[ignore]]
-check = "prose/vale"
-paths = ["README.md"]
-reason = "The owner keeps this README in their own wording."
-
-[[ignore]]
 check = "python/vulture"
 rule = "unused-method"
 paths = ["src/server/listeners.py"]
@@ -1454,6 +1475,21 @@ check = "markdown/fences"
 paths = ["src/hf/templates/**"]
 reason = "The JSON fences hold a ${quantization_summary} field that becomes valid JSON only when the template renders."
 
+[[ignore]]
+check = "prose/vale"
+paths = [
+  "README.md",
+  "docker/README.md",
+  "docker/trt/README.md",
+  "docker/vllm/README.md",
+]
+reason = "The owner keeps these READMEs in their own wording."
+
+[[ignore]]
+check = "prose/vale"
+paths = ["config/model/allowlists.py"]
+reason = "These are the owner's notes on each model."
+
 [[naming.exception]]
 languages = ["bash"]
 allowed_names = ["FLASHINFER_CACHE_DIR", "HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_ENABLE_HF_TRANSFER", "PIP_CACHE_DIR", "PYTORCH_CUDA_ALLOC_CONF", "TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "VLLM_CACHE_DIR"]
@@ -1480,3 +1516,63 @@ paths = ["src/server/listeners.py"]
 languages = ["python"]
 allowed_names = ["install_signal_handlers"]
 reason = "This method overrides uvicorn.Server.install_signal_handlers, so the name must match."
+
+[[licenses.allowed_package]]
+name = "{accelerate,arrow,bleach,cache-dit,etcd-sdk-python,hf-transfer,humming-kernels,json5,ninja,optimum,packaging,peft,python-dateutil,safetensors,sentencepiece,tensorrt-llm,tokenizers}"
+version = "*"
+reason = "Apache-2.0, some also offered under BSD, per PyPI or GitHub. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{aenum,antlr4-python3-runtime,appnope,colorama,comm,contourpy,cycler,fastjsonschema,flash-attn,ipython-pygments-lexers,jinja2,jsonpointer,jupyter-client,jupyter-events,jupyter-server-terminals,jupyterlab-pygments,jupyterlab-server,kiwisolver,nbclient,nbformat,nest-asyncio2,notebook-shim,numba,numpy,omegaconf,pandas,prompt-toolkit,pyzmq,scipy,supervisor,sympy,terminado,tinycss2,torch,torchaudio,torchcodec,torchvision,traitlets,webencodings,xxhash}"
+version = "*"
+reason = "BSD or a BSD-derived license, per PyPI or GitHub. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{fla-core,pytokens,setuptools,tiktoken,tokenspeed-mla,wonderwords}"
+version = "*"
+reason = "MIT, per PyPI or GitHub. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{defusedxml,matplotlib,pywin32}"
+version = "*"
+reason = "Python Software Foundation License, per PyPI. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{pexpect,shellingham}"
+version = "*"
+reason = "ISC, per PyPI. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{blobfile,pycryptodomex,pyelftools}"
+version = "*"
+reason = "Public domain, one also under BSD, per PyPI. deps.dev cannot classify these."
+
+[[licenses.allowed_package]]
+name = "{llvmlite,nvtx,xdsl}"
+version = "*"
+reason = "Apache-2.0 with the LLVM exception, which gspot cannot list as one license ID."
+
+[[licenses.allowed_package]]
+name = "{certifi,fqdn,orjson,pathspec,tqdm}"
+version = "*"
+reason = "MPL-2.0, alone or with permissive licenses. Kept out of the allowed list, so a new MPL package gets reviewed."
+
+[[licenses.allowed_package]]
+name = "{cuda-bindings,cuda-python,nvidia-*,tensorrt,tensorrt-cu13,tensorrt-cu13-bindings,tensorrt-cu13-libs}"
+version = "*"
+reason = "NVIDIA software license. These GPU libraries ship under NVIDIA terms, and many publish no license data."
+
+[[licenses.allowed_package]]
+name = "{cuda-toolkit,openai-harmony,quack-kernels,torch-c-dlpack-ext,torchao}"
+version = "*"
+reason = "Unknown: no license on PyPI or GitHub. The owner accepted unknown licenses without review."
+
+[[licenses.allowed_package]]
+name = "patchelf"
+version = "*"
+reason = "GPL-3.0-or-later. tensorrt-llm requires this command-line tool; no code here imports it."
+
+[[licenses.allowed_package]]
+name = "pycountry"
+version = "26.2.16"
+reason = "LGPL-2.1-only. pydantic-extra-types requires it; no code here imports it."
